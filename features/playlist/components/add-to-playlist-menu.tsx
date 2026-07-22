@@ -26,6 +26,7 @@ export function AddToPlaylistMenu({
           store={menu}
           aria-label="Add to playlist"
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
+          style={{ viewTransitionName: 'none' }}
           className={`text-gray data-[open]:text-accent dark:data-[open]:text-accent rounded-full transition-colors hover:text-black dark:hover:text-white ${size === 'lg' ? 'p-1.5' : 'p-1.5'}`}
         >
           <ListPlus className={size === 'lg' ? 'h-5 w-5' : 'h-4 w-4'} />
