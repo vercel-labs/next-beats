@@ -44,6 +44,7 @@ function ToggleButton({ active, label, icon, pending, className, ...props }: Tog
       {...props}
       className={cn(
         'flex items-center gap-1.5 px-3 py-1.5 transition-colors',
+        'focus-visible:bg-accent/10 dark:focus-visible:bg-accent/20 focus-visible:outline-none',
         active ? 'text-accent' : 'text-gray',
         pending && 'cursor-not-allowed opacity-70',
         className,
@@ -216,7 +217,9 @@ function DemoGuideDialog({
     <Boundary label="DemoGuide">
       <Ariakit.Dialog
         store={store}
-        backdrop={<div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" style={{ viewTransitionName: 'none' }} />}
+        backdrop={
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" style={{ viewTransitionName: 'none' }} />
+        }
         className="border-divider dark:border-divider-dark fixed top-1/2 left-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-white p-6 shadow-2xl outline-none dark:bg-black"
         style={{ viewTransitionName: 'none' }}
         unmountOnHide
@@ -225,8 +228,8 @@ function DemoGuideDialog({
           How this demo works
         </Ariakit.DialogHeading>
         <Ariakit.DialogDescription className="text-muted mt-2 text-sm leading-relaxed">
-          A Next.js 16.3 music player showing instant navigations. The App Shell is prefetched, so navigating never blocks. These
-          toggles simulate different backends, networks, and costs.
+          A Next.js 16.3 music player showing instant navigations. The App Shell is prefetched, so navigating never
+          blocks. These toggles simulate different backends, networks, and costs.
         </Ariakit.DialogDescription>
 
         <div className="mt-6 flex flex-col gap-4">
