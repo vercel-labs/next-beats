@@ -281,3 +281,30 @@
     height: 11px;
   }
 }
+
+/* Client Component boundaries (demo): toggled by the `boundary-mode` class on <html>. */
+html.boundary-mode [data-component] {
+  position: relative;
+  outline: 2px solid #4f6ef7;
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+html.boundary-mode [data-component]::before {
+  content: attr(data-component);
+  position: absolute;
+  top: 0;
+  left: 0.5rem;
+  transform: translateY(-100%);
+  z-index: 9999;
+  padding: 1px 6px;
+  border-radius: 4px 4px 0 0;
+  background: #4f6ef7;
+  color: #fff;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}
