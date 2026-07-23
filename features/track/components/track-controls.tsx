@@ -19,7 +19,7 @@ export async function TrackControls({ id }: { id: string }) {
 
 export function TrackControlsSkeleton() {
   return (
-    <div className="mb-8 flex items-center gap-4">
+    <div className="mb-8 flex items-center gap-4" style={{ viewTransitionName: 'track-controls' }}>
       <Skeleton className="h-14 w-14 shrink-0 rounded-full" />
       <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
       <Skeleton className="h-8 w-8 shrink-0 rounded-full" />

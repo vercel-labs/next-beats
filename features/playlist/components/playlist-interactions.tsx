@@ -111,7 +111,7 @@ export function AddToPlaylistButtons({
   }
 
   return (
-    <div className="flex flex-col gap-0.5" style={{ viewTransitionName: 'none' }}>
+    <div className="flex flex-col gap-0.5">
       {items.map(item => (
         <PlaylistToggleItem key={item.value} item={item} toggleAction={togglePlaylistAction} />
       ))}

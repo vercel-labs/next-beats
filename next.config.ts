@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     inlineCss: true,
     useOffline: true,
-    viewTransition: true,
   },
   typedRoutes: true,
 };

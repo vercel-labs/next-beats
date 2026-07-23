@@ -213,7 +213,7 @@
   }
 }
 
-/* let cursor/clicks pass through the snapshot overlay to pinned chrome */
+/* let cursor/clicks pass through the snapshot overlay to unnamed live content */
 ::view-transition {
   pointer-events: none;
 }
@@ -243,7 +243,7 @@
   z-index: 100;
 }
 
-/* The `toaster` name lives on the always-mounted wrapper in components/theme/toaster.tsx */
+/* The `toaster` name lives on the always-mounted wrapper in components/toaster.tsx */
 ::view-transition-group(toaster) {
   animation: none;
   z-index: 200;
@@ -257,19 +257,23 @@
 ::view-transition-new(player-bar-desktop),
 ::view-transition-old(theme-toggle),
 ::view-transition-new(theme-toggle),
-::view-transition-old(demo-toolbar),
 ::view-transition-new(demo-toolbar),
 ::view-transition-old(add-to-playlist-menu),
 ::view-transition-new(add-to-playlist-menu),
 ::view-transition-old(modal),
 ::view-transition-new(modal),
-::view-transition-old(modal-backdrop),
 ::view-transition-new(modal-backdrop),
 ::view-transition-old(track-controls),
 ::view-transition-new(track-controls),
 ::view-transition-old(toaster),
 ::view-transition-new(toaster) {
   animation: none;
+}
+
+/* backdrop-blur elements: hide the old snapshot so two translucent layers don't stack */
+::view-transition-old(modal-backdrop),
+::view-transition-old(demo-toolbar) {
+  display: none;
 }
 
 /* Equalizer (now-playing indicator) */
