@@ -1,10 +1,10 @@
 'use client';
 
 import * as Ariakit from '@ariakit/react';
-import { ListPlus } from 'lucide-react';
+import { ListPlus, Plus } from 'lucide-react';
 import { Suspense, use } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AddToPlaylistButtons } from '@/features/playlist/components/playlist-interactions';
+import { AddToPlaylistButtons, NewPlaylistDialog } from '@/features/playlist/components/playlist-interactions';
 import type { PlaylistMenuItem } from '@/types/playlist';
 
 export function AddToPlaylistMenu({
@@ -17,6 +17,7 @@ export function AddToPlaylistMenu({
   size?: 'sm' | 'lg';
 }) {
   const menu = Ariakit.useMenuStore({ placement: 'bottom-start' });
+  const dialog = Ariakit.useDialogStore();
 
   return (
     <>
@@ -50,7 +51,19 @@ export function AddToPlaylistMenu({
         >
           <PlaylistMenuItems trackId={trackId} itemsPromise={itemsPromise} />
         </Suspense>
+        <div className="border-divider dark:border-divider-dark my-1 border-t" />
+        <Ariakit.MenuItem
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            dialog.show();
+          }}
+          className="hover:bg-card dark:hover:bg-card-dark data-active-item:bg-card dark:data-active-item:bg-card-dark flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-black transition-colors outline-none dark:text-white"
+        >
+          <Plus className="h-4 w-4 shrink-0" />
+          New playlist
+        </Ariakit.MenuItem>
       </Ariakit.Menu>
+      <NewPlaylistDialog store={dialog} trackId={trackId} />
     </>
   );
 }
