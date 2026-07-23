@@ -3,6 +3,7 @@
 import { refresh } from 'next/cache';
 import { z } from 'zod';
 import { verifyAuth } from '@/features/user/user-queries';
+import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
@@ -18,13 +19,19 @@ export async function toggleFavorite(trackId: string) {
   });
 
   if (existing) {
-    await prisma.userFavorite.delete({
-      where: { userId_trackId: { userId, trackId: id } },
+    await prisma.userFavorite.deleteMany({
+      where: { userId, trackId: id },
     });
   } else {
-    await prisma.userFavorite.create({
-      data: { userId, trackId: id },
-    });
+    try {
+      await prisma.userFavorite.create({
+        data: { userId, trackId: id },
+      });
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')) {
+        throw error;
+      }
+    }
   }
 
   refresh();
