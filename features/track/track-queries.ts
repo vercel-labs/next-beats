@@ -171,7 +171,6 @@ export async function getRecommendedTracks(excludeTrackId: string, limit: number
     where: {
       id: { not: excludeTrackId },
       favorites: { none: { userId } },
-      trackPlays: { none: { userId } },
     },
   });
   return rows.map(row => toTrack(row));
