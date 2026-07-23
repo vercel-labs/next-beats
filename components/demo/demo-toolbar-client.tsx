@@ -218,10 +218,9 @@ function DemoGuideDialog({
       <Ariakit.Dialog
         store={store}
         backdrop={
-          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" style={{ viewTransitionName: 'none' }} />
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" />
         }
         className="border-divider dark:border-divider-dark fixed top-1/2 left-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-white p-6 shadow-2xl outline-none dark:bg-black"
-        style={{ viewTransitionName: 'none' }}
         unmountOnHide
       >
         <Ariakit.DialogHeading className="text-xl font-bold text-black dark:text-white">

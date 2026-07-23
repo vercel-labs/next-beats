@@ -10,7 +10,6 @@ export function Toaster() {
       <SonnerToaster
         theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
         position="bottom-right"
-        toastOptions={{ style: { viewTransitionName: 'none' } }}
       />
     </div>
   );

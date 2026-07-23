@@ -47,7 +47,7 @@ export function PlaylistList({
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {playlists.map(pl =>
         animateItems ? (
-          <ViewTransition key={pl.id} name={`playlist-card-${pl.id}`}>
+          <ViewTransition key={pl.id}>
             <PlaylistCard playlist={pl} />
           </ViewTransition>
         ) : (
