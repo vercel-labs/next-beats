@@ -183,7 +183,6 @@ export function FavoriteButton({
         type="button"
         onClick={handleToggle}
         aria-label={optimisticFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        style={{ viewTransitionName: 'none' }}
         className={cn(
           'rounded-full transition-colors',
           size === 'lg' ? 'p-1.5' : 'p-1.5',
