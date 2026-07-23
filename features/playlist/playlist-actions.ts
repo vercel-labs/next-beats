@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { SEED_PLAYLIST_IDS } from '@/features/playlist/playlist-constants';
 import { verifyAuth } from '@/features/user/user-queries';
+import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
@@ -54,13 +55,21 @@ export async function addToPlaylist(playlistId: string, trackId: string) {
     where: { playlistId },
   });
 
-  await prisma.playlistTrack.create({
-    data: {
-      playlistId,
-      position: (maxPos._max.position ?? -1) + 1,
-      trackId,
-    },
-  });
+  try {
+    await prisma.playlistTrack.create({
+      data: {
+        playlistId,
+        position: (maxPos._max.position ?? -1) + 1,
+        trackId,
+      },
+    });
+  } catch (error) {
+    // Unique violation: a racing add (rapid optimistic toggles) got there first.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { error: 'Already in this playlist', ok: false as const };
+    }
+    throw error;
+  }
   updateTag(`playlist-${playlistId}`);
   updateTag(`playlists:${userId}`);
   return { ok: true as const };
@@ -70,8 +79,8 @@ export async function removeFromPlaylist(playlistId: string, trackId: string) {
   const userId = await verifyAuth();
   await delay(200, await isSlowEnabled());
   if (SEED_PLAYLIST_IDS.has(playlistId)) return { error: "Can't modify a demo playlist", ok: false as const };
-  await prisma.playlistTrack.delete({
-    where: { playlistId_trackId: { playlistId, trackId } },
+  await prisma.playlistTrack.deleteMany({
+    where: { playlistId, trackId },
   });
   updateTag(`playlist-${playlistId}`);
   updateTag(`playlists:${userId}`);
