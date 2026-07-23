@@ -20,10 +20,7 @@ const sidebarLink =
 
 export function Sidebar() {
   return (
-    <aside
-      style={{ viewTransitionName: 'sidebar' }}
-      className="hidden w-[4.5rem] flex-col gap-2 p-2 sm:flex lg:w-[17.5rem]"
-    >
+    <aside className="hidden w-[4.5rem] flex-col gap-2 p-2 sm:flex lg:w-[17.5rem]">
       <div className="bg-card dark:bg-card-dark rounded-lg p-3 lg:p-4">
         <div className="mb-4 hidden items-center justify-between lg:flex">
           <Link

@@ -220,7 +220,6 @@
 
 /* Exclude persistent elements from view transition animations */
 ::view-transition-group(mobile-nav),
-::view-transition-group(sidebar),
 ::view-transition-group(player-bar),
 ::view-transition-group(player-bar-desktop),
 ::view-transition-group(theme-toggle),
@@ -237,11 +236,6 @@
   z-index: 200;
 }
 
-::view-transition-old(sidebar) {
-  display: none;
-}
-
-::view-transition-new(sidebar),
 ::view-transition-old(mobile-nav),
 ::view-transition-new(mobile-nav),
 ::view-transition-old(player-bar),
