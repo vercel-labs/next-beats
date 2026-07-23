@@ -1,4 +1,3 @@
-import { ViewTransition } from 'react';
 import { AlbumArt } from '@/components/ui/album-art';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GenrePill } from '@/features/genre/components/genre-card';
@@ -10,13 +9,11 @@ export async function TrackHeader({ id }: { id: string }) {
 
   return (
     <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
-      <ViewTransition name={`track-art-${track.id}`} default="none">
-        <AlbumArt
-          coverColor={track.coverColor}
-          size="lg"
-          className="!h-40 !w-40 shrink-0 !rounded-md shadow-2xl lg:!h-48 lg:!w-48"
-        />
-      </ViewTransition>
+      <AlbumArt
+        coverColor={track.coverColor}
+        size="lg"
+        className="!h-40 !w-40 shrink-0 !rounded-md shadow-2xl lg:!h-48 lg:!w-48"
+      />
       <div className="flex min-w-0 flex-col items-center gap-1 text-center sm:items-start sm:text-left">
         <span className="text-muted text-xs font-bold tracking-widest uppercase">Track</span>
         <h1 className="text-2xl font-black tracking-tight text-black sm:text-3xl lg:text-4xl dark:text-white">

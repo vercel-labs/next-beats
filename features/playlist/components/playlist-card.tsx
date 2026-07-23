@@ -9,25 +9,23 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistSummary }) {
       href={`/playlist/${playlist.id}`}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
-      <ViewTransition name={`playlist-art-${playlist.id}`} default="none">
-        <div
-          className={`flex aspect-square w-full items-center justify-center rounded-md bg-gradient-to-br shadow-lg ${playlist.coverColor}`}
+      <div
+        className={`flex aspect-square w-full items-center justify-center rounded-md bg-gradient-to-br shadow-lg ${playlist.coverColor}`}
+      >
+        <svg
+          className="h-1/3 w-1/3 text-white/50"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
-          <svg
-            className="h-1/3 w-1/3 text-white/50"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 18V5l12-2v13" />
-            <circle cx="6" cy="18" r="3" />
-            <circle cx="18" cy="16" r="3" />
-          </svg>
-        </div>
-      </ViewTransition>
+          <path d="M9 18V5l12-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="18" cy="16" r="3" />
+        </svg>
+      </div>
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-sm font-semibold text-black dark:text-white">{playlist.name}</span>
         <span className="text-muted truncate text-xs">

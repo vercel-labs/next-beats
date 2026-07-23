@@ -1,4 +1,3 @@
-import { ViewTransition } from 'react';
 import { AlbumArt } from '@/components/ui/album-art';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,13 +12,11 @@ export async function PlaylistDetail({ id }: { id: string }) {
   return (
     <>
       <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
-        <ViewTransition name={`playlist-art-${id}`} default="none">
-          <AlbumArt
-            coverColor={playlist.coverColor}
-            size="lg"
-            className="!h-40 !w-40 !rounded-md shadow-2xl sm:!h-48 sm:!w-48"
-          />
-        </ViewTransition>
+        <AlbumArt
+          coverColor={playlist.coverColor}
+          size="lg"
+          className="!h-40 !w-40 !rounded-md shadow-2xl sm:!h-48 sm:!w-48"
+        />
         <div className="flex flex-col items-center gap-1 text-center sm:items-start sm:text-left">
           <span className="text-muted text-xs font-bold tracking-widest uppercase">Playlist</span>
           <h1 className="text-2xl font-black tracking-tight text-black sm:text-4xl dark:text-white">{playlist.name}</h1>
