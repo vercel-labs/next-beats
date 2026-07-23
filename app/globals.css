@@ -236,6 +236,8 @@
 ::view-transition-group(theme-toggle),
 ::view-transition-group(demo-toolbar),
 ::view-transition-group(add-to-playlist-menu),
+::view-transition-group(modal),
+::view-transition-group(modal-backdrop),
 ::view-transition-group(track-controls) {
   animation: none;
   z-index: 100;
@@ -259,6 +261,10 @@
 ::view-transition-new(demo-toolbar),
 ::view-transition-old(add-to-playlist-menu),
 ::view-transition-new(add-to-playlist-menu),
+::view-transition-old(modal),
+::view-transition-new(modal),
+::view-transition-old(modal-backdrop),
+::view-transition-new(modal-backdrop),
 ::view-transition-old(track-controls),
 ::view-transition-new(track-controls),
 ::view-transition-old(toaster),
