@@ -218,11 +218,6 @@
   pointer-events: none;
 }
 
-html:active-view-transition-type(mutation)::view-transition-old(root),
-html:active-view-transition-type(mutation)::view-transition-new(root) {
-  animation: none;
-}
-
 /* Exclude persistent elements from view transition animations */
 ::view-transition-group(mobile-nav),
 ::view-transition-group(sidebar),
