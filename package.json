@@ -27,7 +27,7 @@
     "dotenv": "^17.4.2",
     "geist": "^1.7.0",
     "lucide-react": "^1.8.0",
-    "next": "16.3.0-preview.7",
+    "next": "16.3.0-preview.8",
     "next-themes": "^0.4.6",
     "prisma": "^7.8.0",
     "react": "19.2.4",
