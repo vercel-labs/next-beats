@@ -218,6 +218,17 @@
   pointer-events: none;
 }
 
+/* No root cross-fade: `new(root)` is a live capture, so unnamed regions
+   (sidebar, chrome) keep rendering hover/active styles during transitions
+   instead of freezing behind a stale snapshot. Content still animates via
+   its classed ViewTransition groups. */
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+
 /* Exclude persistent elements from view transition animations */
 ::view-transition-group(mobile-nav),
 ::view-transition-group(player-bar),
