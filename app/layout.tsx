@@ -4,7 +4,7 @@ import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import { OfflineIndicator } from '@/components/offline-indicator';
 import { ThemeProvider } from '@/components/theme/theme-provider';
-import { Toaster } from '@/components/theme/toaster';
+import { Toaster } from '@/components/toaster';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
