@@ -10,7 +10,7 @@ export function Toaster() {
       theme={resolvedTheme === 'dark' ? 'dark' : 'light'}
       position="bottom-right"
       toastOptions={{ style: { viewTransitionName: 'none' } }}
-      style={{ viewTransitionName: 'toaster', zIndex: 9999 }}
+      style={{ zIndex: 9999 }}
     />
   );
 }
