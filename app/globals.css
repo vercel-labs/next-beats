@@ -229,6 +229,17 @@
   animation: none;
 }
 
+/* The capture pause at the start of each transition hit-tests to <html>,
+   flashing the default arrow over whatever was clicked. Transitions start
+   from clicks on interactive elements, so report pointer there; body
+   resets descendants so everything else keeps its normal cursor. */
+html:active-view-transition {
+  cursor: pointer;
+}
+html:active-view-transition body {
+  cursor: auto;
+}
+
 /* Exclude persistent elements from view transition animations */
 ::view-transition-group(mobile-nav),
 ::view-transition-group(player-bar),
