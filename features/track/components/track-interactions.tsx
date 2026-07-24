@@ -168,11 +168,14 @@ export function FavoriteButton({
 }) {
   const [, startTransition] = useTransition();
   const [optimisticFavorite, setOptimisticFavorite] = useOptimistic(isFavorite);
+  const [removing, setRemoving] = useOptimistic(false);
 
   function handleToggle(e: React.MouseEvent) {
     e.stopPropagation();
+    const willRemove = optimisticFavorite;
     startTransition(async () => {
       setOptimisticFavorite(!optimisticFavorite);
+      if (willRemove) setRemoving(true);
       await toggleFavorite(trackId);
     });
   }
@@ -182,6 +185,7 @@ export function FavoriteButton({
       <button
         type="button"
         onClick={handleToggle}
+        data-removing={removing || undefined}
         aria-label={optimisticFavorite ? 'Remove from favorites' : 'Add to favorites'}
         className={cn(
           'rounded-full transition-colors',
