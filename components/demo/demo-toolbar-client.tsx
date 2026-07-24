@@ -214,7 +214,7 @@ function DemoGuideDialog({
   ];
 
   return (
-    <Boundary label="DemoGuide">
+    <Boundary label="DemoGuide" asChild>
       <Ariakit.Dialog
         store={store}
         backdrop={

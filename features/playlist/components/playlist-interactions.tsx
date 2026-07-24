@@ -139,7 +139,7 @@ export function NewPlaylistDialog({ store, trackId }: { store: Ariakit.DialogSto
   }
 
   return (
-    <Boundary label="NewPlaylistDialog">
+    <Boundary label="NewPlaylistDialog" asChild>
       <Ariakit.Dialog
         store={store}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}

@@ -44,7 +44,7 @@ export function ConfirmDialog({
   }
 
   return (
-    <Boundary label="ConfirmDialog">
+    <Boundary label="ConfirmDialog" asChild>
       <Ariakit.Dialog
         store={store}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}

@@ -31,14 +31,17 @@ export function useBoundaryMode() {
 type Props = {
   children: React.ReactNode;
   label?: string;
+  asChild?: boolean;
 };
 
 // Tags the child's own DOM node so CSS outlines it — no wrapper, so layout is untouched.
-export function Boundary({ children, label }: Props) {
+// `asChild`: the single child is a component that forwards unknown props to its host
+// node (Ariakit Dialog/Menu, next/link), including portaled ones.
+export function Boundary({ children, label, asChild }: Props) {
   const { mode } = useBoundaryMode();
   const name = label ?? 'Client';
 
-  if (isValidElement(children) && typeof children.type === 'string') {
+  if (isValidElement(children) && (asChild || typeof children.type === 'string')) {
     return cloneElement(children as React.ReactElement<{ 'data-component'?: string }>, { 'data-component': name });
   }
 

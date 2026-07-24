@@ -311,12 +311,11 @@
 @layer base {
   html.boundary-mode [data-component] {
     position: relative;
-    outline: 2px solid #4f6ef7;
-    outline-offset: -2px;
     border-radius: 6px;
   }
 
-  html.boundary-mode [data-component]::before {
+  /* Sonner portals its toasts outside the tree, so they are matched by their own attribute. */
+  html.boundary-mode :is([data-component], [data-sonner-toast])::before {
     content: attr(data-component);
     position: absolute;
     top: 0;
@@ -334,4 +333,15 @@
     white-space: nowrap;
     pointer-events: none;
   }
+
+  html.boundary-mode [data-sonner-toast]::before {
+    content: 'Toast';
+  }
+}
+
+/* Unlayered: the outline has to beat `outline-none` utilities (Ariakit dialogs) and
+   Sonner's injected `[data-sonner-toast] { outline: none }`, which both win over @layer. */
+html.boundary-mode :is([data-component], [data-sonner-toast]) {
+  outline: 2px solid #4f6ef7;
+  outline-offset: -2px;
 }
