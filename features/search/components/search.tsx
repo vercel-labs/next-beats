@@ -1,15 +1,14 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { Search as SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useId, useRef, useTransition } from 'react';
 import { Boundary } from '@/components/demo/boundary';
 import { SeedFromSearchParam } from '@/components/scripts/seed-from-search-param';
-import { Spinner } from '@/components/ui/spinner';
 import { useSyncInputToSearchParam } from '@/hooks/use-sync-input-to-search-param';
 import type { Route } from 'next';
 
-export function SearchShell({ children }: { children: React.ReactNode }) {
+export function Search({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
@@ -18,13 +17,9 @@ export function SearchShell({ children }: { children: React.ReactNode }) {
   useSyncInputToSearchParam(inputRef, 'q');
 
   return (
-    <Boundary label="SearchShell">
+    <Boundary label="Search">
       <div className="relative mb-8 flex items-center">
-        {isPending ? (
-          <Spinner className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 opacity-40" />
-        ) : (
-          <Search className="text-gray pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
-        )}
+        <SearchIcon className="text-gray pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
         <input
           ref={inputRef}
           id={inputId}
@@ -37,7 +32,9 @@ export function SearchShell({ children }: { children: React.ReactNode }) {
           onChange={event => {
             const value = event.target.value;
             startTransition(() => {
-              router.replace((value ? `/search?q=${encodeURIComponent(value)}` : '/search') as Route, { scroll: false });
+              router.replace((value ? `/search?q=${encodeURIComponent(value)}` : '/search') as Route, {
+                scroll: false,
+              });
             });
           }}
           className="!rounded-full !py-3 !pr-4 !pl-12 !text-base"

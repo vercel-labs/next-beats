@@ -3,8 +3,8 @@ import { Crossfade } from '@/components/ui/crossfade';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { GenreBrowse, GenreBrowseSkeleton } from '@/features/genre/components/genre-browse';
-import { SearchResults } from '@/features/track/components/search-results';
-import { SearchShell } from '@/features/track/components/search-shell';
+import { Search } from '@/features/search/components/search';
+import { SearchResults } from '@/features/search/components/search-results';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const prefetch = 'allow-runtime';
 export default function SearchPage({ searchParams }: PageProps<'/search'>) {
   return (
     <PageWrapper title="Search">
-      <SearchShell>
+      <Search>
         <ErrorBoundary title="Search is taking a breather">
           <Suspense fallback={<GenreBrowseSkeleton />}>
             <Crossfade>
@@ -35,7 +35,7 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
             </Crossfade>
           </Suspense>
         </ErrorBoundary>
-      </SearchShell>
+      </Search>
     </PageWrapper>
   );
 }
