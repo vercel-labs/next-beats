@@ -12,8 +12,6 @@ export const metadata: Metadata = {
   title: 'Library',
 };
 
-export const prefetch = 'allow-runtime';
-
 export default function LibraryPage() {
   return (
     <PageWrapper title="Library">

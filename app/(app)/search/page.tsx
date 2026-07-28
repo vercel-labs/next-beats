@@ -11,8 +11,6 @@ export const metadata: Metadata = {
   title: 'Search',
 };
 
-export const prefetch = 'allow-runtime';
-
 export default function SearchPage({ searchParams }: PageProps<'/search'>) {
   return (
     <PageWrapper title="Search">

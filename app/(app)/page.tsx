@@ -6,8 +6,6 @@ import { PlaylistBrowse } from '@/features/playlist/components/playlist-browse';
 import { MostPlayed, MostPlayedSkeleton } from '@/features/track/components/most-played';
 import { QuickPlayGrid, QuickPlayGridSkeleton } from '@/features/track/components/quick-play-grid';
 
-export const prefetch = 'allow-runtime';
-
 export default function HomePage() {
   return (
     <PageWrapper title="Welcome back">
