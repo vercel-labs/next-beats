@@ -23,7 +23,7 @@ test.describe('Track page (/track/[id])', () => {
     await link.waitFor({ state: 'visible', timeout: 15000 });
     const href = await link.getAttribute('href');
     if (!href) throw new Error('Expected the track link to have an href');
-    const heading = (await link.textContent())?.trim();
+    const heading = (await link.locator('span').first().textContent())?.trim();
     if (!heading) throw new Error('Expected the track link to have a label');
 
     await instant(page, async () => {
