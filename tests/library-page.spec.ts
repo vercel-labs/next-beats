@@ -21,7 +21,7 @@ test.describe('Library page (/library)', () => {
     await instant(page, async () => {
       await link.click();
       await page.waitForURL(url => url.pathname === '/library');
-      await expect(page.locator('main a[href^="/track/"]').first()).toBeVisible();
+      await expect(page.locator('main a[href^="/track/"]:visible').first()).toBeVisible();
     });
   });
 });
