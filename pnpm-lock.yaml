@@ -76,8 +76,8 @@ importers:
         version: 4.4.3
     devDependencies:
       '@next/playwright':
-        specifier: ^16.2.6
-        version: 16.2.6(@playwright/test@1.60.0)
+        specifier: 16.3.0-preview.10
+        version: 16.3.0-preview.10(@playwright/test@1.60.0)
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
@@ -676,8 +676,8 @@ packages:
   '@next/eslint-plugin-next@16.3.0-canary.30':
     resolution: {integrity: sha512-06t2gF+dIKA/8/b3mkgSD9FO+FXYltdt5QT4Rmh8UjTJ7y+uiMXsvhr+c7kwFHlSQoi/tyxHJQAinQ5tvtSOGg==}
 
-  '@next/playwright@16.2.6':
-    resolution: {integrity: sha512-2e3RywBZb8oS1h679Z3Rt+pxsV6bcVBKuoILv1Y1JaTSo96n554GBMNI2dSrtwrigOQXjsB7wffp4gmYm2A+hQ==}
+  '@next/playwright@16.3.0-preview.10':
+    resolution: {integrity: sha512-pyEdNl4WB6WQlYZ4eTcNuhi0DIXXzZ3RvUdUS3edFSqpAJHo5IeDU3Tby7YkD/cH40vXMDMQ8SnCmdtE33XkDw==}
     peerDependencies:
       '@playwright/test': '>=1.0.0'
     peerDependenciesMeta:
@@ -3496,7 +3496,7 @@ snapshots:
     dependencies:
       fast-glob: 3.3.1
 
-  '@next/playwright@16.2.6(@playwright/test@1.60.0)':
+  '@next/playwright@16.3.0-preview.10(@playwright/test@1.60.0)':
     optionalDependencies:
       '@playwright/test': 1.60.0
 
