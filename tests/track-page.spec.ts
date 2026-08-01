@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Track page (/track/[id])', () => {
-  // Initial page load (MPA): the title reads params and streams in, so it's absent under instant().
-  test('initial page load (MPA) — title absent', async ({ page }) => {
+  test('initial page load shows the shell without the title', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('main a[href^="/track/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
@@ -16,8 +15,7 @@ test.describe('Track page (/track/[id])', () => {
     });
   });
 
-  // Client navigation (SPA): runtime prefetch resolves params, so the title is present under instant().
-  test('client navigation (SPA) — runtime-prefetched title revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched title', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('main a[href^="/track/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

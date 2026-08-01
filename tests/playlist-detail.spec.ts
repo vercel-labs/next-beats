@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Playlist detail page (/playlist/[id])', () => {
-  // Initial page load (MPA): the detail reads params and streams in, so it's absent under instant().
-  test('initial page load (MPA) — detail absent', async ({ page }) => {
+  test('initial page load shows the shell without playlist details', async ({ page }) => {
     await page.goto('/playlist');
     const link = page.locator('main a[href^="/playlist/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
@@ -16,8 +15,7 @@ test.describe('Playlist detail page (/playlist/[id])', () => {
     });
   });
 
-  // Client navigation (SPA): runtime prefetch resolves params, so the detail is present under instant().
-  test('client navigation (SPA) — runtime-prefetched detail revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched playlist details', async ({ page }) => {
     await page.goto('/playlist');
     const link = page.locator('main a[href^="/playlist/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

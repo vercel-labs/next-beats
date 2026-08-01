@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Library page (/library)', () => {
-  // Initial page load (MPA): the library grid streams in behind Suspense, so it's absent under instant().
-  test('initial page load (MPA) — library grid absent', async ({ page }) => {
+  test('initial page load shows the shell without the library grid', async ({ page }) => {
     await page.goto('/');
 
     await instant(page, async () => {
@@ -12,8 +11,7 @@ test.describe('Library page (/library)', () => {
     });
   });
 
-  // Client navigation (SPA): prefetch={true} resolves cookies, so the library grid is present under instant().
-  test('client navigation (SPA) — runtime-prefetched library grid revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched library grid', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Library"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

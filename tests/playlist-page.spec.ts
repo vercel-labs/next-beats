@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Playlists page (/playlist)', () => {
-  // Initial page load (MPA): the playlist list streams in behind Suspense, so it's absent under instant().
-  test('initial page load (MPA) — playlist list absent', async ({ page }) => {
+  test('initial page load shows the shell without the playlist list', async ({ page }) => {
     await page.goto('/');
 
     await instant(page, async () => {
@@ -12,8 +11,7 @@ test.describe('Playlists page (/playlist)', () => {
     });
   });
 
-  // Client navigation (SPA): prefetch={true} resolves cookies, so the playlist list is present under instant().
-  test('client navigation (SPA) — runtime-prefetched playlist list revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched playlist list', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[href="/playlist"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

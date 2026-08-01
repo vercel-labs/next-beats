@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Search page (/search)', () => {
-  // Initial page load (MPA): input only; the searchParams-gated browse grid streams in under Suspense.
-  test('initial page load (MPA) — browse grid absent', async ({ page }) => {
+  test('initial page load shows the search shell without the browse grid', async ({ page }) => {
     await page.goto('/');
 
     await instant(page, async () => {
@@ -13,8 +12,7 @@ test.describe('Search page (/search)', () => {
     });
   });
 
-  // Client navigation (SPA): prefetch={true} resolves searchParams, so the browse grid is present under instant().
-  test('client navigation (SPA) — runtime-prefetched browse grid revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched browse grid', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Search"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

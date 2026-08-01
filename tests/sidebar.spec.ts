@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Sidebar', () => {
-  // Initial page load (MPA): nav links are static; the cookie-dependent playlists stream in behind Suspense.
-  test('initial page load (MPA) — nav links present, playlists stream in', async ({ page }) => {
+  test('initial page load shows nav links while playlists stream', async ({ page }) => {
     await page.goto('/');
 
     await instant(page, async () => {

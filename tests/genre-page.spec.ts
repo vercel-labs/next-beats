@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Genre page (/genre/[genre])', () => {
-  // Initial page load (MPA): the heading reads params and streams in, so it's absent under instant().
-  test('initial page load (MPA) — heading absent', async ({ page }) => {
+  test('initial page load shows the shell without the heading', async ({ page }) => {
     await page.goto('/search');
     const link = page.locator('main a[href^="/genre/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
@@ -16,8 +15,7 @@ test.describe('Genre page (/genre/[genre])', () => {
     });
   });
 
-  // Client navigation (SPA): runtime prefetch resolves params, so the heading is present under instant().
-  test('client navigation (SPA) — runtime-prefetched heading revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched heading', async ({ page }) => {
     await page.goto('/search');
     const link = page.locator('main a[href^="/genre/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

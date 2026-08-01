@@ -2,8 +2,7 @@ import { instant } from '@next/playwright';
 import { test, expect } from '@playwright/test';
 
 test.describe('Favorites page (/favorites)', () => {
-  // Initial page load (MPA): the favorites feed streams in behind Suspense, so it's absent under instant().
-  test('initial page load (MPA) — favorites absent', async ({ page }) => {
+  test('initial page load shows the shell without favorites', async ({ page }) => {
     await page.goto('/');
 
     await instant(page, async () => {
@@ -12,8 +11,7 @@ test.describe('Favorites page (/favorites)', () => {
     });
   });
 
-  // Client navigation (SPA): prefetch={true} resolves cookies, so favorites are present under instant().
-  test('client navigation (SPA) — runtime-prefetched favorites revealed', async ({ page }) => {
+  test('client navigation shows the runtime-prefetched favorites', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Liked Tracks"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
