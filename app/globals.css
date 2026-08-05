@@ -89,19 +89,9 @@
 }
 
 .skeleton-animation.skeleton-subtle {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(150, 150, 150, 0.12);
   background-size: unset;
   animation: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  .skeleton-animation.skeleton-subtle {
-    background: rgba(255, 255, 255, 0.06);
-  }
-}
-
-:is(.dark) .skeleton-animation.skeleton-subtle {
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .skeleton-animation:not([class*='rounded-']) {
