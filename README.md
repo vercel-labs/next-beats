@@ -53,14 +53,6 @@ The end-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides
 pnpm test:e2e
 ```
 
-## Analyze
-
-Inspect the client and server bundles with Next.js's [built-in Turbopack analyzer](https://nextjs.org/docs/app/guides/package-bundling):
-
-```bash
-pnpm analyze
-```
-
 ## Stack
 
 - **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Server Functions
