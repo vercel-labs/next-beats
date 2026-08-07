@@ -4,7 +4,7 @@
 
 # NextBeats
 
-A [Next.js 16.3](https://nextjs.org/blog/next-16-3-instant-navigations) music player demonstrating [Instant Navigations](https://preview.nextjs.org/docs/app/guides/instant-navigation).
+A [Next.js 16.3](https://nextjs.org/blog/next-16-3) music player demonstrating [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation).
 
 [**Live demo →**](https://next-beats.dev)
 
@@ -14,10 +14,10 @@ A [Next.js 16.3](https://nextjs.org/blog/next-16-3-instant-navigations) music pl
 
 ## Features
 
-- **[Cache Components](https://preview.nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** cache each query with `'use cache'`, name the data with `cacheTag`, and set its lifetime with `cacheLife`, so repeated reads come from the cache until a tag is invalidated.
-- **[Partial Prefetching](https://preview.nextjs.org/docs/app/guides/adopting-partial-prefetching)** prefetches the shared App Shell of links as they enter the viewport, so navigation commits instantly and the data streams in behind it.
-- **[Runtime prefetching](https://preview.nextjs.org/docs/app/guides/runtime-prefetching)** lets a link prefetch a route's per-request data with `<Link prefetch={true}>`, which resolves `searchParams` and dynamic `params` ahead of the click.
-- **[Hover-triggered prefetch](https://preview.nextjs.org/docs/app/guides/prefetching#hover-triggered-prefetch)** defers a link's runtime prefetch until the pointer or focus reaches it, so a long list of tracks does not prefetch every destination on render.
+- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** cache each query with `'use cache'`, name the data with `cacheTag`, and set its lifetime with `cacheLife`, so repeated reads come from the cache until a tag is invalidated.
+- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** prefetches the shared App Shell of links as they enter the viewport, so navigation commits instantly and the data streams in behind it.
+- **[Runtime prefetching](https://nextjs.org/docs/app/guides/runtime-prefetching)** lets a link prefetch a route's per-request data with `<Link prefetch={true}>`, which resolves `searchParams` and dynamic `params` ahead of the click.
+- **[Hover-triggered prefetch](https://nextjs.org/docs/app/guides/prefetching#hover-triggered-prefetch)** defers a link's runtime prefetch until the pointer or focus reaches it, so a long list of tracks does not prefetch every destination on render.
 - **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** run mutations such as favoriting a track or creating a playlist on the server, and invalidate only the tags they change with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag), which re-prefetches the affected routes so they stay instant and reflect the change.
 - **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** animate content updates and route changes as you move through the player.
