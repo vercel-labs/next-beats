@@ -140,7 +140,6 @@ async function getDiscoverForUser(userId: string, limit: number, slow: boolean) 
     take: limit,
     where: {
       favorites: { none: { userId } },
-      trackPlays: { none: { userId } },
     },
   });
   return rows.map(row => toTrack(row));
