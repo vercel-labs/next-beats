@@ -4,7 +4,7 @@
 
 # NextBeats
 
-A [Next.js 16.3](https://nextjs.org/blog/next-16-3) music player demonstrating [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation).
+A [Next.js 16.3](https://nextjs.org/blog/next-16-3) music player demo showcasing [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation).
 
 [**Live demo →**](https://next-beats.dev)
 
