@@ -17,17 +17,17 @@ export function SignInForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
-      <label htmlFor="name" className="text-muted text-sm">
-        Sign in with a username
+      <label htmlFor="email" className="text-muted text-sm">
+        Email
       </label>
       <input
-        id="name"
-        name="name"
-        type="text"
-        autoComplete="username"
+        id="email"
+        name="email"
+        type="email"
+        autoComplete="email"
         required
         autoFocus
-        placeholder="Aurora"
+        placeholder="you@example.com"
         aria-invalid={state?.error ? true : undefined}
         aria-describedby={state?.error ? 'sign-in-error' : undefined}
       />

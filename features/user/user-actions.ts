@@ -8,11 +8,14 @@ import { prisma } from '@/lib/db';
 const SESSION_COOKIE = 'beats-user';
 
 const signInSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required').max(50, 'Name must be 50 characters or fewer'),
+  email: z.preprocess(
+    value => (typeof value === 'string' ? value.trim() : value),
+    z.email('Enter a valid email address').max(254, 'Email is too long'),
+  ),
 });
 
 export async function signIn(formData: FormData) {
-  const parsed = signInSchema.safeParse({ name: formData.get('name') });
+  const parsed = signInSchema.safeParse({ email: formData.get('email') });
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message, ok: false as const };
   }
@@ -20,8 +23,8 @@ export async function signIn(formData: FormData) {
   let userId: string;
   try {
     const user = await prisma.user.upsert({
-      where: { name: parsed.data.name },
-      create: { name: parsed.data.name },
+      where: { name: parsed.data.email },
+      create: { name: parsed.data.email },
       update: {},
     });
     userId = user.id;
