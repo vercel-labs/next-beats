@@ -158,7 +158,7 @@ export function DemoToolbarClient({
       <Ariakit.DialogDisclosure
         store={guide}
         aria-label="How this demo works"
-        className="text-gray flex items-center px-3 py-1.5 transition-colors hover:text-black dark:hover:text-white"
+        className="text-gray focus-visible:bg-accent/10 dark:focus-visible:bg-accent/20 flex items-center px-3 py-1.5 transition-colors hover:text-black focus-visible:outline-none dark:hover:text-white"
       >
         <CircleHelp className="size-3.5" />
       </Ariakit.DialogDisclosure>
