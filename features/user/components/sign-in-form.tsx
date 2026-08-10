@@ -18,7 +18,7 @@ export function SignInForm() {
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <label htmlFor="email" className="text-muted text-sm">
-        Email
+        Demo email
       </label>
       <input
         id="email"
@@ -30,8 +30,11 @@ export function SignInForm() {
         defaultValue="demo@example.com"
         placeholder="you@example.com"
         aria-invalid={state?.error ? true : undefined}
-        aria-describedby={state?.error ? 'sign-in-error' : undefined}
+        aria-describedby={state?.error ? 'sign-in-hint sign-in-error' : 'sign-in-hint'}
       />
+      <p id="sign-in-hint" className="text-muted -mt-1 text-xs">
+        Any fake email works.
+      </p>
       {state?.error ? (
         <p id="sign-in-error" role="alert" className="text-sm text-red-500">
           {state.error}
