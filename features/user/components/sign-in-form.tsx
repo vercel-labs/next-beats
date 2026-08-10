@@ -27,6 +27,7 @@ export function SignInForm() {
         autoComplete="email"
         required
         autoFocus
+        defaultValue="demo@example.com"
         placeholder="you@example.com"
         aria-invalid={state?.error ? true : undefined}
         aria-describedby={state?.error ? 'sign-in-error' : undefined}
