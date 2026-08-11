@@ -78,6 +78,27 @@ body:has([data-login-splash]) .demo-toggles {
   label {
     @apply text-gray mb-1.5 block text-xs font-medium tracking-wide;
   }
+
+  :where(a, button, summary, [role='button']) {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  :where(button, summary, [role='button']) {
+    user-select: none;
+  }
+}
+
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: 1rem !important;
+  }
+
+  :where(a, button, summary, [role='button']):active {
+    opacity: 0.78;
+  }
 }
 
 .skeleton-animation {

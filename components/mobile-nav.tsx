@@ -9,7 +9,7 @@ export function MobileTabBar() {
     <nav
       aria-label="Primary"
       style={{ viewTransitionName: 'mobile-nav' }}
-      className="border-divider/70 dark:border-divider-dark/70 flex w-full shrink-0 border-t bg-white pb-[env(safe-area-inset-bottom)] sm:hidden dark:bg-[#181818]"
+      className="border-divider/70 dark:border-divider-dark/70 flex w-full shrink-0 border-t bg-white pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] sm:hidden dark:bg-[#181818]"
     >
       <NavLink href="/" aria-label="Home" className={mobileTab}>
         <Home className="h-5 w-5" />
