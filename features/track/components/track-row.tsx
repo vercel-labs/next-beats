@@ -6,7 +6,7 @@ import { AddToPlaylistMenu } from '@/features/playlist/components/add-to-playlis
 import { getPlaylistMenuItems } from '@/features/playlist/playlist-queries';
 import { FavoriteButton, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';
 import { TrackPlayRow } from '@/features/track/components/track-interactions';
-import { getUserFavoriteIds } from '@/features/track/track-queries';
+import { getRecommendedTracks, getUserFavoriteIds } from '@/features/track/track-queries';
 import { formatDuration, formatCount } from '@/lib/utils';
 import type { Track as TrackT } from '@/types/track';
 
@@ -40,6 +40,11 @@ export async function TrackRow({ track, index, showAlbum = true, queue }: Props 
       </div>
     </TrackPlayRow>
   );
+}
+
+export async function RecommendedTracks({ trackId }: { trackId: string }) {
+  const tracks = await getRecommendedTracks(trackId);
+  return <TrackList tracks={tracks} animateItems />;
 }
 
 export function TrackList({
