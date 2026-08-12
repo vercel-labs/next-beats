@@ -3,7 +3,7 @@
 import * as Ariakit from '@ariakit/react';
 import { Check, Plus, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useOptimistic } from 'react';
+import { useOptimistic, useTransition } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/demo/boundary';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -58,12 +58,11 @@ export function DeletePlaylistButton({ playlistId, size = 'sm' }: { playlistId: 
 }
 
 export function RemoveFromPlaylistButton({ playlistId, trackId }: { playlistId: string; trackId: string }) {
-  const [isPending, setIsPending] = useOptimistic(false);
+  const [isPending, startTransition] = useTransition();
 
   function handleRemove(e: React.MouseEvent) {
     e.stopPropagation();
     startTransition(async () => {
-      setIsPending(true);
       const result = await removeFromPlaylist(playlistId, trackId);
       if (result?.error) toast.error(result.error);
     });
@@ -120,10 +119,9 @@ export function AddToPlaylistButtons({
 }
 
 export function NewPlaylistDialog({ store, trackId }: { store: Ariakit.DialogStore; trackId: string }) {
-  const [isPending, setIsPending] = useOptimistic(false);
+  const [isPending, startTransition] = useTransition();
 
   async function createAndAddAction(formData: FormData) {
-    setIsPending(true);
     const created = await createPlaylist(formData);
     if (!created.ok) {
       toast.error(created.error);
@@ -202,6 +200,7 @@ function PlaylistToggleItem({
   item: { label: string; value: string; active: boolean };
   toggleAction: (value: string, active: boolean, label: string) => void | Promise<void>;
 }) {
+  const [, startTransition] = useTransition();
   const [optimisticActive, setOptimisticActive] = useOptimistic(item.active);
 
   function handleClick() {
