@@ -3,6 +3,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
+import type { Route } from 'next';
 
 const SESSION_COOKIE = 'beats-user';
 
@@ -17,9 +18,7 @@ export async function getCurrentUser() {
 }
 
 export async function getCurrentUserName() {
-  'use cache: private';
-
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
   return user?.name ?? 'listener';
 }
@@ -27,9 +26,7 @@ export async function getCurrentUserName() {
 export async function verifyAuth() {
   const userId = await getCurrentUser();
   if (!userId) {
-    const store = await cookies();
-    store.delete(SESSION_COOKIE);
-    redirect('/login');
+    redirect('/logout' as Route);
   }
   return userId;
 }

@@ -1,18 +1,15 @@
 import { revalidateTag } from 'next/cache';
-import { cookies } from 'next/headers';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
+import { getCurrentUser } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
-
-const SESSION_COOKIE = 'beats-user';
 
 const bodySchema = z.object({
   trackId: z.string().min(1),
 });
 
 export async function POST(request: NextRequest) {
-  const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
+  const userId = await getCurrentUser();
   if (!userId) return new NextResponse(null, { status: 401 });
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));

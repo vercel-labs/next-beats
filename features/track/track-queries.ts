@@ -3,7 +3,7 @@ import 'server-only';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
-import { getCurrentUser } from '@/features/user/user-queries';
+import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { toTrack } from '@/types/track';
@@ -34,7 +34,7 @@ async function getLibraryCached(page: number, slow: boolean) {
 }
 
 export async function getFavorites() {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getFavoritesForUser(userId, await isSlowEnabled());
 }
 
@@ -52,8 +52,7 @@ async function getFavoritesForUser(userId: string, slow: boolean) {
 }
 
 export async function getUserFavoriteIds() {
-  const userId = await getCurrentUser();
-  if (!userId) return new Set<string>();
+  const userId = await verifyAuth();
   return getUserFavoriteIdsForUser(userId);
 }
 
@@ -69,7 +68,7 @@ async function getUserFavoriteIdsForUser(userId: string) {
 }
 
 export async function getRecentlyPlayed(limit: number = 8) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getRecentlyPlayedForUser(userId, limit, await isSlowEnabled());
 }
 
@@ -89,7 +88,7 @@ async function getRecentlyPlayedForUser(userId: string, limit: number, slow: boo
 }
 
 export async function getTrack(id: string) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getTrackForUser(id, userId, await isSlowEnabled());
 }
 
@@ -126,7 +125,7 @@ async function getMostPlayedCached(limit: number, slow: boolean) {
 }
 
 export async function getDiscover(limit: number = 8) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getDiscoverForUser(userId, limit, await isSlowEnabled());
 }
 
@@ -162,7 +161,7 @@ async function getTracksByGenreCached(genre: string, slow: boolean) {
 }
 
 export async function getRecommendedTracks(excludeTrackId: string, limit: number = 5) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   await delay(900, await isSlowEnabled());
   const rows = await prisma.track.findMany({
     orderBy: { playCount: 'desc' },

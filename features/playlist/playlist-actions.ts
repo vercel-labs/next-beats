@@ -12,6 +12,7 @@ import { delay } from '@/lib/utils';
 const createPlaylistSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
 });
+const idSchema = z.string().min(1);
 
 const colors = [
   'from-violet-500 to-purple-600',
@@ -44,23 +45,30 @@ export async function createPlaylist(formData: FormData) {
 export async function addToPlaylist(playlistId: string, trackId: string) {
   const userId = await verifyAuth();
   await delay(200, await isSlowEnabled());
-  if (SEED_PLAYLIST_IDS.has(playlistId)) return { error: "Can't modify a demo playlist", ok: false as const };
+  const parsedPlaylistId = idSchema.parse(playlistId);
+  const parsedTrackId = idSchema.parse(trackId);
+  if (SEED_PLAYLIST_IDS.has(parsedPlaylistId)) {
+    return { error: "Can't modify a demo playlist", ok: false as const };
+  }
+  if (!(await ownsPlaylist(parsedPlaylistId, userId))) {
+    return { error: 'Playlist not found', ok: false as const };
+  }
   const existing = await prisma.playlistTrack.findUnique({
-    where: { playlistId_trackId: { playlistId, trackId } },
+    where: { playlistId_trackId: { playlistId: parsedPlaylistId, trackId: parsedTrackId } },
   });
   if (existing) return { error: 'Already in this playlist', ok: false as const };
 
   const maxPos = await prisma.playlistTrack.aggregate({
     _max: { position: true },
-    where: { playlistId },
+    where: { playlistId: parsedPlaylistId },
   });
 
   try {
     await prisma.playlistTrack.create({
       data: {
-        playlistId,
+        playlistId: parsedPlaylistId,
         position: (maxPos._max.position ?? -1) + 1,
-        trackId,
+        trackId: parsedTrackId,
       },
     });
   } catch (error) {
@@ -70,7 +78,7 @@ export async function addToPlaylist(playlistId: string, trackId: string) {
     }
     throw error;
   }
-  updateTag(`playlist-${playlistId}`);
+  updateTag(`playlist-${parsedPlaylistId}`);
   updateTag(`playlists:${userId}`);
   return { ok: true as const };
 }
@@ -78,22 +86,38 @@ export async function addToPlaylist(playlistId: string, trackId: string) {
 export async function removeFromPlaylist(playlistId: string, trackId: string) {
   const userId = await verifyAuth();
   await delay(200, await isSlowEnabled());
-  if (SEED_PLAYLIST_IDS.has(playlistId)) return { error: "Can't modify a demo playlist", ok: false as const };
+  const parsedPlaylistId = idSchema.parse(playlistId);
+  const parsedTrackId = idSchema.parse(trackId);
+  if (SEED_PLAYLIST_IDS.has(parsedPlaylistId)) {
+    return { error: "Can't modify a demo playlist", ok: false as const };
+  }
+  if (!(await ownsPlaylist(parsedPlaylistId, userId))) {
+    return { error: 'Playlist not found', ok: false as const };
+  }
   await prisma.playlistTrack.deleteMany({
-    where: { playlistId, trackId },
+    where: { playlistId: parsedPlaylistId, trackId: parsedTrackId },
   });
-  updateTag(`playlist-${playlistId}`);
+  updateTag(`playlist-${parsedPlaylistId}`);
   updateTag(`playlists:${userId}`);
   return { ok: true as const };
 }
 
 export async function deletePlaylist(playlistId: string) {
   const userId = await verifyAuth();
-  const id = z.string().min(1).parse(playlistId);
+  const id = idSchema.parse(playlistId);
   if (SEED_PLAYLIST_IDS.has(id)) return { error: "Can't delete a demo playlist", ok: false as const };
   await delay(300, await isSlowEnabled());
-  await prisma.playlist.delete({ where: { id } });
+  const result = await prisma.playlist.deleteMany({ where: { id, userId } });
+  if (result.count === 0) return { error: 'Playlist not found', ok: false as const };
   updateTag(`playlists:${userId}`);
   updateTag(`playlist-${id}`);
   return { ok: true as const };
+}
+
+async function ownsPlaylist(playlistId: string, userId: string) {
+  const playlist = await prisma.playlist.findFirst({
+    select: { id: true },
+    where: { id: playlistId, userId },
+  });
+  return playlist !== null;
 }

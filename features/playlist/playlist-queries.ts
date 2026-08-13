@@ -3,13 +3,13 @@ import 'server-only';
 import { cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
-import { getCurrentUser } from '@/features/user/user-queries';
+import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { toTrack } from '@/types/track';
 
 export async function getPlaylists() {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getPlaylistsForUser(userId, await isSlowEnabled());
 }
 
@@ -33,7 +33,7 @@ async function getPlaylistsForUser(userId: string, slow: boolean) {
 }
 
 export async function searchPlaylists(query: string) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return searchPlaylistsForUser(userId, query, await isSlowEnabled());
 }
 
@@ -60,7 +60,7 @@ async function searchPlaylistsForUser(userId: string, query: string, slow: boole
 }
 
 export async function getPlaylist(id: string) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getPlaylistForUser(id, userId, await isSlowEnabled());
 }
 
@@ -90,7 +90,7 @@ async function getPlaylistForUser(id: string, userId: string, slow: boolean) {
 }
 
 export async function getPlaylistMenuItems(trackId: string) {
-  const userId = await getCurrentUser();
+  const userId = await verifyAuth();
   return getPlaylistMenuItemsForUser(trackId, userId);
 }
 

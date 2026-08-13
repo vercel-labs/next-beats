@@ -10,6 +10,20 @@ test.describe('Auth', () => {
     await expect(page.getByLabel('Email')).toBeVisible();
   });
 
+  test('stale session redirects when private data verifies the user', async ({ context, page }) => {
+    await context.addCookies([
+      {
+        domain: 'localhost',
+        name: 'beats-user',
+        path: '/',
+        value: 'missing-user',
+      },
+    ]);
+
+    await page.goto('/favorites');
+    await expect(page).toHaveURL(/\/login$/);
+  });
+
   test('signing in sets cookie and redirects home', async ({ page }) => {
     await page.goto('/login');
     await page.getByLabel('Email').fill('aurora@example.com');
