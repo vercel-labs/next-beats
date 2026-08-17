@@ -49,10 +49,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-body:has([data-login-splash]) .demo-toggles {
-  display: none !important;
-}
-
 @layer base {
   body {
     @apply selection:bg-accent bg-surface dark:bg-surface-dark font-sans text-black antialiased selection:text-black dark:text-white;
