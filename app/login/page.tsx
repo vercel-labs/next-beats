@@ -9,10 +9,7 @@ const SESSION_COOKIE = 'beats-user';
 
 export default function LoginPage() {
   return (
-    <main
-      className="bg-surface dark:bg-surface-dark relative isolate grid min-h-dvh place-items-center overflow-hidden pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pt-[max(1.5rem,env(safe-area-inset-top))] sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]"
-      data-login-splash
-    >
+    <main className="bg-surface dark:bg-surface-dark relative isolate grid min-h-dvh place-items-center overflow-hidden pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] sm:pt-[max(1.5rem,env(safe-area-inset-top))] sm:pr-[max(1.5rem,env(safe-area-inset-right))] sm:pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pl-[max(1.5rem,env(safe-area-inset-left))]">
       <Suspense>
         <RedirectIfAuthed />
       </Suspense>
