@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
 
   revalidateTag(`recently-played:${userId}`, 'max');
   revalidateTag(`discover:${userId}`, 'max');
+  revalidateTag(`recommendations:${userId}`, 'max');
 
   return new NextResponse(null, { status: 204 });
 }

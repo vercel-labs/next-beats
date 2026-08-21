@@ -38,5 +38,6 @@ export async function toggleFavorite(trackId: string) {
   updateTag(`track-${id}:${userId}`);
   updateTag(`favorites:${userId}`);
   revalidateTag(`discover:${userId}`, 'max');
+  revalidateTag(`recommendations:${userId}`, 'max');
   return { ok: true as const };
 }

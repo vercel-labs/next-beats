@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation as navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
@@ -161,8 +161,16 @@ async function getTracksByGenreCached(genre: string, slow: boolean) {
 }
 
 export async function getRecommendedTracks(excludeTrackId: string, limit: number = 5) {
+  await navigation();
   const userId = await verifyAuth();
-  await delay(900, await isSlowEnabled());
+  return getRecommendedTracksForUser(excludeTrackId, userId, limit, await isSlowEnabled());
+}
+
+async function getRecommendedTracksForUser(excludeTrackId: string, userId: string, limit: number, slow: boolean) {
+  'use cache';
+  cacheTag(`recommendations:${userId}`);
+
+  await delay(900, slow);
   const rows = await prisma.track.findMany({
     orderBy: { playCount: 'desc' },
     take: limit,

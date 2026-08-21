@@ -44,7 +44,11 @@ export async function TrackRow({ track, index, showAlbum = true, queue }: Props 
 
 export async function RecommendedTracks({ trackId }: { trackId: string }) {
   const tracks = await getRecommendedTracks(trackId);
-  return <TrackList tracks={tracks} animateItems />;
+  return (
+    <div data-testid="recommended-tracks">
+      <TrackList tracks={tracks} animateItems />
+    </div>
+  );
 }
 
 export function TrackList({

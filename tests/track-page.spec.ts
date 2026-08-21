@@ -15,7 +15,7 @@ test.describe('Track page (/track/[id])', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched title', async ({ page }) => {
+  test('client navigation defers recommendations until navigation', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('main a[href^="/track/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
@@ -28,6 +28,9 @@ test.describe('Track page (/track/[id])', () => {
       await link.click();
       await page.waitForURL(url => url.pathname === href);
       await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+      await expect(page.getByTestId('recommended-tracks')).toHaveCount(0);
     });
+
+    await expect(page.getByTestId('recommended-tracks')).toBeVisible();
   });
 });
