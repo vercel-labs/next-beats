@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { cacheLife } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
@@ -9,6 +10,7 @@ const SESSION_COOKIE = 'beats-user';
 
 export async function getCurrentUser() {
   'use cache: private';
+  cacheLife({ stale: Infinity });
 
   const store = await cookies();
   const userId = store.get(SESSION_COOKIE)?.value;
