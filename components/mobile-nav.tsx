@@ -6,27 +6,29 @@ const mobileTab =
 
 export function MobileTabBar() {
   return (
-    <nav
-      aria-label="Primary"
-      style={{ viewTransitionName: 'mobile-nav' }}
-      className="border-divider/70 dark:border-divider-dark/70 flex w-full shrink-0 border-t bg-white pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] sm:hidden dark:bg-[#181818]"
-    >
-      <NavLink href="/" aria-label="Home" className={mobileTab}>
-        <Home className="h-5 w-5" />
-        <span>Home</span>
-      </NavLink>
-      <NavLink href="/search" aria-label="Search" className={mobileTab}>
-        <Search className="h-5 w-5" />
-        <span>Search</span>
-      </NavLink>
-      <NavLink href="/library" aria-label="Library" className={mobileTab}>
-        <Library className="h-5 w-5" />
-        <span>Library</span>
-      </NavLink>
-      <NavLink href="/favorites" aria-label="Liked" className={mobileTab}>
-        <Heart className="h-5 w-5" />
-        <span>Liked</span>
-      </NavLink>
-    </nav>
+    <div className="h-[calc(3.625rem+env(safe-area-inset-bottom))] shrink-0 sm:hidden">
+      <nav
+        aria-label="Primary"
+        style={{ viewTransitionName: 'mobile-nav' }}
+        className="border-divider/70 dark:border-divider-dark/70 fixed inset-x-0 bottom-0 z-30 flex border-t bg-white pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] sm:hidden dark:bg-[#181818]"
+      >
+        <NavLink href="/" aria-label="Home" className={mobileTab}>
+          <Home className="h-5 w-5" />
+          <span>Home</span>
+        </NavLink>
+        <NavLink href="/search" aria-label="Search" className={mobileTab}>
+          <Search className="h-5 w-5" />
+          <span>Search</span>
+        </NavLink>
+        <NavLink href="/library" aria-label="Library" className={mobileTab}>
+          <Library className="h-5 w-5" />
+          <span>Library</span>
+        </NavLink>
+        <NavLink href="/favorites" aria-label="Liked" className={mobileTab}>
+          <Heart className="h-5 w-5" />
+          <span>Liked</span>
+        </NavLink>
+      </nav>
+    </div>
   );
 }
