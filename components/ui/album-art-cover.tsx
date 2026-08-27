@@ -59,95 +59,123 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
 
   useEffect(() => {
     if (small) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvasElement = canvasRef.current;
+    if (!canvasElement) return;
 
     let disposed = false;
+    let gpu: Gpu | undefined;
+    let revealed = false;
+    let started = false;
+    let visible = false;
     let output: Surface | undefined;
     let observer: IntersectionObserver | undefined;
     let revealFrame: number | undefined;
+    let renderCover: ((currentFrame: Frame, time: number) => void) | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
     const seedValues = seedVector(seed);
     const variant = artworkVariant(label, kind, seedValues[3]);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    void getGpu()
-      .then(gpu => {
-        if (disposed) return;
-        let aspect = 1;
+    function hideLiveCover() {
+      unregisterAnimation?.();
+      unregisterAnimation = undefined;
+      if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
+      revealFrame = undefined;
+      revealed = false;
+      canvasElement.removeAttribute('data-ready');
+    }
 
-        output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
-        const cover = draw(gpu, {
-          entry: { fragment: 'fs_main' },
-          label: `album-cover-${seed}`,
-          set: {
-            cover: {
-              params: [0, kindIndex[kind], variant, 0],
-              seed: seedValues,
-              shape: [aspect, 1, 0, 0],
+    function startRendering() {
+      if (!gpu || !renderCover || !visible) return;
+      if (reducedMotion) {
+        void frame(gpu, currentFrame => renderCover?.(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
+      } else {
+        unregisterAnimation ??= registerAnimatedCover(gpu, renderCover);
+      }
+    }
+
+    function initializeLiveCover() {
+      if (started || disposed) return;
+      started = true;
+
+      void getGpu()
+        .then(initializedGpu => {
+          if (disposed) return;
+          gpu = initializedGpu;
+          let aspect = 1;
+
+          output = surface(initializedGpu, canvasElement, { dpr: [1, 2], label: `album-cover-${seed}` });
+          const cover = draw(initializedGpu, {
+            entry: { fragment: 'fs_main' },
+            label: `album-cover-${seed}`,
+            set: {
+              cover: {
+                params: [0, kindIndex[kind], variant, 0],
+                seed: seedValues,
+                shape: [aspect, 1, 0, 0],
+              },
             },
-          },
-          shader: coverShader,
-        });
-
-        let visible = true;
-        let revealed = false;
-        const render = (currentFrame: Frame, time: number) => {
-          if (disposed || !visible || !output) return;
-          const beat = getPlaybackBeat(seed, beatTrackIds);
-          cover.set({
-            cover: {
-              params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
-              seed: seedValues,
-              shape: [aspect, 1, 0, 0],
-            },
+            shader: coverShader,
           });
-          currentFrame.pass(output, cover);
-          if (!revealed) {
-            revealed = true;
-            void currentFrame.done.then(() => {
-              if (disposed) return;
-              revealFrame = requestAnimationFrame(() => {
+
+          renderCover = (currentFrame: Frame, time: number) => {
+            if (disposed || !visible || !output) return;
+            const beat = getPlaybackBeat(seed, beatTrackIds);
+            cover.set({
+              cover: {
+                params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
+                seed: seedValues,
+                shape: [aspect, 1, 0, 0],
+              },
+            });
+            currentFrame.pass(output, cover);
+            if (!revealed) {
+              revealed = true;
+              void currentFrame.done.then(() => {
                 if (disposed) return;
                 revealFrame = requestAnimationFrame(() => {
-                  if (!disposed && visible) canvas.setAttribute('data-ready', '');
+                  if (disposed) return;
+                  revealFrame = requestAnimationFrame(() => {
+                    if (!disposed && visible) canvasElement.setAttribute('data-ready', '');
+                  });
                 });
               });
-            });
-          }
-        };
+            }
+          };
 
-        unsubscribeResize = output.onResize(({ height, width }) => {
-          aspect = height > 0 ? width / height : 1;
+          unsubscribeResize = output.onResize(({ height, width }) => {
+            aspect = height > 0 ? width / height : 1;
+          });
+
+          startRendering();
+        })
+        .catch(() => {
+          // The pre-rendered artwork remains visible when WebGPU is unavailable.
         });
-        observer = new IntersectionObserver(entries => {
-          const nextVisible = entries[0]?.isIntersecting ?? true;
-          if (disposed || nextVisible === visible) return;
-          visible = nextVisible;
-          if (!visible) {
-            revealed = false;
-            if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
-            revealFrame = undefined;
-            canvas.removeAttribute('data-ready');
-          }
-        });
-        observer.observe(canvas);
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          void frame(gpu, currentFrame => render(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
-        } else {
-          unregisterAnimation = registerAnimatedCover(gpu, render);
+    }
+
+    observer = new IntersectionObserver(
+      entries => {
+        const nextVisible = entries[0]?.isIntersecting ?? false;
+        if (disposed || nextVisible === visible) return;
+        visible = nextVisible;
+        if (!visible) {
+          hideLiveCover();
+          return;
         }
-      })
-      .catch(() => {
-        // The type-colour CSS gradient remains visible when WebGPU is unavailable.
-      });
+
+        initializeLiveCover();
+        startRendering();
+      },
+      { rootMargin: '256px 0px' },
+    );
+    observer.observe(canvasElement);
 
     return () => {
       disposed = true;
-      canvas.removeAttribute('data-ready');
-      if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
+      hideLiveCover();
       observer?.disconnect();
-      unregisterAnimation?.();
       unsubscribeResize?.();
       output?.dispose();
     };
