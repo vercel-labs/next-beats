@@ -53,35 +53,15 @@ type Props = {
 
 const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
-function StaticAlbumArtCover({ seed, label, kind, small = false, hidden = false }: Props & { hidden?: boolean }) {
-  const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
-
-  return (
-    <Image
-      alt=""
-      decoding="sync"
-      fill
-      loading="eager"
-      sizes={small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'}
-      src={coverAssetPath(seed, label, kind, staticShape, true)}
-      unoptimized
-      className="pointer-events-none absolute inset-0 z-10 block object-cover"
-      style={{
-        opacity: hidden ? 0 : 1,
-        transition: 'opacity 160ms ease-out',
-        willChange: 'opacity',
-      }}
-    />
-  );
-}
-
-function LiveAlbumArtCover({ seed, label, kind, beatTrackIds }: Props) {
+export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const coverKey = `${kind}\0${seed}\0${label}`;
   const [readyKey, setReadyKey] = useState<string>();
-  const ready = readyKey === coverKey;
+  const ready = !small && readyKey === coverKey;
+  const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
 
   useEffect(() => {
+    if (small) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -157,25 +137,35 @@ function LiveAlbumArtCover({ seed, label, kind, beatTrackIds }: Props) {
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [beatTrackIds, coverKey, kind, label, seed]);
+  }, [beatTrackIds, coverKey, kind, label, seed, small]);
 
   return (
     <>
-      <StaticAlbumArtCover seed={seed} label={label} kind={kind} hidden={ready} />
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        data-ready={ready || undefined}
-        className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
+      <Image
+        alt=""
+        decoding="sync"
+        fill
+        loading="eager"
+        sizes={
+          small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
+        }
+        src={coverAssetPath(seed, label, kind, staticShape, true)}
+        unoptimized
+        className="pointer-events-none absolute inset-0 z-10 block object-cover"
+        style={{
+          opacity: ready ? 0 : 1,
+          transition: 'opacity 160ms ease-out',
+          willChange: 'opacity',
+        }}
       />
+      {!small && (
+        <canvas
+          ref={canvasRef}
+          aria-hidden
+          data-ready={ready || undefined}
+          className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
+        />
+      )}
     </>
   );
-}
-
-export function AlbumArtCover(props: Props) {
-  if (props.small) {
-    return <StaticAlbumArtCover {...props} />;
-  }
-
-  return <LiveAlbumArtCover {...props} />;
 }
