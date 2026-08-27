@@ -12,7 +12,7 @@ test.describe('Search page (/search)', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched browse grid', async ({ page }) => {
+  test('client navigation shows the browse grid resolved at prefetch time', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Search"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

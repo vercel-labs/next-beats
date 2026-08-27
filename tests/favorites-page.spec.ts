@@ -11,7 +11,7 @@ test.describe('Favorites page (/favorites)', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched favorites', async ({ page }) => {
+  test('client navigation shows the favorites resolved at prefetch time', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Liked Tracks"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

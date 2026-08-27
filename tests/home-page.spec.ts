@@ -11,7 +11,7 @@ test.describe('Home page (/)', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched track data', async ({ page }) => {
+  test('client navigation shows the track data resolved at prefetch time', async ({ page }) => {
     await page.goto('/library');
     const link = page.locator('aside a[aria-label="Home"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

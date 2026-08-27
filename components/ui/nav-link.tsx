@@ -9,7 +9,7 @@ import type { Route } from 'next';
 
 type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 'href' | 'prefetch'> & {
   href: Route<T> | URL;
-  // Defer this link's runtime prefetch until the user hovers/focuses it, rather
+  // Defer this link's URL-specific prefetch until the user hovers/focuses it, rather
   // than firing it eagerly when the link enters the viewport. Use for unbounded
   // lists (e.g. the playlist sidebar) so N links don't each wake a server on load.
   hoverPrefetch?: boolean;

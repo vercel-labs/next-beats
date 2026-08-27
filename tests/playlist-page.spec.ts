@@ -11,7 +11,7 @@ test.describe('Playlists page (/playlist)', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched playlist list', async ({ page }) => {
+  test('client navigation shows the playlist list resolved at prefetch time', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[href="/playlist"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });

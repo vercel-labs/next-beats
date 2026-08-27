@@ -11,7 +11,7 @@ test.describe('Library page (/library)', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched library grid', async ({ page }) => {
+  test('client navigation shows the library grid resolved at prefetch time', async ({ page }) => {
     await page.goto('/');
     const link = page.locator('aside a[aria-label="Library"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
