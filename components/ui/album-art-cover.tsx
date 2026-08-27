@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
@@ -55,9 +55,6 @@ const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2
 
 export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const coverKey = `${kind}\0${seed}\0${label}`;
-  const [readyKey, setReadyKey] = useState<string>();
-  const ready = !small && readyKey === coverKey;
   const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
 
   useEffect(() => {
@@ -113,7 +110,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
               revealFrame = requestAnimationFrame(() => {
                 if (disposed) return;
                 revealFrame = requestAnimationFrame(() => {
-                  if (!disposed) setReadyKey(coverKey);
+                  if (!disposed && visible) canvas.setAttribute('data-ready', '');
                 });
               });
             });
@@ -131,7 +128,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
             revealed = false;
             if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
             revealFrame = undefined;
-            setReadyKey(current => (current === coverKey ? undefined : current));
+            canvas.removeAttribute('data-ready');
           }
         });
         observer.observe(canvas);
@@ -147,16 +144,24 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
 
     return () => {
       disposed = true;
+      canvas.removeAttribute('data-ready');
       if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
       observer?.disconnect();
       unregisterAnimation?.();
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [beatTrackIds, coverKey, kind, label, seed, small]);
+  }, [beatTrackIds, kind, label, seed, small]);
 
   return (
     <>
+      {!small && (
+        <canvas
+          ref={canvasRef}
+          aria-hidden
+          className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
+        />
+      )}
       <Image
         alt=""
         fill
@@ -166,17 +171,8 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         }
         src={coverAssetPath(seed, label, kind, staticShape, true)}
         unoptimized
-        className="pointer-events-none absolute inset-0 z-10 block object-cover"
-        style={{ opacity: ready ? 0 : 1 }}
+        className="album-art-fallback pointer-events-none absolute inset-0 z-10 block object-cover"
       />
-      {!small && (
-        <canvas
-          ref={canvasRef}
-          aria-hidden
-          data-ready={ready || undefined}
-          className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
-        />
-      )}
     </>
   );
 }
