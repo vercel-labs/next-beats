@@ -2,22 +2,34 @@ import { ViewTransition } from 'react';
 import { AlbumArt } from '@/components/ui/album-art';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { PlaylistSummary } from '@/types/playlist';
+import { PlayButton } from '@/features/track/components/play-button';
+import type { PlaylistWithTracks } from '@/types/playlist';
 
-export function PlaylistCard({ playlist }: { playlist: PlaylistSummary }) {
+export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
+  const firstTrack = playlist.tracks[0];
+
   return (
     <PrefetchLink
       href={`/playlist/${playlist.id}`}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
-      <AlbumArt
-        coverColor={playlist.coverColor}
-        coverSeed={playlist.id}
-        label={playlist.name}
-        kind="playlist"
-        size="lg"
-        className="aspect-square !h-auto !w-full shadow-lg"
-      />
+      <div className="relative">
+        <AlbumArt
+          coverColor={playlist.coverColor}
+          coverSeed={playlist.id}
+          label={playlist.name}
+          kind="playlist"
+          size="lg"
+          className="aspect-square !h-auto !w-full shadow-lg"
+        />
+        {firstTrack && (
+          <PlayButton
+            track={firstTrack}
+            queue={playlist.tracks}
+            className="card-play-btn absolute right-2 bottom-2"
+          />
+        )}
+      </div>
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-sm font-semibold text-black dark:text-white">{playlist.name}</span>
         <span className="text-muted truncate text-xs">
@@ -32,7 +44,7 @@ export function PlaylistList({
   playlists,
   animateItems = false,
 }: {
-  playlists: PlaylistSummary[];
+  playlists: PlaylistWithTracks[];
   animateItems?: boolean;
 }) {
   return (

@@ -19,7 +19,13 @@ async function getPlaylistsForUser(userId: string, slow: boolean) {
 
   await delay(500, slow);
   const rows = await prisma.playlist.findMany({
-    include: { _count: { select: { tracks: true } } },
+    include: {
+      _count: { select: { tracks: true } },
+      tracks: {
+        include: { track: true },
+        orderBy: { position: 'asc' },
+      },
+    },
     orderBy: { createdAt: 'desc' },
     where: { OR: [{ userId }, { userId: null }] },
   });
@@ -29,6 +35,7 @@ async function getPlaylistsForUser(userId: string, slow: boolean) {
     id: r.id,
     name: r.name,
     trackCount: r._count.tracks,
+    tracks: r.tracks.map(pt => toTrack(pt.track)),
   }));
 }
 
@@ -43,7 +50,13 @@ async function searchPlaylistsForUser(userId: string, query: string, slow: boole
 
   await delay(400, slow);
   const rows = await prisma.playlist.findMany({
-    include: { _count: { select: { tracks: true } } },
+    include: {
+      _count: { select: { tracks: true } },
+      tracks: {
+        include: { track: true },
+        orderBy: { position: 'asc' },
+      },
+    },
     orderBy: { createdAt: 'desc' },
     where: {
       OR: [{ userId }, { userId: null }],
@@ -56,6 +69,7 @@ async function searchPlaylistsForUser(userId: string, query: string, slow: boole
     id: r.id,
     name: r.name,
     trackCount: r._count.tracks,
+    tracks: r.tracks.map(pt => toTrack(pt.track)),
   }));
 }
 

@@ -5,7 +5,6 @@ import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
 import type { ArtworkKind } from '@/lib/cover-motif';
-import { cn } from '@/lib/utils';
 import coverShader from './album-art.wgsl';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
 
@@ -150,10 +149,8 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
     <canvas
       ref={canvasRef}
       aria-hidden
-      className={cn(
-        'pointer-events-none absolute inset-0 z-20 block h-full w-full',
-        ready ? 'opacity-100' : 'opacity-0',
-      )}
+      data-ready={ready || undefined}
+      className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
     />
   );
 }
