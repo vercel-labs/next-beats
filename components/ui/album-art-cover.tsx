@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { startTransition, Suspense, useEffect, useRef, useState } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
@@ -77,9 +76,8 @@ function StaticAlbumArtCover({ seed, label, kind, small = false, hidden = false 
 }
 
 function LiveAlbumArtCover({ seed, label, kind, beatTrackIds }: Props) {
-  const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const coverKey = `${pathname}\0${kind}\0${seed}\0${label}`;
+  const coverKey = `${kind}\0${seed}\0${label}`;
   const [readyKey, setReadyKey] = useState<string>();
   const ready = readyKey === coverKey;
 
@@ -179,9 +177,5 @@ export function AlbumArtCover(props: Props) {
     return <StaticAlbumArtCover {...props} />;
   }
 
-  return (
-    <Suspense fallback={<StaticAlbumArtCover {...props} />}>
-      <LiveAlbumArtCover {...props} />
-    </Suspense>
-  );
+  return <LiveAlbumArtCover {...props} />;
 }
