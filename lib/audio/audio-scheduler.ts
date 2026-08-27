@@ -43,10 +43,11 @@ export function stopAll(refs: AudioRefs) {
   visualBeatClock = null;
 }
 
-/** The decay of the most recent kick that was actually scheduled for this track. */
-export function getPlaybackBeat(trackId: string) {
+/** The decay of the most recent kick scheduled for this cover or one of its tracks. */
+export function getPlaybackBeat(trackId: string, relatedTrackIds?: readonly string[]) {
   const clock = visualBeatClock;
-  if (!clock || clock.trackId !== trackId || clock.context.state !== 'running') return 0;
+  const matchesCover = clock && (clock.trackId === trackId || relatedTrackIds?.includes(clock.trackId));
+  if (!clock || !matchesCover || clock.context.state !== 'running') return 0;
 
   const now = clock.context.currentTime;
   let sinceKick = Number.POSITIVE_INFINITY;

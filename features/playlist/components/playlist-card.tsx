@@ -7,6 +7,7 @@ import type { PlaylistWithTracks } from '@/types/playlist';
 
 export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
+  const trackIds = playlist.tracks.map(track => track.id);
 
   return (
     <PrefetchLink
@@ -19,6 +20,7 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
           coverSeed={playlist.id}
           label={playlist.name}
           kind="playlist"
+          beatTrackIds={trackIds}
           size="lg"
           className="aspect-square !h-auto !w-full shadow-lg"
         />

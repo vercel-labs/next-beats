@@ -27,33 +27,12 @@ const referenceMotifs = [
 ] as const;
 
 const GENERIC_TRACK_MOTIF_COUNT = 8;
-export const TRACK_MOTIF_COUNT = 16;
 export const PLAYLIST_VARIANT_COUNT = 4;
 
 export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
 
 /** Every movement is constructed to return to its origin over this live loop. */
 export const COVER_LOOP_SECONDS = 12;
-
-// Named for the form each one takes, which is what the shader's height fields build.
-const motifNames = [
-  'swell',
-  'limb',
-  'satin',
-  'panels',
-  'strata',
-  'cluster',
-  'tunnel',
-  'dunes',
-  'monolith',
-  'pinch',
-  'folded-edge',
-  'inset-panels',
-  'night-horizon',
-  'pixel-grid',
-  'chemical-cluster',
-  'protective-arc',
-] as const;
 
 const genreMotifs: Record<string, number> = {
   electronic: 0,
@@ -75,20 +54,11 @@ const playlistMotifs: Record<string, number> = {
 // slightly wider field than the large art so the complete title-specific silhouette has
 // breathing room instead of turning into one cropped edge at 40px.
 export const COVER_SHAPES = [
-  { detail: 1.06, height: 320, kind: 0, name: 'square', width: 320 },
-  { detail: 1.08, height: 80, kind: 0, name: 'thumb', width: 80 },
-  { detail: 1, height: 192, kind: 3, name: 'banner', width: 640 },
-  { detail: 1.08, height: 96, kind: 3, name: 'banner-thumb', width: 320 },
+  { detail: 1.08, height: 80, name: 'thumb', width: 80 },
+  { detail: 1.08, height: 96, name: 'banner-thumb', width: 320 },
 ] as const;
 
-/** Covers at or below this CSS height use the thumbnail composition. */
-export const THUMB_MAX_PX = 72;
-
 export type CoverShape = (typeof COVER_SHAPES)[number]['name'];
-
-export function coverAssetName(motif: number, shape: CoverShape) {
-  return `${motifNames[motif] ?? motifNames[0]}-${shape}`;
-}
 
 export function seedVector(value: string): [number, number, number, number] {
   let a = 0x9e3779b9;

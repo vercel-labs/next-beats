@@ -46,12 +46,13 @@ type Props = {
   seed: string;
   label: string;
   kind: ArtworkKind;
+  beatTrackIds?: string[];
   small?: boolean;
 };
 
 const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
-export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
+export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -91,7 +92,7 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
         let revealed = false;
         const render = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
-          const beat = getPlaybackBeat(seed);
+          const beat = getPlaybackBeat(seed, beatTrackIds);
           cover.set({
             cover: {
               params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
@@ -132,7 +133,7 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [kind, label, seed, small]);
+  }, [beatTrackIds, kind, label, seed, small]);
 
   if (small) {
     const shape = kind === 'genre' ? 'banner-thumb' : 'thumb';

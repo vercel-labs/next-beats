@@ -499,9 +499,7 @@ struct SurfaceSample {
   height: f32,
 }
 
-// A fullscreen triangle is explicit here so vGPU can select any of the fragment entry
-// points below. The diagnostic entries exercise the exact same height-field code as the
-// shipped image instead of maintaining a parallel debug shader.
+// Fullscreen triangle for the cover fragment shader.
 @vertex
 fn vs_main(@builtin(vertex_index) index: u32) -> VertexOutput {
   var positions = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
@@ -542,25 +540,6 @@ fn surfaceAt(uv: vec2f) -> SurfaceSample {
   let normal = normalize(vec3f((height - alongX) / step2 * relief, (height - alongY) / step2 * relief, 1.0));
 
   return SurfaceSample(point, normal, height);
-}
-
-// False-colour height view: violet is recessed, cyan is raised. This makes the SDF and
-// field silhouettes readable before lighting hides them.
-@fragment
-fn fs_sdf(@location(0) uv: vec2f) -> @location(0) vec4f {
-  let surface = surfaceAt(uv);
-  let level = clamp(surface.height * 1.25 + 0.3, 0.0, 1.0);
-  let low = vec3f(0.16, 0.06, 0.36);
-  let high = vec3f(0.12, 0.86, 0.96);
-  return vec4f(mix(low, high, level), 1.0);
-}
-
-// Encoded XYZ normals. Abrupt colour seams reveal the hard bevels that made the previous
-// bake look metallic; the final design should stay broad and slowly varying here.
-@fragment
-fn fs_normal(@location(0) uv: vec2f) -> @location(0) vec4f {
-  let surface = surfaceAt(uv);
-  return vec4f(surface.normal * 0.5 + 0.5, 1.0);
 }
 
 @fragment

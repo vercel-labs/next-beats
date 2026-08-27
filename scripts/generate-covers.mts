@@ -1,8 +1,6 @@
  
-// Pre-generates deterministic WebP fallback cover overlays through vGPU in Chrome.
-// Chrome is the render backend on macOS because vGPU's Node software renderer is
-// Linux-only. Large artwork animates live; these stills cover loading, reduced motion,
-// small thumbnails, and browsers without WebGPU.
+// Pre-generates the compact WebP cover overlays through vGPU in Chrome. Large artwork
+// animates live; only small thumbnails need baked files.
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -31,7 +29,6 @@ type StudioOptions = {
   height: number;
   kind: ArtworkKind;
   label: string;
-  mode?: 'final' | 'normal' | 'sdf';
   seed: string;
   turn: number;
   width: number;
@@ -104,14 +101,8 @@ async function coverCatalog(): Promise<CoverItem[]> {
   }
 }
 
-function shapesFor(kind: ArtworkKind, smallOnly: boolean) {
-  const names: CoverShape[] = smallOnly
-    ? kind === 'genre'
-      ? ['banner-thumb']
-      : ['thumb']
-    : kind === 'genre'
-      ? ['banner', 'banner-thumb']
-      : ['square', 'thumb'];
+function shapesFor(kind: ArtworkKind) {
+  const names: CoverShape[] = kind === 'genre' ? ['banner-thumb'] : ['thumb'];
   return COVER_SHAPES.filter(shape => names.includes(shape.name));
 }
 
@@ -126,11 +117,6 @@ function pngBytes(dataUrl: string) {
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required. Add it to .env.local first.');
   const catalog = await coverCatalog();
-  const smallOnly = process.argv.includes('--small');
-  const sampleIds = new Set(['t11', 't16', 't17', 't18']);
-  const items = process.argv.includes('--sample')
-    ? catalog.filter(item => item.kind !== 'track' || sampleIds.has(item.seed))
-    : catalog;
   const { child, url } = await studioServer();
   const browser = await chromium.launch({
     args: ['--disable-gpu-sandbox', '--enable-unsafe-webgpu'],
@@ -155,8 +141,8 @@ async function main() {
     if (studioError) throw new Error(`Cover studio failed: ${studioError}`);
 
     const report: string[] = [];
-    for (const item of items) {
-      for (const shape of shapesFor(item.kind, smallOnly)) {
+    for (const item of catalog) {
+      for (const shape of shapesFor(item.kind)) {
         console.log(`[cover] ${item.kind.padEnd(8)} ${item.label.padEnd(28)} ${shape.name}`);
         const scratch = mkdtempSync(join(tmpdir(), 'next-beats-covers-'));
         try {

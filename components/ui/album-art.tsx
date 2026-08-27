@@ -6,6 +6,7 @@ type Props = {
   coverSeed?: string;
   label?: string;
   kind?: 'track' | 'album' | 'playlist';
+  beatTrackIds?: string[];
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
@@ -16,7 +17,15 @@ const sizeMap = {
   sm: 'h-10 w-10',
 };
 
-export function AlbumArt({ coverColor, coverSeed, label, kind = 'track', size = 'md', className }: Props) {
+export function AlbumArt({
+  coverColor,
+  coverSeed,
+  label,
+  kind = 'track',
+  beatTrackIds,
+  size = 'md',
+  className,
+}: Props) {
   return (
     <div
       className={cn(
@@ -26,7 +35,15 @@ export function AlbumArt({ coverColor, coverSeed, label, kind = 'track', size = 
         className,
       )}
     >
-      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} small={size !== 'lg'} />}
+      {coverSeed && (
+        <AlbumArtCover
+          seed={coverSeed}
+          label={label ?? coverSeed}
+          kind={kind}
+          beatTrackIds={beatTrackIds}
+          small={size !== 'lg'}
+        />
+      )}
     </div>
   );
 }

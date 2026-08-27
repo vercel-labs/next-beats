@@ -17,6 +17,7 @@ export async function PlaylistDetail({ id }: { id: string }) {
           coverSeed={playlist.id}
           label={playlist.name}
           kind="playlist"
+          beatTrackIds={playlist.tracks.map(track => track.id)}
           size="lg"
           className="!h-40 !w-40 !rounded-md shadow-2xl sm:!h-48 sm:!w-48"
         />

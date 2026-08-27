@@ -7,14 +7,11 @@ import { artworkVariant, seedVector } from '@/lib/cover-motif';
 import type { ArtworkKind } from '@/lib/cover-motif';
 import type { Draw, Gpu, Target } from 'vgpu';
 
-type RenderMode = 'final' | 'normal' | 'sdf';
-
 type RenderOptions = {
   detail: number;
   height: number;
   kind: ArtworkKind;
   label: string;
-  mode?: RenderMode;
   seed: string;
   turn: number;
   width: number;
@@ -72,23 +69,11 @@ export function CoverStudio() {
       .then(context => {
         if (disposed) return context.dispose();
         gpu = context;
-        const covers: Record<RenderMode, Draw> = {
-          final: draw(context, {
-            entry: { fragment: 'fs_main' },
-            label: 'cover-studio-final',
-            shader: coverShader,
-          }),
-          normal: draw(context, {
-            entry: { fragment: 'fs_normal' },
-            label: 'cover-studio-normal',
-            shader: coverShader,
-          }),
-          sdf: draw(context, {
-            entry: { fragment: 'fs_sdf' },
-            label: 'cover-studio-sdf',
-            shader: coverShader,
-          }),
-        };
+        const cover: Draw = draw(context, {
+          entry: { fragment: 'fs_main' },
+          label: 'cover-studio-final',
+          shader: coverShader,
+        });
 
         window.__renderCoverFrame = async options => {
           const key = `${options.width}x${options.height}`;
@@ -100,7 +85,6 @@ export function CoverStudio() {
 
           const values = seedVector(options.seed);
           const variant = artworkVariant(options.label, options.kind, values[3]);
-          const cover = covers[options.mode ?? 'final'];
           cover.set({
             cover: {
               params: [options.turn, kindIndex[options.kind], variant, 0],
