@@ -124,7 +124,15 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           aspect = height > 0 ? width / height : 1;
         });
         observer = new IntersectionObserver(entries => {
-          visible = entries[0]?.isIntersecting ?? true;
+          const nextVisible = entries[0]?.isIntersecting ?? true;
+          if (disposed || nextVisible === visible) return;
+          visible = nextVisible;
+          if (!visible) {
+            revealed = false;
+            if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
+            revealFrame = undefined;
+            setReadyKey(current => (current === coverKey ? undefined : current));
+          }
         });
         observer.observe(canvas);
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
