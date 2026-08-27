@@ -56,6 +56,21 @@ const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2
 export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
+  const staticCover = (
+    <Image
+      alt=""
+      decoding="sync"
+      fill
+      loading="eager"
+      sizes={
+        small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
+      }
+      src={coverAssetPath(seed, label, kind, staticShape, true)}
+      unoptimized
+      className="pointer-events-none absolute inset-0 z-10 block object-cover"
+    />
+  );
 
   useEffect(() => {
     if (small) return;
@@ -137,27 +152,18 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
   }, [beatTrackIds, kind, label, seed, small]);
 
   if (small) {
-    const shape = kind === 'genre' ? 'banner-thumb' : 'thumb';
-    return (
-      <Image
-        alt=""
-        decoding="sync"
-        fill
-        loading="eager"
-        sizes={shape === 'banner-thumb' ? '320px' : '80px'}
-        src={coverAssetPath(seed, label, kind, shape, true)}
-        unoptimized
-        className="pointer-events-none absolute inset-0 z-20 block object-cover"
-      />
-    );
+    return staticCover;
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden
-      data-ready={ready || undefined}
-      className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
-    />
+    <>
+      {staticCover}
+      <canvas
+        ref={canvasRef}
+        aria-hidden
+        data-ready={ready || undefined}
+        className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
+      />
+    </>
   );
 }

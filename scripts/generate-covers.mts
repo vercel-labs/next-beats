@@ -1,6 +1,6 @@
  
-// Pre-generates the compact WebP cover overlays through vGPU in Chrome. Large artwork
-// animates live; only small thumbnails need baked files.
+// Pre-generates WebP first frames through vGPU in Chrome. Large artwork animates live
+// after hydration; these stills make its first paint and compact thumbnails immediate.
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -102,7 +102,7 @@ async function coverCatalog(): Promise<CoverItem[]> {
 }
 
 function shapesFor(kind: ArtworkKind) {
-  const names: CoverShape[] = kind === 'genre' ? ['banner-thumb'] : ['thumb'];
+  const names: CoverShape[] = kind === 'genre' ? ['banner', 'banner-thumb'] : ['square', 'thumb'];
   return COVER_SHAPES.filter(shape => names.includes(shape.name));
 }
 

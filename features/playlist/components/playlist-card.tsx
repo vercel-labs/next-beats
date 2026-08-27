@@ -9,12 +9,15 @@ import type { PlaylistWithTracks } from '@/types/playlist';
 export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
-  const trackCovers = playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true));
+  const prefetchedCovers = [
+    coverAssetPath(playlist.id, playlist.name, 'playlist', 'square', true),
+    ...playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true)),
+  ];
 
   return (
     <PrefetchLink
       href={`/playlist/${playlist.id}`}
-      preloadImages={trackCovers}
+      preloadImages={prefetchedCovers}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
       <div className="relative">

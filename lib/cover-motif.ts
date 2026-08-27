@@ -1,29 +1,64 @@
-// Picks which form a cover takes from its title, so the artwork is about the song. First
-// match wins, so ordering matters: "WebSocket Sunset" should be a limb, not a swell, and
-// "Console Calm" should be dunes, not panels.
-const motifs = [
-  { index: 2, test: /love|crush|heart|feeling|romance|kiss|\bpop\b/ }, // satin
-  { index: 1, test: /sunset|sunrise|synth|morning|midnight|dawn|dusk|night|dream|lullaby|sunday/ }, // limb
-  { index: 7, test: /sleep|calm|idle|slow|soft|quiet|rest|dark|lo-?fi/ }, // dunes
-  { index: 3, test: /pixel|crt|terminal|bios|compil|console|retro|neon|paint|chrome|glow|render/ }, // panels
-  { index: 6, test: /merge|conflict|stack|trace|overflow|deadlock|pointer|commit|cache|approv|reset|branch|diff/ }, // tunnel
-  { index: 5, test: /async|await|chemistr|component|thread|race|condition|atom|orbit|cycle|promise|indie/ }, // cluster
-  { index: 4, test: /energ|electro|push|force|ship|deploy|boot|monday|vibe|beat|drop|bass|fast/ }, // strata
-  {
-    index: 0,
-    test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/,
-  }, // swell
-] as const;
+// Every seeded track has an art-directed composition. Keyword matching is only the
+// fallback for tracks added after the bundled catalog.
+const trackMotifs: Record<string, number> = {
+  'async await': 0,
+  'websocket sunset': 1,
+  'server sent vibes': 2,
+  hydration: 3,
+  'hot module reload': 4,
+  'localhost morning': 5,
+  'readme love letter': 6,
+  'open source crush': 7,
+  'sunday deploy': 8,
+  'npm install feelings': 9,
+  'ship it': 10,
+  'stack overflow flow': 11,
+  '3 am push': 12,
+  'merge conflict': 13,
+  'git push --force': 14,
+  'pixel perfect': 15,
+  'tailwind hearts': 16,
+  'component chemistry': 17,
+  'type safe love': 18,
+  'first contentful paint': 19,
+  'slow build': 20,
+  'console calm': 21,
+  'soft reset': 22,
+  'idle thread': 23,
+  'npm install sleep': 24,
+  'neon terminal': 25,
+  'retro compiler': 26,
+  'cyber monday': 27,
+  'chrome dreams': 28,
+  'midnight deploy': 29,
+  'race condition': 30,
+  deadlock: 31,
+  backpressure: 32,
+  'commit message': 33,
+  'force push': 34,
+  'cache hit': 35,
+  'null pointer': 36,
+  'vibe coding': 37,
+  'pr approved': 38,
+  'localhost lullaby': 39,
+  'stack trace': 40,
+  'crt glow': 41,
+  'modem handshake': 42,
+  'bios boot': 43,
+};
 
-const referenceMotifs = [
-  { index: 13, test: /^pixel perfect$/ },
-  { index: 8, test: /^ship it$/ },
-  { index: 9, test: /^tailwind hearts$/ },
-  { index: 15, test: /^type safe love$/ },
-  { index: 10, test: /^stack overflow flow$/ },
-  { index: 14, test: /^component chemistry$/ },
-  { index: 11, test: /^hot module reload$/ },
-  { index: 12, test: /^3 am push$/ },
+const motifs = [
+  { index: 46, test: /love|crush|heart|feeling|romance|kiss|\bpop\b/ },
+  { index: 45, test: /sunset|sunrise|synth|morning|midnight|dawn|dusk|night|dream|lullaby|sunday/ },
+  { index: 51, test: /sleep|calm|idle|slow|soft|quiet|rest|dark|lo-?fi/ },
+  { index: 47, test: /pixel|crt|terminal|bios|compil|console|retro|neon|paint|chrome|glow|render/ },
+  { index: 50, test: /merge|conflict|stack|trace|overflow|deadlock|pointer|commit|cache|approv|reset|branch|diff/ },
+  { index: 49, test: /async|await|chemistr|component|thread|race|condition|atom|orbit|cycle|promise|indie/ },
+  { index: 48, test: /energ|electro|push|force|ship|deploy|boot|monday|vibe|beat|drop|bass|fast/ },
+  {
+    index: 44,
+    test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/,
+  },
 ] as const;
 
 const GENERIC_TRACK_MOTIF_COUNT = 8;
@@ -54,7 +89,9 @@ const playlistMotifs: Record<string, number> = {
 // slightly wider field than the large art so the complete title-specific silhouette has
 // breathing room instead of turning into one cropped edge at 40px.
 export const COVER_SHAPES = [
+  { detail: 1, height: 512, name: 'square', width: 512 },
   { detail: 1.08, height: 80, name: 'thumb', width: 80 },
+  { detail: 1, height: 288, name: 'banner', width: 960 },
   { detail: 1.08, height: 96, name: 'banner-thumb', width: 320 },
 ] as const;
 
@@ -109,11 +146,10 @@ export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, s
 
 export function motifForTitle(title: string, fallback: number) {
   const value = title.toLowerCase();
-  for (const motif of referenceMotifs) {
-    if (motif.test.test(value)) return motif.index;
-  }
+  const directed = trackMotifs[value];
+  if (directed !== undefined) return directed;
   for (const motif of motifs) {
     if (motif.test.test(value)) return motif.index;
   }
-  return Math.min(GENERIC_TRACK_MOTIF_COUNT - 1, Math.floor(fallback * GENERIC_TRACK_MOTIF_COUNT));
+  return 44 + Math.min(GENERIC_TRACK_MOTIF_COUNT - 1, Math.floor(fallback * GENERIC_TRACK_MOTIF_COUNT));
 }

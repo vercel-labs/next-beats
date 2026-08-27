@@ -105,7 +105,10 @@ async function SidebarPlaylists() {
           key={pl.id}
           hoverPrefetch
           href={`/playlist/${pl.id}` as Route}
-          preloadImages={pl.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true))}
+          preloadImages={[
+            coverAssetPath(pl.id, pl.name, 'playlist', 'square', true),
+            ...pl.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true)),
+          ]}
           aria-label={pl.name}
           className={sidebarLink}
         >
