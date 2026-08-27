@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { addTransitionType, startTransition, useEffect, useRef, useState, ViewTransition } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
@@ -55,10 +55,15 @@ const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2
 
 export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const beatTrackIdsRef = useRef(beatTrackIds);
   const coverKey = `${kind}\0${seed}\0${label}`;
   const [readyKey, setReadyKey] = useState<string>();
   const ready = !small && readyKey === coverKey;
   const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
+
+  useEffect(() => {
+    beatTrackIdsRef.current = beatTrackIds;
+  }, [beatTrackIds]);
 
   useEffect(() => {
     if (small) return;
@@ -96,7 +101,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         let revealed = false;
         const render = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
-          const beat = getPlaybackBeat(seed, beatTrackIds);
+          const beat = getPlaybackBeat(seed, beatTrackIdsRef.current);
           cover.set({
             cover: {
               params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
@@ -108,12 +113,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
-              if (!disposed) {
-                startTransition(() => {
-                  addTransitionType('cover-ready');
-                  setReadyKey(coverKey);
-                });
-              }
+              if (!disposed) setReadyKey(coverKey);
             });
           }
         };
@@ -142,15 +142,13 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [beatTrackIds, coverKey, kind, label, seed, small]);
+  }, [coverKey, kind, label, seed, small]);
 
   return (
-    <ViewTransition update={{ 'cover-ready': 'auto', default: 'none' }} default="none">
+    <>
       <Image
         alt=""
-        decoding="sync"
         fill
-        loading="eager"
         sizes={
           small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
         }
@@ -167,6 +165,6 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
         />
       )}
-    </ViewTransition>
+    </>
   );
 }

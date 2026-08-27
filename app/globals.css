@@ -128,8 +128,7 @@
   }
 }
 
-/* Keep the pre-rendered artwork visible until the first live GPU frame. The
-   complete cover layers crossfade through their update-only ViewTransition. */
+/* Keep the pre-rendered artwork visible until the first live GPU frame. */
 .album-art-shader {
   opacity: 0;
 }

@@ -1,4 +1,3 @@
- 
 // Pre-generates WebP first frames through vGPU in Chrome. Large artwork animates live
 // after hydration; these stills make its first paint and compact thumbnails immediate.
 import { execFileSync, spawn } from 'node:child_process';

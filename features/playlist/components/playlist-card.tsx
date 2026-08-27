@@ -3,21 +3,15 @@ import { AlbumArt } from '@/components/ui/album-art';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PlayButton } from '@/features/track/components/play-button';
-import { coverAssetPath } from '@/lib/cover-motif';
 import type { PlaylistWithTracks } from '@/types/playlist';
 
 export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
-  const prefetchedCovers = [
-    coverAssetPath(playlist.id, playlist.name, 'playlist', 'square', true),
-    ...playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true)),
-  ];
 
   return (
     <PrefetchLink
       href={`/playlist/${playlist.id}`}
-      preloadImages={prefetchedCovers}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
       <div className="relative">
@@ -31,11 +25,7 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
           className="aspect-square !h-auto !w-full shadow-lg"
         />
         {firstTrack && (
-          <PlayButton
-            track={firstTrack}
-            queue={playlist.tracks}
-            className="card-play-btn absolute right-2 bottom-2"
-          />
+          <PlayButton track={firstTrack} queue={playlist.tracks} className="card-play-btn absolute right-2 bottom-2" />
         )}
       </div>
       <div className="flex min-w-0 flex-col gap-0.5">
