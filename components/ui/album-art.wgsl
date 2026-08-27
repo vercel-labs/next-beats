@@ -176,24 +176,26 @@ fn monolith(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   return max(max(sail + leadingEdge, mast + boom), hull) + wake;
 }
 
-/** Folded paper forming an almost-heart: readable from the title, never an icon. */
+/** One inset folded heart: recognisable at card size, but still sculptural rather than an icon. */
 fn pinch(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let focus = vec2f((seed.x - 0.5) * 0.14, (seed.y - 0.5) * 0.12);
-  let drift = vec2f(cos(cycle), sin(cycle)) * 0.014;
-  let leftCenter = vec2f(-0.42, -0.22) + focus + drift;
-  let rightCenter = vec2f(0.42, -0.22) + focus - drift;
-  let left = sphereHeight(point, leftCenter, 0.72) * 0.2;
-  let right = sphereHeight(point, rightCenter, 0.72) * 0.2;
-  let heartPoint = (point - focus - vec2f(0.0, 0.04)) * vec2f(1.15, -1.05);
-  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.48;
+  let breathe = 1.0 + sin(cycle) * 0.012;
+  let heartPoint = (point - focus - vec2f(0.0, 0.015)) * vec2f(1.28, -1.08) / breathe;
+  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.43;
   let heartField = heartBase * heartBase * heartBase
     - heartPoint.x * heartPoint.x * heartPoint.y * heartPoint.y * heartPoint.y;
-  let foldedBody = (1.0 - smoothstep(-0.015, 0.065, heartField)) * 0.075;
-  let outerFold = exp(-abs(heartField) * 20.0) * smoothstep(1.0, 0.22, length(heartPoint)) * 0.1;
+  let body = 1.0 - smoothstep(-0.012, 0.035, heartField);
+  let centreRise = exp(-dot(heartPoint * vec2f(0.72, 0.9), heartPoint * vec2f(0.72, 0.9)) * 1.7);
+  let foldedBody = body * (0.105 + centreRise * 0.075);
+  let outerFold = exp(-abs(heartField) * 28.0) * smoothstep(0.94, 0.18, length(heartPoint)) * 0.12;
+
+  // Two restrained paper creases lead the eye to the lower point without replacing the
+  // heart silhouette with a pair of spherical lobes.
   let pointAt = focus + vec2f(0.0, 0.68);
-  let leftCrease = exp(-pow(segmentDistance(point, focus + vec2f(-0.42, -0.2), pointAt) * 12.0, 2.0));
-  let rightCrease = exp(-pow(segmentDistance(point, focus + vec2f(0.42, -0.2), pointAt) * 12.0, 2.0));
-  return max(left, right) + foldedBody + outerFold + max(leftCrease, rightCrease) * 0.055;
+  let leftCrease = exp(-pow(segmentDistance(point, focus + vec2f(-0.37, -0.13), pointAt) * 15.0, 2.0));
+  let rightCrease = exp(-pow(segmentDistance(point, focus + vec2f(0.37, -0.13), pointAt) * 15.0, 2.0));
+  let centreFold = exp(-pow(segmentDistance(point, focus + vec2f(0.0, -0.37), pointAt) * 18.0, 2.0));
+  return foldedBody + outerFold + body * (max(leftCrease, rightCrease) * 0.045 + centreFold * 0.025);
 }
 
 /** Three heavy sheets overflowing over broad, irregular edges. */
