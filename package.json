@@ -61,9 +61,6 @@
   },
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
-    "minimumReleaseAgeExclude": [
-      "vgpu"
-    ],
     "onlyBuiltDependencies": [
       "better-sqlite3"
     ],
