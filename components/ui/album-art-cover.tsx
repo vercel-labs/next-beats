@@ -22,7 +22,7 @@ function registerAnimatedCover(gpu: Gpu, render: (currentFrame: Frame, time: num
       const time = performance.now() / 1000;
       animatedCovers.forEach(drawCover => drawCover(currentFrame, time));
     },
-    { fps: 20 },
+    { fps: 15 },
   );
 
   return () => {
@@ -79,11 +79,9 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
 
     let disposed = false;
     let output: Surface | undefined;
-    let resizeObserver: ResizeObserver | undefined;
     let visibilityObserver: IntersectionObserver | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
-    let animationFrame = 0;
 
     void getGpu()
       .then(gpu => {
@@ -93,22 +91,15 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
         const motif = motifForTitle(label, seedValues[3]);
 
         // Strokes are given in CSS pixels and shapes stay circular, so the shader needs
-        // the element's own height and aspect ratio.
-        const metrics = () => {
-          const height = canvas.clientHeight || 48;
-          return { aspect: (canvas.clientWidth || height) / height, unit: 2 / height };
-        };
+        // the element's height and aspect ratio. Both come from the surface's resize
+        // event rather than from the canvas, so drawing never forces a layout.
+        let unit = 2 / 48;
+        let aspect = 1;
 
         output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
         const cover = effect(gpu, coverShader, {
           label: `album-cover-${seed}`,
-          set: {
-            cover: {
-              params: [0, kindIndex[kind], motif, metrics().unit],
-              seed: seedValues,
-              shape: [metrics().aspect, 0, 0, 0],
-            },
-          },
+          set: { cover: { params: [0, kindIndex[kind], motif, unit], seed: seedValues, shape: [aspect, 0, 0, 0] } },
         });
 
         let visible = true;
@@ -116,7 +107,7 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
         const draw = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
 
-          cover.set({ cover: { params: [time, kindIndex[kind], motif, metrics().unit] } });
+          cover.set({ cover: { params: [time, kindIndex[kind], motif, unit] } });
           currentFrame.pass(output, cover);
 
           if (!revealed) {
@@ -127,25 +118,25 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
           }
         };
 
+        const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const drawStill = () => {
+          if (!disposed) void frame(gpu, currentFrame => draw(currentFrame, seedValues[3] * 12)).done;
+        };
+
+        // Fires once immediately with the current size, then on every resize.
+        unsubscribeResize = output.onResize(({ dpr, height, width }) => {
+          aspect = height > 0 ? width / height : 1;
+          unit = 2 / (height / dpr || 48);
+          cover.set({ cover: { params: [0, kindIndex[kind], motif, unit], shape: [aspect, 0, 0, 0] } });
+          if (still) drawStill();
+        });
+
         visibilityObserver = new IntersectionObserver(entries => {
           visible = entries[0]?.isIntersecting ?? true;
         });
         visibilityObserver.observe(canvas);
 
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          const drawStill = () => {
-            if (!disposed) void frame(gpu, currentFrame => draw(currentFrame, seedValues[3] * 12)).done;
-          };
-
-          drawStill();
-          resizeObserver = new ResizeObserver(() => {
-            cancelAnimationFrame(animationFrame);
-            animationFrame = requestAnimationFrame(drawStill);
-          });
-          resizeObserver.observe(canvas);
-        } else {
-          unregisterAnimation = registerAnimatedCover(gpu, draw);
-        }
+        if (!still) unregisterAnimation = registerAnimatedCover(gpu, draw);
       })
       .catch(() => {
         // The CSS gradient stays visible on its own; nothing else is needed.
@@ -153,10 +144,8 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
 
     return () => {
       disposed = true;
-      cancelAnimationFrame(animationFrame);
       unregisterAnimation?.();
       unsubscribeResize?.();
-      resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
       output?.dispose();
     };
