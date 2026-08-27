@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { effect, init, surface } from 'vgpu';
+import { effect, frame, init, surface } from 'vgpu';
 import coverShader from './album-art.wgsl';
 import type { Gpu, Surface } from 'vgpu';
 
@@ -54,7 +54,15 @@ export function AlbumArtCover({ seed }: { seed: string }) {
           set: { seed: seedVector(seed) },
         });
         const draw = () => {
-          if (!disposed && output) cover.draw(output);
+          if (!disposed && output) {
+            const renderedFrame = frame(gpu, currentFrame => {
+              currentFrame.pass(output!, cover);
+            });
+
+            void renderedFrame.done.then(() => {
+              if (!disposed) canvas.style.opacity = '1';
+            });
+          }
         };
 
         draw();
@@ -76,5 +84,11 @@ export function AlbumArtCover({ seed }: { seed: string }) {
     };
   }, [seed]);
 
-  return <canvas ref={canvasRef} aria-hidden className="pointer-events-none absolute inset-0 block h-full w-full" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-10 block h-full w-full opacity-0 transition-opacity"
+    />
+  );
 }
