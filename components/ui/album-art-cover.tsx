@@ -68,6 +68,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
     let disposed = false;
     let output: Surface | undefined;
     let observer: IntersectionObserver | undefined;
+    let revealFrame: number | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
     const seedValues = seedVector(seed);
@@ -108,7 +109,10 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
-              if (!disposed) setReadyKey(coverKey);
+              if (disposed) return;
+              revealFrame = requestAnimationFrame(() => {
+                if (!disposed) setReadyKey(coverKey);
+              });
             });
           }
         };
@@ -132,6 +136,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
 
     return () => {
       disposed = true;
+      if (revealFrame !== undefined) cancelAnimationFrame(revealFrame);
       observer?.disconnect();
       unregisterAnimation?.();
       unsubscribeResize?.();
@@ -144,6 +149,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       <Image
         alt=""
         fill
+        loading="eager"
         sizes={
           small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
         }
