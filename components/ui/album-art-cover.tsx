@@ -59,8 +59,9 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
 
   useEffect(() => {
     if (small) return;
-    const canvasElement = canvasRef.current;
-    if (!canvasElement) return;
+    const currentCanvas = canvasRef.current;
+    if (!currentCanvas) return;
+    const canvasElement: HTMLCanvasElement = currentCanvas;
 
     let disposed = false;
     let gpu: Gpu | undefined;
