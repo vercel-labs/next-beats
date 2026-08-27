@@ -3,8 +3,38 @@
 import { Pause, Play, SkipBack, SkipForward, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { Boundary } from '@/components/demo/boundary';
 import { AlbumArt } from '@/components/ui/album-art';
-import { formatDuration } from '@/lib/utils';
+import { cn, formatDuration } from '@/lib/utils';
 import { usePlayer } from '@/providers/player-provider';
+
+// While a track plays, its own cover art lights the bar: a blurred copy of the exact same
+// gradient spills out from behind the artwork, so the light always matches the cover.
+function LitCover({
+  coverColor,
+  coverSeed,
+  isPlaying,
+  label,
+  className,
+}: {
+  coverColor: string;
+  coverSeed?: string;
+  isPlaying: boolean;
+  label?: string;
+  className: string;
+}) {
+  return (
+    <div className="relative isolate shrink-0">
+      <span
+        aria-hidden
+        className={cn(
+          'pointer-events-none absolute inset-0 -z-10 rounded-sm bg-gradient-to-br blur-md transition-all duration-1000',
+          coverColor,
+          isPlaying ? 'scale-125 opacity-70' : 'scale-100 opacity-0',
+        )}
+      />
+      <AlbumArt coverColor={coverColor} coverSeed={coverSeed} label={label} size="sm" className={className} />
+    </div>
+  );
+}
 
 export function NowPlayingBar() {
   const { track, isPlaying, progress, volume, hasQueue, togglePlayPause, next, previous, setVolume } = usePlayer();
@@ -22,11 +52,11 @@ export function NowPlayingBar() {
             className="border-divider dark:border-divider-dark shrink-0 border-t bg-white px-4 py-2 sm:hidden dark:bg-[#181818]"
           >
             <div className="flex items-center gap-3">
-              <AlbumArt
+              <LitCover
                 coverColor={track.coverColor}
                 coverSeed={track.id}
                 label={track.title}
-                size="sm"
+                isPlaying={isPlaying}
                 className="!h-12 !w-12 !rounded-sm"
               />
               <div className="flex min-w-0 flex-1 flex-col">
@@ -62,11 +92,11 @@ export function NowPlayingBar() {
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_2fr] items-center gap-4 lg:grid-cols-[minmax(0,1fr)_2fr_minmax(0,1fr)]">
             <div className="min-w-0">
               <div className="hidden items-center gap-3 lg:flex">
-                <AlbumArt
+                <LitCover
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
                   coverSeed={track?.id}
                   label={track?.title}
-                  size="sm"
+                  isPlaying={isPlaying}
                   className="!h-14 !w-14 !rounded-sm"
                 />
                 <TrackInfo
@@ -75,11 +105,11 @@ export function NowPlayingBar() {
                 />
               </div>
               <div className="flex items-center gap-3 lg:hidden">
-                <AlbumArt
+                <LitCover
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
                   coverSeed={track?.id}
                   label={track?.title}
-                  size="sm"
+                  isPlaying={isPlaying}
                   className="!h-10 !w-10 !rounded-sm"
                 />
                 <TrackInfo title={track?.title ?? 'No track'} subtitle={track?.artist ?? ''} />

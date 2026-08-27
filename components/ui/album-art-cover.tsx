@@ -2,7 +2,7 @@
 
 import { startTransition, useEffect, useRef, useState } from 'react';
 import { effect, frame, frameLoop, init, surface } from 'vgpu';
-import { motifForTitle } from '@/lib/cover-motif';
+import { COVER_LOOP_SECONDS, motifForTitle } from '@/lib/cover-motif';
 import { cn } from '@/lib/utils';
 import coverShader from './album-art.wgsl';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
@@ -107,7 +107,8 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
         const draw = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
 
-          cover.set({ cover: { params: [time, kindIndex[kind], motif, unit] } });
+          // The shader takes a normalised loop position, not seconds.
+          cover.set({ cover: { params: [time / COVER_LOOP_SECONDS, kindIndex[kind], motif, unit] } });
           currentFrame.pass(output, cover);
 
           if (!revealed) {
@@ -120,7 +121,7 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
 
         const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const drawStill = () => {
-          if (!disposed) void frame(gpu, currentFrame => draw(currentFrame, seedValues[3] * 12)).done;
+          if (!disposed) void frame(gpu, currentFrame => draw(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
         };
 
         // Fires once immediately with the current size, then on every resize.

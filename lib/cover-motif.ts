@@ -14,6 +14,31 @@ const motifs = [
 
 export const MOTIF_COUNT = 8;
 
+/** Frames and cadence of the baked loop. 48 frames at 250ms is a 12s cycle. */
+export const COVER_FRAMES = 48;
+export const COVER_FRAME_MS = 250;
+export const COVER_LOOP_SECONDS = (COVER_FRAMES * COVER_FRAME_MS) / 1000;
+
+const motifNames = ['ripple', 'horizon', 'heart', 'grid', 'spectrum', 'orbit', 'paths', 'crescent'] as const;
+
+// `kind` matches the shader: square covers print the motif bare, banners set it beside
+// the label. Sizes are the largest the artwork is displayed at, times a little headroom.
+export const COVER_SHAPES = [
+  { height: 384, kind: 0, name: 'square', width: 384 },
+  { height: 224, kind: 3, name: 'banner', width: 768 },
+] as const;
+
+export type CoverShape = (typeof COVER_SHAPES)[number]['name'];
+
+export function coverAssetName(motif: number, shape: CoverShape) {
+  return `${motifNames[motif] ?? motifNames[0]}-${shape}`;
+}
+
+/** Public URL of the baked overlay for a title. */
+export function coverAssetUrl(title: string, fallback: number, shape: CoverShape) {
+  return `/covers/${coverAssetName(motifForTitle(title, fallback), shape)}.webp`;
+}
+
 export function motifForTitle(title: string, fallback: number) {
   const value = title.toLowerCase();
   for (const motif of motifs) {
