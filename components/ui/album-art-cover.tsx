@@ -69,6 +69,11 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       src={coverAssetPath(seed, label, kind, staticShape, true)}
       unoptimized
       className="pointer-events-none absolute inset-0 z-10 block object-cover"
+      style={{
+        opacity: !small && ready ? 0 : 1,
+        transition: 'opacity 160ms ease-out',
+        willChange: 'opacity',
+      }}
     />
   );
 
