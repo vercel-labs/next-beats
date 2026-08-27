@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { addTransitionType, startTransition, useEffect, useRef, useState, ViewTransition } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
@@ -108,7 +108,12 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
-              if (!disposed) startTransition(() => setReadyKey(coverKey));
+              if (!disposed) {
+                startTransition(() => {
+                  addTransitionType('cover-ready');
+                  setReadyKey(coverKey);
+                });
+              }
             });
           }
         };
@@ -140,7 +145,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
   }, [beatTrackIds, coverKey, kind, label, seed, small]);
 
   return (
-    <>
+    <ViewTransition update={{ 'cover-ready': 'auto', default: 'none' }} default="none">
       <Image
         alt=""
         decoding="sync"
@@ -152,11 +157,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         src={coverAssetPath(seed, label, kind, staticShape, true)}
         unoptimized
         className="pointer-events-none absolute inset-0 z-10 block object-cover"
-        style={{
-          opacity: ready ? 0 : 1,
-          transition: 'opacity 160ms ease-out',
-          willChange: 'opacity',
-        }}
+        style={{ opacity: ready ? 0 : 1 }}
       />
       {!small && (
         <canvas
@@ -166,6 +167,6 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
         />
       )}
-    </>
+    </ViewTransition>
   );
 }

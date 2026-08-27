@@ -128,12 +128,10 @@
   }
 }
 
-/* Keep the pre-rendered artwork visible while WebGPU warms up, then crossfade
-   the complete live cover in as one layer. */
+/* Keep the pre-rendered artwork visible until the first live GPU frame. The
+   complete cover layers crossfade through their update-only ViewTransition. */
 .album-art-shader {
   opacity: 0;
-  transition: opacity 160ms ease-out;
-  will-change: opacity;
 }
 
 .album-art-shader[data-ready] {
@@ -226,10 +224,6 @@
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  .album-art-shader {
-    transition: none;
-  }
-
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
