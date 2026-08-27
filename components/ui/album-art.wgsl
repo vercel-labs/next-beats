@@ -148,53 +148,60 @@ fn dunes(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     + point.y * (0.06 + seed.y * 0.12);
 }
 
-/** A dark, sail-like sleeve standing upright, with a narrow illuminated edge. */
+/** A cropped sail and hull: still sculptural, but unmistakably moving forward. */
 fn monolith(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let sway = sin(cycle) * 0.012;
-  let local = rotate(point - vec2f(-0.2 + (seed.x - 0.5) * 0.08, 0.02), -0.025 + sway);
-  let sailEdge = 0.56 + local.y * 0.24;
-  let taper = 1.0 - smoothstep(sailEdge - 0.025, sailEdge + 0.025, local.x);
-  let body = roundedPlate(local, vec2f(0.7, 1.16), 0.035, 0.31) * taper;
-  let edge = exp(-pow((local.x - sailEdge) * 25.0, 2.0))
-    * (1.0 - smoothstep(1.0, 1.14, abs(local.y))) * 0.18;
-  let mast = exp(-pow((local.x + 0.38) * 24.0, 2.0))
-    * (1.0 - smoothstep(0.86, 1.02, abs(local.y))) * 0.045;
-  let hull = roundedPlate(local - vec2f(-0.02, 0.78), vec2f(0.58, 0.075), 0.07, 0.11);
-  let wake = exp(-pow((local.y - 0.86) * 10.0, 2.0)) * smoothstep(0.35, -0.88, local.x) * 0.055;
-  return max(body + edge + mast, hull) + wake;
+  let sway = sin(cycle) * 0.018;
+  let local = rotate(point - vec2f((seed.x - 0.5) * 0.06, -0.03), -0.035 + sway);
+  let top = -0.72;
+  let bottom = 0.54;
+  let mastX = -0.5;
+  let sailEdge = 0.5 - (local.y - top) * 0.23;
+  let vertical = smoothstep(top - 0.04, top + 0.04, local.y)
+    * (1.0 - smoothstep(bottom - 0.04, bottom + 0.04, local.y));
+  let inside = smoothstep(mastX - 0.035, mastX + 0.035, local.x)
+    * (1.0 - smoothstep(sailEdge - 0.04, sailEdge + 0.04, local.x))
+    * vertical;
+  let sail = inside * (0.24 + (sailEdge - local.x) * 0.055);
+  let leadingEdge = exp(-pow((local.x - sailEdge) * 28.0, 2.0)) * vertical * 0.18;
+  let mast = exp(-pow((local.x - mastX) * 30.0, 2.0))
+    * smoothstep(top - 0.08, top, local.y)
+    * (1.0 - smoothstep(0.72, 0.8, local.y)) * 0.09;
+  let boom = exp(-pow((local.y - 0.53) * 26.0, 2.0))
+    * smoothstep(mastX - 0.05, mastX + 0.05, local.x)
+    * (1.0 - smoothstep(0.43, 0.5, local.x)) * 0.1;
+  let hullLocal = local - vec2f(-0.02, 0.66);
+  let hull = roundedPlate(hullLocal, vec2f(0.62, 0.09), 0.08, 0.17);
+  let wake = exp(-pow((local.y - 0.82) * 13.0, 2.0))
+    * smoothstep(0.55, -0.82, local.x) * 0.075;
+  return max(max(sail + leadingEdge, mast + boom), hull) + wake;
 }
 
-/** Three broad curved surfaces converging in a soft photographic pinch. */
+/** Folded paper forming an almost-heart: readable from the title, never an icon. */
 fn pinch(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let focus = vec2f((seed.x - 0.5) * 0.14, (seed.y - 0.5) * 0.12);
   let drift = vec2f(cos(cycle), sin(cycle)) * 0.014;
-  let firstCenter = vec2f(-0.86, -0.78) + focus + drift;
-  let secondCenter = vec2f(1.02, -0.12) + focus - drift.yx;
-  let thirdCenter = vec2f(-0.14, 1.04) + focus + drift.yx;
-  let firstRadius = 1.13;
-  let secondRadius = 1.08;
-  let thirdRadius = 1.12;
-  let first = sphereHeight(point, firstCenter, firstRadius) * 0.2
-    + (1.0 - smoothstep(firstRadius - 0.09, firstRadius + 0.025, length(point - firstCenter))) * 0.07;
-  let second = sphereHeight(point, secondCenter, secondRadius) * 0.21
-    + (1.0 - smoothstep(secondRadius - 0.09, secondRadius + 0.025, length(point - secondCenter))) * 0.07;
-  let third = sphereHeight(point, thirdCenter, thirdRadius) * 0.19
-    + (1.0 - smoothstep(thirdRadius - 0.09, thirdRadius + 0.025, length(point - thirdCenter))) * 0.07;
-  // A faint heart crease gives the title a second read without drawing a standalone icon.
-  let heartPoint = (point - focus - vec2f(0.02, 0.08)) * vec2f(1.3, -1.2);
-  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.28;
+  let leftCenter = vec2f(-0.42, -0.22) + focus + drift;
+  let rightCenter = vec2f(0.42, -0.22) + focus - drift;
+  let left = sphereHeight(point, leftCenter, 0.72) * 0.2;
+  let right = sphereHeight(point, rightCenter, 0.72) * 0.2;
+  let heartPoint = (point - focus - vec2f(0.0, 0.04)) * vec2f(1.15, -1.05);
+  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.48;
   let heartField = heartBase * heartBase * heartBase
     - heartPoint.x * heartPoint.x * heartPoint.y * heartPoint.y * heartPoint.y;
-  let heartCrease = exp(-abs(heartField) * 18.0) * smoothstep(0.9, 0.18, length(heartPoint)) * 0.065;
-  return first + second + third + heartCrease;
+  let foldedBody = (1.0 - smoothstep(-0.015, 0.065, heartField)) * 0.075;
+  let outerFold = exp(-abs(heartField) * 20.0) * smoothstep(1.0, 0.22, length(heartPoint)) * 0.1;
+  let pointAt = focus + vec2f(0.0, 0.68);
+  let leftCrease = exp(-pow(segmentDistance(point, focus + vec2f(-0.42, -0.2), pointAt) * 12.0, 2.0));
+  let rightCrease = exp(-pow(segmentDistance(point, focus + vec2f(0.42, -0.2), pointAt) * 12.0, 2.0));
+  return max(left, right) + foldedBody + outerFold + max(leftCrease, rightCrease) * 0.055;
 }
 
 /** Three heavy sheets overflowing over broad, irregular edges. */
 fn foldedEdge(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let local = rotate(point, -0.18 + (seed.z - 0.5) * 0.08);
+  let local = rotate(point * 0.84 - vec2f(0.0, 0.08), -0.18 + (seed.z - 0.5) * 0.08);
   var height = 0.0;
   for (var layer = 0.0; layer < 3.0; layer += 1.0) {
-    let boundary = -0.18 + layer * 0.2
+    let boundary = -0.34 + layer * 0.3
       + sin(local.x * (1.35 + layer * 0.16) + seed.x * TAU + layer) * 0.045
       + smoothFlow(vec2f(local.x * 0.62, seed.y * 2.0 + layer * 1.8), cycle, 0.14) * 0.05;
     let sheet = 1.0 - smoothstep(-0.04, 0.04, local.y - boundary);
@@ -207,18 +214,14 @@ fn foldedEdge(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 /** Two large translucent sleeves inset into one another. */
 fn insetPanels(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let breathe = sin(cycle) * 0.018;
-  let back = roundedPlate(
-    rotate(point - vec2f(-0.34, 0.18), -0.02 + breathe),
-    vec2f(0.88, 0.9),
-    0.09,
-    0.17,
-  );
-  let front = roundedPlate(
-    rotate(point - vec2f(0.28, -0.2), 0.015 - breathe),
-    vec2f(0.68, 0.7),
-    0.1,
-    0.33,
-  );
+  let backLocal = rotate(point - vec2f(-0.24, 0.16), -0.02 + breathe);
+  let frontLocal = rotate(point - vec2f(0.22, -0.18), 0.015 - breathe);
+  let backDistance = roundedBoxDistance(backLocal, vec2f(0.75, 0.78), 0.09);
+  let frontDistance = roundedBoxDistance(frontLocal, vec2f(0.58, 0.61), 0.1);
+  let back = (1.0 - smoothstep(-0.1, 0.055, backDistance)) * 0.16
+    + exp(-pow(backDistance * 18.0, 2.0)) * 0.075;
+  let front = (1.0 - smoothstep(-0.1, 0.055, frontDistance)) * 0.3
+    + exp(-pow(frontDistance * 19.0, 2.0)) * 0.12;
   let centre = exp(-dot(point - vec2f(0.25, -0.18), point - vec2f(0.25, -0.18)) * 3.8) * 0.07;
   return max(back, front) + centre;
 }
@@ -227,9 +230,11 @@ fn insetPanels(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 fn nightHorizon(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let local = rotate(point, -0.66 + (seed.z - 0.5) * 0.04);
   let horizon = 1.0 - smoothstep(-0.035, 0.035, local.y + 0.12);
+  let horizonEdge = exp(-pow((local.y + 0.12) * 18.0, 2.0)) * 0.09;
   let starAt = vec2f(0.48 + sin(cycle) * 0.012, -0.32);
-  let star = exp(-dot(point - starAt, point - starAt) * 240.0) * 0.2;
-  return horizon * 0.28 + star;
+  let star = exp(-dot(point - starAt, point - starAt) * 190.0) * 0.27;
+  let starRay = exp(-abs(point.x - starAt.x) * 75.0) * exp(-abs(point.y - starAt.y) * 5.0) * 0.045;
+  return horizon * 0.28 + horizonEdge + star + starRay;
 }
 
 /** The reference's centred, regular tile field for Pixel Perfect. */

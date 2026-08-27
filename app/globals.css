@@ -133,15 +133,15 @@
    the underlying cover at its perimeter instead of arriving as a hard tile. */
 .album-art-shader {
   opacity: 0;
-  filter: blur(10px);
+  filter: blur(2px);
   mask-image: radial-gradient(ellipse at center, #000 50%, rgb(0 0 0 / 90%) 72%, transparent 100%);
   mask-position: center;
   mask-repeat: no-repeat;
-  mask-size: 68% 108%;
+  mask-size: 88% 118%;
   transition:
-    opacity 480ms ease-out,
-    filter 720ms ease-out,
-    mask-size 820ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 220ms ease-out,
+    filter 260ms ease-out,
+    mask-size 300ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, filter, mask-size;
 }
 
