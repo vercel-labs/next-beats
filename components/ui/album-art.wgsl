@@ -61,6 +61,17 @@ fn segmentDistance(point: vec2f, start: vec2f, end: vec2f) -> f32 {
   return length(point - (start + line * along));
 }
 
+// Analytic heart SDF: one continuous symbol silhouette with no primitive seams.
+fn heartDistance(point: vec2f) -> f32 {
+  let p = vec2f(abs(point.x), point.y);
+  if (p.x + p.y > 1.0) {
+    return length(p - vec2f(0.25, 0.75)) - 0.3535534;
+  }
+  let diagonal = p - 0.5 * max(p.x + p.y, 0.0) * vec2f(1.0);
+  return sqrt(min(dot(p - vec2f(0.0, 1.0), p - vec2f(0.0, 1.0)), dot(diagonal, diagonal)))
+    * sign(p.x - p.y);
+}
+
 // Every field is parameterised by the seed -- frequency, count, radius, offset -- so two
 // items that land on the same form still get their own composition. Nothing here depends
 // on the seed in a way that breaks the loop: only shapes vary, never the harmonics.
@@ -180,22 +191,14 @@ fn monolith(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 fn pinch(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let focus = vec2f((seed.x - 0.5) * 0.14, (seed.y - 0.5) * 0.12);
   let breathe = 1.0 + sin(cycle) * 0.012;
-  let heartPoint = (point - focus - vec2f(0.0, 0.015)) * vec2f(1.28, -1.08) / breathe;
-  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.43;
-  let heartField = heartBase * heartBase * heartBase
-    - heartPoint.x * heartPoint.x * heartPoint.y * heartPoint.y * heartPoint.y;
-  let body = 1.0 - smoothstep(-0.012, 0.035, heartField);
-  let centreRise = exp(-dot(heartPoint * vec2f(0.72, 0.9), heartPoint * vec2f(0.72, 0.9)) * 1.7);
-  let foldedBody = body * (0.105 + centreRise * 0.075);
-  let outerFold = exp(-abs(heartField) * 28.0) * smoothstep(0.94, 0.18, length(heartPoint)) * 0.12;
-
-  // Two restrained paper creases lead the eye to the lower point without replacing the
-  // heart silhouette with a pair of spherical lobes.
-  let pointAt = focus + vec2f(0.0, 0.68);
-  let leftCrease = exp(-pow(segmentDistance(point, focus + vec2f(-0.37, -0.13), pointAt) * 15.0, 2.0));
-  let rightCrease = exp(-pow(segmentDistance(point, focus + vec2f(0.37, -0.13), pointAt) * 15.0, 2.0));
-  let centreFold = exp(-pow(segmentDistance(point, focus + vec2f(0.0, -0.37), pointAt) * 18.0, 2.0));
-  return foldedBody + outerFold + body * (max(leftCrease, rightCrease) * 0.045 + centreFold * 0.025);
+  let local = (point - focus) / breathe;
+  // The source SDF points upward; map its cusp to the lower edge of this cover.
+  let distance = heartDistance(vec2f(local.x, 0.68 - local.y) / 1.17) * 1.17;
+  let body = 1.0 - smoothstep(-0.025, 0.025, distance);
+  let edge = exp(-pow(distance * 19.0, 2.0));
+  let paperPlane = body * (0.145 + local.x * 0.018 - local.y * 0.008);
+  let fold = exp(-pow(segmentDistance(local, vec2f(-0.42, -0.12), vec2f(0.08, 0.54)) * 18.0, 2.0));
+  return paperPlane + edge * 0.075 + body * fold * 0.022;
 }
 
 /** Three heavy sheets overflowing over broad, irregular edges. */
