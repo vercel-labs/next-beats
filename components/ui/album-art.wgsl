@@ -99,18 +99,19 @@ fn ripple(point: vec2f, phase: f32, scale: f32) -> Artwork {
 fn horizon(point: vec2f, phase: f32, scale: f32) -> Artwork {
   var art = Artwork(0.0, 0.0, 0.0);
   let line = 0.26;
+  let within = 1.0 - smoothstep(0.8, 1.0, abs(point.x));
   let sun = vec2f(0.0, line - 0.32 - sin(phase * 0.5) * 0.03);
   let disc = length(point - sun) - 0.36;
 
   // Sun resting on the horizon, its lower half cut away by the line.
   art.ink += strokeAt(disc, 2.2, scale) * step(point.y, line);
   art.glow += fillAt(disc) * step(point.y, line) * 0.55 + strokeAt(disc, 7.0, scale) * 0.3;
-  art.ink += strokeAt(point.y - line, 2.2, scale);
+  art.ink += strokeAt(point.y - line, 2.2, scale) * within;
 
   if (tiny() < 0.5) {
     for (var band = 1.0; band < 4.0; band += 1.0) {
       let at = line + band * 0.16 + sin(phase * 0.9 + band) * 0.014;
-      art.ink += strokeAt(point.y - at, 1.4, scale) * (0.46 - band * 0.1)
+      art.ink += strokeAt(point.y - at, 1.4, scale) * (0.46 - band * 0.1) * within
         * (1.0 - smoothstep(0.08, 0.5, abs(point.x)));
     }
   }
@@ -161,7 +162,7 @@ fn spectrum(point: vec2f, phase: f32, scale: f32) -> Artwork {
   art.ink += fillAt(bar) * inside * 0.66;
   art.ink += strokeAt(bar, 1.7, scale) * inside;
   art.glow += fillAt(bar) * inside * 0.3;
-  art.ink += strokeAt(point.y - base, 1.6, scale) * 0.5;
+  art.ink += strokeAt(point.y - base, 1.6, scale) * 0.5 * (1.0 - smoothstep(0.82, 1.0, abs(point.x)));
   return art;
 }
 
