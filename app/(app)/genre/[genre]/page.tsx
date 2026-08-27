@@ -1,9 +1,6 @@
 import { Suspense } from 'react';
 import { Crossfade } from '@/components/ui/crossfade';
-import ErrorBoundary from '@/components/ui/error-boundary';
-import { PageWrapper } from '@/components/ui/page-layout';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TopGenresGrid, TopGenresGridSkeleton } from '@/features/genre/components/genre-browse';
 import { GenreTracks } from '@/features/genre/components/genre-tracks';
 import { TrackListSkeleton } from '@/features/track/components/track-row';
 import type { Metadata } from 'next';
@@ -16,7 +13,7 @@ export async function generateMetadata({ params }: PageProps<'/genre/[genre]'>):
 
 export default function GenreDetailPage({ params }: PageProps<'/genre/[genre]'>) {
   return (
-    <PageWrapper>
+    <>
       <Suspense
         fallback={
           <>
@@ -37,16 +34,6 @@ export default function GenreDetailPage({ params }: PageProps<'/genre/[genre]'>)
           })}
         </Crossfade>
       </Suspense>
-      <section className="mt-10">
-        <h2 className="mb-4">Explore Other Genres</h2>
-        <ErrorBoundary title="Couldn't load other genres">
-          <Suspense fallback={<TopGenresGridSkeleton />}>
-            <Crossfade>
-              <TopGenresGrid />
-            </Crossfade>
-          </Suspense>
-        </ErrorBoundary>
-      </section>
-    </PageWrapper>
+    </>
   );
 }
