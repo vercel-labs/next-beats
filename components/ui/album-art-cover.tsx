@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { startTransition, useEffect, useRef, useState } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
@@ -138,10 +139,15 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
   if (small) {
     const shape = kind === 'genre' ? 'banner-thumb' : 'thumb';
     return (
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-20 block bg-cover bg-center"
-        style={{ backgroundImage: `url(${coverAssetPath(seed, label, kind, shape, true)})` }}
+      <Image
+        alt=""
+        decoding="sync"
+        fill
+        loading="eager"
+        sizes={shape === 'banner-thumb' ? '320px' : '80px'}
+        src={coverAssetPath(seed, label, kind, shape, true)}
+        unoptimized
+        className="pointer-events-none absolute inset-0 z-20 block object-cover"
       />
     );
   }
