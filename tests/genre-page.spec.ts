@@ -15,7 +15,7 @@ test.describe('Genre page (/genre/[genre])', () => {
     });
   });
 
-  test('client navigation shows the runtime-prefetched heading', async ({ page }) => {
+  test('client navigation shows the heading resolved at prefetch time', async ({ page }) => {
     await page.goto('/search');
     const link = page.locator('main a[href^="/genre/"]').first();
     await link.waitFor({ state: 'visible', timeout: 15000 });
