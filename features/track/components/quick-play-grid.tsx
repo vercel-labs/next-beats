@@ -21,6 +21,7 @@ export async function QuickPlayGrid() {
               <AlbumArt
                 coverColor={track.coverColor}
                 coverSeed={track.id}
+                label={track.title}
                 size="sm"
                 className="!h-10 !w-10 !rounded-md"
               />

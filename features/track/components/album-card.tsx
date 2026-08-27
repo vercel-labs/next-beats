@@ -15,6 +15,7 @@ export function AlbumCard({ track }: { track: Track }) {
         <AlbumArt
           coverColor={track.coverColor}
           coverSeed={track.id}
+          label={track.title}
           size="lg"
           className="aspect-square !h-auto !w-full shadow-lg"
         />

@@ -14,6 +14,9 @@ export async function PlaylistDetail({ id }: { id: string }) {
       <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
         <AlbumArt
           coverColor={playlist.coverColor}
+          coverSeed={playlist.id}
+          label={playlist.name}
+          kind="playlist"
           size="lg"
           className="!h-40 !w-40 !rounded-md shadow-2xl sm:!h-48 sm:!w-48"
         />

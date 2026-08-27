@@ -12,6 +12,7 @@ export async function TrackHeader({ id }: { id: string }) {
       <AlbumArt
         coverColor={track.coverColor}
         coverSeed={track.id}
+        label={track.title}
         size="lg"
         className="!h-40 !w-40 shrink-0 !rounded-md shadow-2xl lg:!h-48 lg:!w-48"
       />

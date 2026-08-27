@@ -4,6 +4,8 @@ import { AlbumArtCover } from './album-art-cover';
 type Props = {
   coverColor: string;
   coverSeed?: string;
+  label?: string;
+  kind?: 'track' | 'album' | 'playlist';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
@@ -14,7 +16,7 @@ const sizeMap = {
   sm: 'h-10 w-10',
 };
 
-export function AlbumArt({ coverColor, coverSeed, size = 'md', className }: Props) {
+export function AlbumArt({ coverColor, coverSeed, label, kind = 'track', size = 'md', className }: Props) {
   return (
     <div
       className={cn(
@@ -24,7 +26,7 @@ export function AlbumArt({ coverColor, coverSeed, size = 'md', className }: Prop
         className,
       )}
     >
-      {coverSeed && <AlbumArtCover seed={coverSeed} />}
+      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} />}
       <svg
         className="h-1/3 w-1/3 text-white/60 drop-shadow-md"
         viewBox="0 0 24 24"

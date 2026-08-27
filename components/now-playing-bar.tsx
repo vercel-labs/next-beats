@@ -25,6 +25,7 @@ export function NowPlayingBar() {
               <AlbumArt
                 coverColor={track.coverColor}
                 coverSeed={track.id}
+                label={track.title}
                 size="sm"
                 className="!h-12 !w-12 !rounded-sm"
               />
@@ -64,6 +65,7 @@ export function NowPlayingBar() {
                 <AlbumArt
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
                   coverSeed={track?.id}
+                  label={track?.title}
                   size="sm"
                   className="!h-14 !w-14 !rounded-sm"
                 />
@@ -76,6 +78,7 @@ export function NowPlayingBar() {
                 <AlbumArt
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
                   coverSeed={track?.id}
+                  label={track?.title}
                   size="sm"
                   className="!h-10 !w-10 !rounded-sm"
                 />
