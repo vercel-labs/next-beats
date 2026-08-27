@@ -7,7 +7,7 @@ Creates the public `Gpu` context. `init()` creates the device only; canvas-backe
 ## Import
 
 ```ts
-import { init } from "vgpu";
+import { init } from 'vgpu';
 ```
 
 Browser code imports from `vgpu`; Node GPU tests import from `vgpu/node`; deterministic unit tests import from `vgpu/mock`.
@@ -15,8 +15,8 @@ Browser code imports from `vgpu`; Node GPU tests import from `vgpu/node`; determ
 ## Signature
 
 ```ts
-import type { Gpu } from "vgpu";
-import type { RequiredDeviceLimits, VGPUAdapter } from "vgpu/core";
+import type { Gpu } from 'vgpu';
+import type { RequiredDeviceLimits, VGPUAdapter } from 'vgpu/core';
 
 declare function init(options?: InitOptions): Promise<Gpu>;
 
@@ -31,14 +31,14 @@ interface InitOptions {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| options | `InitOptions` | ✖ | `{}` | Device creation options only. Canvas size, DPR, and auto-resize belong to `surface(gpu, canvas, opts)`. |
-| options.adapter | `VGPUAdapter` | ✖ | `undefined` | Explicit adapter. If omitted in `vgpu`, `navigator.gpu.requestAdapter()` is used; `vgpu/node` and `vgpu/mock` provide adapter factories. |
-| options.powerPreference | `GPUPowerPreference` | ✖ | `undefined` | Forwarded to `navigator.gpu.requestAdapter({ powerPreference })`. |
-| options.requiredFeatures | `readonly GPUFeatureName[]` | ✖ | `undefined` | Optional device features to enable, forwarded to `adapter.requestDevice` (e.g. `"depth-clip-control"` for `DrawOptions.unclippedDepth`). Checked against the adapter's supported features first: a name the adapter lacks fails init with `VGPU-FEATURE-UNSUPPORTED` instead of a native rejection. `device.features` reflects exactly the requested features. |
-| options.requiredLimits | `RequiredDeviceLimits` | ✖ | `undefined` | Forwarded unchanged to `adapter.requestDevice`. Unsupported names/values reject device creation. |
-| options.label | `string` | ✖ | `undefined` | Reserved public option; current main API (`vgpu`) device creation does not use it as a debug label. |
+| Param                    | Type                        | Required | Default     | Notes                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------ | --------------------------- | -------: | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options                  | `InitOptions`               |        ✖ | `{}`        | Device creation options only. Canvas size, DPR, and auto-resize belong to `surface(gpu, canvas, opts)`.                                                                                                                                                                                                                                                        |
+| options.adapter          | `VGPUAdapter`               |        ✖ | `undefined` | Explicit adapter. If omitted in `vgpu`, `navigator.gpu.requestAdapter()` is used; `vgpu/node` and `vgpu/mock` provide adapter factories.                                                                                                                                                                                                                       |
+| options.powerPreference  | `GPUPowerPreference`        |        ✖ | `undefined` | Forwarded to `navigator.gpu.requestAdapter({ powerPreference })`.                                                                                                                                                                                                                                                                                              |
+| options.requiredFeatures | `readonly GPUFeatureName[]` |        ✖ | `undefined` | Optional device features to enable, forwarded to `adapter.requestDevice` (e.g. `"depth-clip-control"` for `DrawOptions.unclippedDepth`). Checked against the adapter's supported features first: a name the adapter lacks fails init with `VGPU-FEATURE-UNSUPPORTED` instead of a native rejection. `device.features` reflects exactly the requested features. |
+| options.requiredLimits   | `RequiredDeviceLimits`      |        ✖ | `undefined` | Forwarded unchanged to `adapter.requestDevice`. Unsupported names/values reject device creation.                                                                                                                                                                                                                                                               |
+| options.label            | `string`                    |        ✖ | `undefined` | Reserved public option; current main API (`vgpu`) device creation does not use it as a debug label.                                                                                                                                                                                                                                                            |
 
 **Returns:** `Promise<Gpu>` — the context every factory takes first: `surface(gpu, ...)`,
 `target(gpu, ...)`, `draw(gpu, ...)`, `effect(gpu, ...)`, `compute(gpu, ...)`, `geometry(gpu, ...)`,
@@ -50,23 +50,26 @@ interface InitOptions {
 ## Examples
 
 ```ts
-import { init, effect, frame, target } from "vgpu/mock";
+import { init, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
-const colorTarget = target(gpu, { size: [64, 64], format: "rgba8unorm" });
-const shader = effect(gpu, `
+const colorTarget = target(gpu, { size: [64, 64], format: 'rgba8unorm' });
+const shader = effect(
+  gpu,
+  `
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv, 0.0, 1.0);
   }
-`);
+`,
+);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: colorTarget }, (p) => p.draw(shader));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: colorTarget }, p => p.draw(shader));
 });
 ```
 
 ```ts
-import { init, effect, frame, surface } from "vgpu";
+import { init, effect, frame, surface } from 'vgpu';
 
 declare const canvas: HTMLCanvasElement;
 
@@ -77,21 +80,21 @@ const gpu = await init({
 const canvasSurface = surface(gpu, canvas, { dpr: [1, 2] });
 const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: canvasSurface }, (p) => p.draw(shader));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: canvasSurface }, p => p.draw(shader));
 });
 ```
 
 ```ts
-import { init, createMockAdapter, timer } from "vgpu/mock";
+import { init, createMockAdapter, timer } from 'vgpu/mock';
 
 // Feature-gated device: GPU pass timing needs "timestamp-query".
 const gpu = await init({
-  adapter: createMockAdapter({ features: ["timestamp-query"] }),
-  requiredFeatures: ["timestamp-query"],
+  adapter: createMockAdapter({ features: ['timestamp-query'] }),
+  requiredFeatures: ['timestamp-query'],
 });
 const gpuTimer = timer(gpu);
-gpuTimer.onResults((spans) => console.table(spans));
+gpuTimer.onResults(spans => console.table(spans));
 ```
 
 The granted feature makes `timer(gpu)` succeed. In a browser, drop the `adapter` option — `requiredFeatures` is forwarded to the real adapter the same way.

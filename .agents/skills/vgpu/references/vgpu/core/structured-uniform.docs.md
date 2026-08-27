@@ -7,23 +7,40 @@ Low-level structured uniform buffer that computes WGSL-compatible offsets from a
 ## Import
 
 ```ts
-import { StructuredUniform } from "vgpu/core";
-import type { StructuredUniformOptions, UniformValues, ScalarUniformType, VectorUniformInput, UniformLayoutInfo, UniformField, WgslUniformType } from "vgpu/core";
+import { StructuredUniform } from 'vgpu/core';
+import type {
+  StructuredUniformOptions,
+  UniformValues,
+  ScalarUniformType,
+  VectorUniformInput,
+  UniformLayoutInfo,
+  UniformField,
+  WgslUniformType,
+} from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { BindVisibility, Device } from "vgpu/core";
+import type { BindVisibility, Device } from 'vgpu/core';
 
-type ScalarUniformType = "f32" | "u32" | "i32";
+type ScalarUniformType = 'f32' | 'u32' | 'i32';
 type VectorUniformInput = readonly number[] | Float32Array | Uint32Array | Int32Array;
 type WgslUniformType =
-  | "f32" | "u32" | "i32"
-  | "vec2f" | "vec3f" | "vec4f"
-  | "vec2u" | "vec3u" | "vec4u"
-  | "vec2i" | "vec3i" | "vec4i"
-  | "mat3x3f" | "mat4x4f";
+  | 'f32'
+  | 'u32'
+  | 'i32'
+  | 'vec2f'
+  | 'vec3f'
+  | 'vec4f'
+  | 'vec2u'
+  | 'vec3u'
+  | 'vec4u'
+  | 'vec2i'
+  | 'vec3i'
+  | 'vec4i'
+  | 'mat3x3f'
+  | 'mat4x4f';
 
 type UniformValues<S extends Record<string, WgslUniformType>> = {
   [K in keyof S]: S[K] extends ScalarUniformType ? number : VectorUniformInput;
@@ -55,7 +72,7 @@ declare class StructuredUniform<S extends Record<string, WgslUniformType>> {
   readonly layout: UniformLayoutInfo;
   readonly byteSize: number;
   readonly offsets: Readonly<Record<keyof S, number>>;
-  readonly buffer: import("vgpu/core").Buffer;
+  readonly buffer: import('vgpu/core').Buffer;
   constructor(device: Device, opts: StructuredUniformOptions<S>);
   get gpu(): GPUBuffer;
   get bindGroupLayout(): GPUBindGroupLayout;
@@ -69,15 +86,15 @@ declare class StructuredUniform<S extends Record<string, WgslUniformType>> {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Core device. |
-| opts | `StructuredUniformOptions<S>` | ✔ | — | Schema and optional labels/visibility. |
-| opts.schema | `S extends Record<string, WgslUniformType>` | ✔ | — | Insertion order is WGSL member order. Empty schema and unsupported type strings are invalid. |
-| opts.label | `string` | ✖ | `undefined` | Buffer label; lazy layout/bind group labels become `${label}.bgl` and `${label}.bg`. |
-| opts.visibility | `BindVisibility` | ✖ | `["vertex", "fragment"]` | Used only by lazy `bindGroupLayout`; ignored until that getter is read. |
-| write.values | `Partial<UniformValues<S>>` | ✔ | — | Field patch. Scalars require `number`; vectors/matrices require exact-length array or typed array. |
-| wgsl.structName | `string` | ✖ | `"Uniforms"` | Name for generated WGSL struct text. |
+| Param           | Type                                        | Required | Default                  | Notes                                                                                              |
+| --------------- | ------------------------------------------- | -------: | ------------------------ | -------------------------------------------------------------------------------------------------- |
+| device          | `Device`                                    |        ✔ | —                        | Core device.                                                                                       |
+| opts            | `StructuredUniformOptions<S>`               |        ✔ | —                        | Schema and optional labels/visibility.                                                             |
+| opts.schema     | `S extends Record<string, WgslUniformType>` |        ✔ | —                        | Insertion order is WGSL member order. Empty schema and unsupported type strings are invalid.       |
+| opts.label      | `string`                                    |        ✖ | `undefined`              | Buffer label; lazy layout/bind group labels become `${label}.bgl` and `${label}.bg`.               |
+| opts.visibility | `BindVisibility`                            |        ✖ | `["vertex", "fragment"]` | Used only by lazy `bindGroupLayout`; ignored until that getter is read.                            |
+| write.values    | `Partial<UniformValues<S>>`                 |        ✔ | —                        | Field patch. Scalars require `number`; vectors/matrices require exact-length array or typed array. |
+| wgsl.structName | `string`                                    |        ✖ | `"Uniforms"`             | Name for generated WGSL struct text.                                                               |
 
 **Returns:** Constructor returns `StructuredUniform`; `bindGroupLayout` and `bindGroup` lazily create native objects; `write()` returns `void`; `wgsl()` returns WGSL struct source; `destroy()` / `dispose()` return `void`.
 
@@ -86,35 +103,37 @@ declare class StructuredUniform<S extends Record<string, WgslUniformType>> {
 ## Examples
 
 ```ts
-import { init } from "vgpu/mock";
-import { StructuredUniform } from "vgpu/core";
+import { init } from 'vgpu/mock';
+import { StructuredUniform } from 'vgpu/core';
 
 const gpu = await init();
 const params = new StructuredUniform(gpu.device, {
-  label: "params",
-  schema: { time: "f32", tint: "vec3f", viewProjection: "mat4x4f" },
+  label: 'params',
+  schema: { time: 'f32', tint: 'vec3f', viewProjection: 'mat4x4f' },
 });
 params.write({
   time: 1,
   tint: [1, 0.5, 0.25],
   viewProjection: new Float32Array(16),
 });
-const wgsl = params.wgsl("Params");
+const wgsl = params.wgsl('Params');
 void wgsl;
 ```
 
 ```ts
-import { init, draw } from "vgpu/mock";
-import { StructuredUniform } from "vgpu/core";
+import { init, draw } from 'vgpu/mock';
+import { StructuredUniform } from 'vgpu/core';
 
 const gpu = await init();
-const params = new StructuredUniform(gpu.device, { schema: { value: "f32" } });
-const drawable = draw(gpu, { shader: `
+const params = new StructuredUniform(gpu.device, { schema: { value: 'f32' } });
+const drawable = draw(gpu, {
+  shader: `
   struct Params { value: f32 }
   @group(0) @binding(0) var<uniform> params: Params;
   @vertex fn vs_main() -> @builtin(position) vec4f { return vec4f(0, 0, 0, 1); }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(params.value); }
-` });
+`,
+});
 params.write({ value: 1 });
 drawable.set({ params });
 ```

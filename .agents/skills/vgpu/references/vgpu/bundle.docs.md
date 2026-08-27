@@ -7,13 +7,13 @@ Main API (`vgpu`) render bundle recorded by `bundle(gpu, { target }, cb)`. Bundl
 ## Import
 
 ```ts
-import type { Bundle, BundleOptions, BundleRecorder } from "vgpu";
+import type { Bundle, BundleOptions, BundleRecorder } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { Draw, DrawCallOptions, Effect, Target, TargetSignature } from "vgpu";
+import type { Draw, DrawCallOptions, Effect, Target, TargetSignature } from 'vgpu';
 
 interface BundleOptions {
   readonly target: Target | TargetSignature;
@@ -32,15 +32,15 @@ interface Bundle {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| bundle.opts | `BundleOptions` | ✔ | — | Recording options. |
-| opts.target | `Target \| TargetSignature` | ✔ | — | Formats, depth format, and sample count are recorded. Signature form is `{ colors: [...], depth?, sampleCount? }`; `colors` is required. |
-| opts.label | `string` | ✖ | `` `bundle${n}` `` | Bundle id and GPU label. Auto id increments from `bundle1`. |
-| bundle.cb | `(recorder: BundleRecorder) => void` | ✔ | — | Called immediately to encode commands. |
-| recorder.draw.drawable | `Draw \| Effect` | ✔ | — | Draw or fullscreen effect to encode into the bundle. |
-| recorder.draw.opts | `DrawCallOptions` | ✖ | `{}` | Counts and offsets captured in the recorded commands. `indirect` records fine — render bundle encoders support `drawIndirect`/`drawIndexedIndirect` — and the GPU re-reads the argument buffer on every replay. |
-| framePass.bundles.bundles | `readonly Bundle[]` | ✔ | — | Replayed bundles; must be created by `bundle()`. |
+| Param                     | Type                                 | Required | Default            | Notes                                                                                                                                                                                                           |
+| ------------------------- | ------------------------------------ | -------: | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bundle.opts               | `BundleOptions`                      |        ✔ | —                  | Recording options.                                                                                                                                                                                              |
+| opts.target               | `Target \| TargetSignature`          |        ✔ | —                  | Formats, depth format, and sample count are recorded. Signature form is `{ colors: [...], depth?, sampleCount? }`; `colors` is required.                                                                        |
+| opts.label                | `string`                             |        ✖ | `` `bundle${n}` `` | Bundle id and GPU label. Auto id increments from `bundle1`.                                                                                                                                                     |
+| bundle.cb                 | `(recorder: BundleRecorder) => void` |        ✔ | —                  | Called immediately to encode commands.                                                                                                                                                                          |
+| recorder.draw.drawable    | `Draw \| Effect`                     |        ✔ | —                  | Draw or fullscreen effect to encode into the bundle.                                                                                                                                                            |
+| recorder.draw.opts        | `DrawCallOptions`                    |        ✖ | `{}`               | Counts and offsets captured in the recorded commands. `indirect` records fine — render bundle encoders support `drawIndirect`/`drawIndexedIndirect` — and the GPU re-reads the argument buffer on every replay. |
+| framePass.bundles.bundles | `readonly Bundle[]`                  |        ✔ | —                  | Replayed bundles; must be created by `bundle()`.                                                                                                                                                                |
 
 **Returns:** `bundle(gpu)` returns `Bundle` with `id` and native `gpu` render bundle; `BundleRecorder.draw()` returns `void`; `FramePass.bundles()` returns `void`.
 
@@ -49,41 +49,43 @@ interface Bundle {
 ## Examples
 
 ```ts
-import { init, bundle, draw, frame, target } from "vgpu/mock";
+import { init, bundle, draw, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [64, 64] });
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
     var p = array<vec2f, 3>(vec2f(-1, -1), vec2f(3, -1), vec2f(-1, 3));
     return vec4f(p[vi], 0, 1);
   }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1, 1, 0, 1); }
-` });
+`,
+});
 
-const statics = bundle(gpu, { target: colorTarget, label: "static" }, (recorded) => {
+const statics = bundle(gpu, { target: colorTarget, label: 'static' }, recorded => {
   recorded.draw(drawable);
 });
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: colorTarget }, (pass) => pass.bundles(statics));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: colorTarget }, pass => pass.bundles(statics));
 });
 ```
 
 ```ts
-import { init, bundle, effect, frame, surface } from "vgpu/mock";
+import { init, bundle, effect, frame, surface } from 'vgpu/mock';
 
 const gpu = await init();
 const canvasSurface = surface(gpu, mockCanvas());
 const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
-let statics = bundle(gpu, { target: canvasSurface, label: "surfaceStatics" }, (recorded) => recorded.draw(shader));
+let statics = bundle(gpu, { target: canvasSurface, label: 'surfaceStatics' }, recorded => recorded.draw(shader));
 
 canvasSurface.onResize(() => {
-  statics = bundle(gpu, { target: canvasSurface, label: "surfaceStatics" }, (recorded) => recorded.draw(shader));
+  statics = bundle(gpu, { target: canvasSurface, label: 'surfaceStatics' }, recorded => recorded.draw(shader));
 });
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: canvasSurface }, (p) => p.bundles(statics));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: canvasSurface }, p => p.bundles(statics));
 });
 
 function mockCanvas(): HTMLCanvasElement {
@@ -92,24 +94,32 @@ function mockCanvas(): HTMLCanvasElement {
     height: 10,
     clientWidth: 10,
     clientHeight: 10,
-    getContext() { return { configure() {}, unconfigure() {}, getCurrentTexture() { return { createView: () => ({}) }; } }; },
+    getContext() {
+      return {
+        configure() {},
+        unconfigure() {},
+        getCurrentTexture() {
+          return { createView: () => ({}) };
+        },
+      };
+    },
   } as unknown as HTMLCanvasElement;
 }
 ```
 
 ```ts
-import { init, bundle, clock, effect, frame, pingPong } from "vgpu/mock";
+import { init, bundle, clock, effect, frame, pingPong } from 'vgpu/mock';
 
 const gpu = await init();
 const ping = pingPong(gpu, 32, 32);
 const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
-const even = bundle(gpu, { target: ping.write }, (b) => b.draw(shader));
+const even = bundle(gpu, { target: ping.write }, b => b.draw(shader));
 ping.swap();
-const odd = bundle(gpu, { target: ping.write }, (b) => b.draw(shader));
+const odd = bundle(gpu, { target: ping.write }, b => b.draw(shader));
 ping.swap();
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: ping.write }, (p) => p.bundles(clock(gpu).frameCount % 2 ? odd : even));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: ping.write }, p => p.bundles(clock(gpu).frameCount % 2 ? odd : even));
 });
 ```
 

@@ -7,35 +7,36 @@ Reads the current drawing buffer size of a canvas and optionally watches for res
 ## Import
 
 ```ts
-import { canvasResolution } from "@vgpu/render/utils";
+import { canvasResolution } from '@vgpu/render/utils';
 ```
 
 ## Signature
 
 ```ts
-export function canvasResolution(
-  canvas: HTMLCanvasElement,
-  opts?: { readonly observe?: boolean },
-): CanvasResolution;
+export function canvasResolution(canvas: HTMLCanvasElement, opts?: { readonly observe?: boolean }): CanvasResolution;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| canvas | HTMLCanvasElement | ✔ | — | Target element; `width`/`height` are read from its drawing buffer, not CSS pixels. |
-| opts | { observe?: boolean } | ✖ | `{}` | Optional behavior flags. Omitted options behave like `{ observe: false }`. |
-| opts.observe | boolean | ✖ | false | When true, attaches a `ResizeObserver` that keeps the cached width/height in sync. |
+| Param        | Type                  | Required | Default | Notes                                                                              |
+| ------------ | --------------------- | -------- | ------- | ---------------------------------------------------------------------------------- |
+| canvas       | HTMLCanvasElement     | ✔        | —       | Target element; `width`/`height` are read from its drawing buffer, not CSS pixels. |
+| opts         | { observe?: boolean } | ✖        | `{}`    | Optional behavior flags. Omitted options behave like `{ observe: false }`.         |
+| opts.observe | boolean               | ✖        | false   | When true, attaches a `ResizeObserver` that keeps the cached width/height in sync. |
 
 **Returns:** `CanvasResolution` — exposes `width`, `height`, and `dispose()`. Without `observe: true`, `width` and `height` are the initial drawing-buffer snapshot; with `observe: true`, they update when the `ResizeObserver` callback runs.
 
 ## Examples
 
 ```ts
-import { canvasResolution } from "@vgpu/render/utils";
+import { canvasResolution } from '@vgpu/render/utils';
 
-const canvas = document.createElement("canvas");
-const effect = { set(values: { readonly resolution: readonly [number, number] }): void { void values; } };
+const canvas = document.createElement('canvas');
+const effect = {
+  set(values: { readonly resolution: readonly [number, number] }): void {
+    void values;
+  },
+};
 const resolution = canvasResolution(canvas, { observe: true });
 
 function frame() {

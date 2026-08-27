@@ -5,25 +5,29 @@
 Start with the public `vgpu` package. A program has one `Gpu` context, explicit WGSL bindings, and explicit frames. There are no global uniforms: time comes from the frame clock (`clock(gpu).time`, `.deltaTime`, `.frameCount`) and resolution comes from targets (`target.size`, `target.texelSize`).
 
 ```ts
-import { clock, init, effect, frameLoop, surface } from "vgpu";
+import { clock, init, effect, frameLoop, surface } from 'vgpu';
 
 const gpu = await init();
-const canvas = document.querySelector("canvas")!;
+const canvas = document.querySelector('canvas')!;
 const canvasSurface = surface(gpu, canvas, { dpr: [1, 2] });
-const gradient = effect(gpu, `
+const gradient = effect(
+  gpu,
+  `
 struct Params { time: f32, texel: vec2f }
 @group(0) @binding(0) var<uniform> params: Params;
 @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
   return vec4f(uv, sin(params.time) * 0.5 + 0.5, 1.0);
 }
-`, { set: { params: { time: 0, texel: canvasSurface.texelSize } } });
+`,
+  { set: { params: { time: 0, texel: canvasSurface.texelSize } } },
+);
 
 canvasSurface.onResize(() => {
   gradient.set({ params: { texel: canvasSurface.texelSize } });
 });
 
 const time = clock(gpu);
-frameLoop(gpu, (frame) => {
+frameLoop(gpu, frame => {
   gradient.set({ params: { time: time.time } });
   frame.pass(canvasSurface, gradient);
 });
@@ -49,9 +53,9 @@ set. Once healthy, render headless and read the pixels back — objective
 evidence instead of guesswork:
 
 ```typescript
-import { writeFileSync } from "node:fs";
-import { PNG } from "pngjs";
-import { init, effect, target } from "vgpu/node";
+import { writeFileSync } from 'node:fs';
+import { PNG } from 'pngjs';
+import { init, effect, target } from 'vgpu/node';
 
 const SHADER = `
   @fragment fn main() -> @location(0) vec4f {
@@ -63,11 +67,11 @@ const height = 90;
 const gpu = await init();
 const colorTarget = target(gpu, { size: [width, height] }); // small targets stay fast, even on CPU
 effect(gpu, SHADER).draw(colorTarget);
-const pixels = await colorTarget.read();                   // RGBA bytes — assert on them
-const png = new PNG({ width, height });               // ...and write a PNG you can open
+const pixels = await colorTarget.read(); // RGBA bytes — assert on them
+const png = new PNG({ width, height }); // ...and write a PNG you can open
 png.data.set(pixels);
-writeFileSync("frame.png", PNG.sync.write(png));
-gpu.dispose();                                        // stops Dawn's polling so the process exits
+writeFileSync('frame.png', PNG.sync.write(png));
+gpu.dispose(); // stops Dawn's polling so the process exits
 ```
 
 Keep the loop tight: render → read → adjust → render. Every visual claim you

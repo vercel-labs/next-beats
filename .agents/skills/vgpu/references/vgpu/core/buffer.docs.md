@@ -7,25 +7,25 @@
 ## Import
 
 ```ts
-import { Buffer } from "vgpu/core";
+import { Buffer } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "vgpu/core";
+import type { Device } from 'vgpu/core';
 
 type BufferUsageName =
-  | "map_read"
-  | "map_write"
-  | "copy_src"
-  | "copy_dst"
-  | "index"
-  | "vertex"
-  | "uniform"
-  | "storage"
-  | "indirect"
-  | "query_resolve";
+  | 'map_read'
+  | 'map_write'
+  | 'copy_src'
+  | 'copy_dst'
+  | 'index'
+  | 'vertex'
+  | 'uniform'
+  | 'storage'
+  | 'indirect'
+  | 'query_resolve';
 
 interface BufferOptions {
   readonly size: number;
@@ -50,35 +50,35 @@ declare class Buffer {
 
 ### `Device.createBuffer(opts)` / `BufferOptions`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts.size | `number` | ✔ | — | Buffer byte length. Must be finite and greater than `0`. |
-| opts.usage | `readonly BufferUsageName[]` | ✔ | — | One or more vgpu usage names mapped to `GPUBufferUsage` flags. Empty arrays throw. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to `GPUBufferDescriptor.label`. |
+| Param      | Type                         | Required | Default     | Notes                                                                              |
+| ---------- | ---------------------------- | -------: | ----------- | ---------------------------------------------------------------------------------- |
+| opts.size  | `number`                     |        ✔ | —           | Buffer byte length. Must be finite and greater than `0`.                           |
+| opts.usage | `readonly BufferUsageName[]` |        ✔ | —           | One or more vgpu usage names mapped to `GPUBufferUsage` flags. Empty arrays throw. |
+| opts.label | `string`                     |        ✖ | `undefined` | Forwarded to `GPUBufferDescriptor.label`.                                          |
 
 Valid `BufferUsageName` values: `"map_read"`, `"map_write"`, `"copy_src"`, `"copy_dst"`, `"index"`, `"vertex"`, `"uniform"`, `"storage"`, `"indirect"`, `"query_resolve"`.
 
 ### Constructor
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Owning device wrapper used for queue writes and readback. Normally supplied by `Device.createBuffer(...)`. |
-| gpu | `GPUBuffer` | ✔ | — | Raw WebGPU buffer. |
-| options | `BufferOptions` | ✔ | — | Original vgpu descriptor exposed as `buffer.options`. |
+| Param   | Type            | Required | Default | Notes                                                                                                      |
+| ------- | --------------- | -------: | ------- | ---------------------------------------------------------------------------------------------------------- |
+| device  | `Device`        |        ✔ | —       | Owning device wrapper used for queue writes and readback. Normally supplied by `Device.createBuffer(...)`. |
+| gpu     | `GPUBuffer`     |        ✔ | —       | Raw WebGPU buffer.                                                                                         |
+| options | `BufferOptions` |        ✔ | —       | Original vgpu descriptor exposed as `buffer.options`.                                                      |
 
 ### `write(data, offset?)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| data | `ArrayBuffer \| ArrayBufferView<ArrayBuffer>` | ✔ | — | Bytes passed to `device.queue.writeBuffer(buffer.gpu, offset, data)`. |
-| offset | `number` | ✖ | `0` | Destination byte offset in the GPU buffer. |
+| Param  | Type                                          | Required | Default | Notes                                                                 |
+| ------ | --------------------------------------------- | -------: | ------- | --------------------------------------------------------------------- |
+| data   | `ArrayBuffer \| ArrayBufferView<ArrayBuffer>` |        ✔ | —       | Bytes passed to `device.queue.writeBuffer(buffer.gpu, offset, data)`. |
+| offset | `number`                                      |        ✖ | `0`     | Destination byte offset in the GPU buffer.                            |
 
 ### `read(byteLength, offset?)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| byteLength | `number` | ✔ | — | Number of bytes to copy from the GPU buffer into CPU memory. |
-| offset | `number` | ✖ | `0` | Source byte offset in the GPU buffer. |
+| Param      | Type     | Required | Default | Notes                                                        |
+| ---------- | -------- | -------: | ------- | ------------------------------------------------------------ |
+| byteLength | `number` |        ✔ | —       | Number of bytes to copy from the GPU buffer into CPU memory. |
+| offset     | `number` |        ✖ | `0`     | Source byte offset in the GPU buffer.                        |
 
 **Returns:**
 
@@ -95,13 +95,13 @@ Valid `BufferUsageName` values: `"map_read"`, `"map_write"`, `"copy_src"`, `"cop
 ## Examples
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const buffer = device.createBuffer({
-  label: "cpu-visible-data",
+  label: 'cpu-visible-data',
   size: 16,
-  usage: ["copy_dst", "copy_src"],
+  usage: ['copy_dst', 'copy_src'],
 });
 
 buffer.write(new Uint32Array([1, 2, 3, 4]));
@@ -113,12 +113,12 @@ device.destroy();
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 
-device.pushErrorScope("validation");
-const placeholder = device.createBuffer({ size: 0, usage: ["copy_dst"] });
+device.pushErrorScope('validation');
+const placeholder = device.createBuffer({ size: 0, usage: ['copy_dst'] });
 const error = await device.popErrorScope();
 
 console.log(placeholder.options.size); // 0: wrapper exists, backing GPU buffer is mock-sized

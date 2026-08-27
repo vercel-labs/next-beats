@@ -7,13 +7,13 @@ Canvas-backed render target created by `surface(gpu, canvas, opts)`. Use it for 
 ## Import
 
 ```ts
-import type { Surface, SurfaceOptions, SurfaceResizeEvent } from "vgpu";
+import type { Surface, SurfaceOptions, SurfaceResizeEvent } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { Target } from "vgpu";
+import type { Target } from 'vgpu';
 
 interface SurfaceOptions {
   readonly autoResize?: boolean;
@@ -46,24 +46,24 @@ interface Surface extends Target {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| surface.canvas | `HTMLCanvasElement \| OffscreenCanvas` | ✔ | — | Must return a `GPUCanvasContext` from `getContext("webgpu")`. |
-| surface.opts | `SurfaceOptions` | ✖ | `{}` | Canvas configuration and resize behavior. |
-| opts.autoResize | `boolean` | ✖ | `true` for layout-backed canvases, `false` when `size` is provided or when the canvas has no numeric `clientWidth` | Auto-resize is checked at the frame boundary before user frame callbacks. Explicit `true` on buffer-only canvases throws. |
-| opts.dpr | `number \| readonly [number, number]` | ✖ | `globalThis.devicePixelRatio ?? 1` | Number fixes DPR. Tuple clamps runtime DPR to `[min, max]`; layout-backed surfaces re-read DPR each frame. |
-| opts.size | `readonly [number, number]` | ✖ | Layout-backed: `clientWidth/clientHeight × dpr`; buffer-only: existing `canvas.width/height` | Physical pixel size. When provided, initial canvas buffer is set and `autoResize` defaults to `false`. |
-| opts.format | `GPUTextureFormat` | ✖ | `navigator.gpu.getPreferredCanvasFormat() ?? "bgra8unorm"` | Canvas swapchain format. |
-| opts.alphaMode | `GPUCanvasAlphaMode` | ✖ | `"premultiplied"` | Passed to `GPUCanvasContext.configure`. |
-| opts.colorSpace | `PredefinedColorSpace` | ✖ | `"srgb"` | Passed to `GPUCanvasContext.configure`. |
-| opts.clearColor | `ClearColor` | ✖ | `[0, 0, 0, 1]` | Default clear color of this surface, used by passes that clear without naming one. Writable at runtime as `surface.clearColor`; a pass `clear` color still wins for that pass. Four finite numbers, or a `GPUColor` object. |
-| opts.label | `string` | ✖ | `undefined` | Used in error messages and texture labels. |
-| onResize.cb | `(event: SurfaceResizeEvent) => void` | ✔ | — | Called synchronously immediately on subscription and after future size changes. |
-| event.width | `number` | ✔ | — | Physical pixel width, equal to `surface.size[0]` and `canvas.width`. |
-| event.height | `number` | ✔ | — | Physical pixel height, equal to `surface.size[1]` and `canvas.height`. |
-| event.dpr | `number` | ✔ | — | Effective DPR used for the current size. |
-| event.surface | `Surface` | ✔ | — | Surface that resized, useful for shared handlers. |
-| surface.resize.size | `readonly [number, number]` | ✔ | — | Manual physical pixel size. Values are floored and clamped to at least `1`. |
+| Param               | Type                                   | Required | Default                                                                                                            | Notes                                                                                                                                                                                                                       |
+| ------------------- | -------------------------------------- | -------: | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| surface.canvas      | `HTMLCanvasElement \| OffscreenCanvas` |        ✔ | —                                                                                                                  | Must return a `GPUCanvasContext` from `getContext("webgpu")`.                                                                                                                                                               |
+| surface.opts        | `SurfaceOptions`                       |        ✖ | `{}`                                                                                                               | Canvas configuration and resize behavior.                                                                                                                                                                                   |
+| opts.autoResize     | `boolean`                              |        ✖ | `true` for layout-backed canvases, `false` when `size` is provided or when the canvas has no numeric `clientWidth` | Auto-resize is checked at the frame boundary before user frame callbacks. Explicit `true` on buffer-only canvases throws.                                                                                                   |
+| opts.dpr            | `number \| readonly [number, number]`  |        ✖ | `globalThis.devicePixelRatio ?? 1`                                                                                 | Number fixes DPR. Tuple clamps runtime DPR to `[min, max]`; layout-backed surfaces re-read DPR each frame.                                                                                                                  |
+| opts.size           | `readonly [number, number]`            |        ✖ | Layout-backed: `clientWidth/clientHeight × dpr`; buffer-only: existing `canvas.width/height`                       | Physical pixel size. When provided, initial canvas buffer is set and `autoResize` defaults to `false`.                                                                                                                      |
+| opts.format         | `GPUTextureFormat`                     |        ✖ | `navigator.gpu.getPreferredCanvasFormat() ?? "bgra8unorm"`                                                         | Canvas swapchain format.                                                                                                                                                                                                    |
+| opts.alphaMode      | `GPUCanvasAlphaMode`                   |        ✖ | `"premultiplied"`                                                                                                  | Passed to `GPUCanvasContext.configure`.                                                                                                                                                                                     |
+| opts.colorSpace     | `PredefinedColorSpace`                 |        ✖ | `"srgb"`                                                                                                           | Passed to `GPUCanvasContext.configure`.                                                                                                                                                                                     |
+| opts.clearColor     | `ClearColor`                           |        ✖ | `[0, 0, 0, 1]`                                                                                                     | Default clear color of this surface, used by passes that clear without naming one. Writable at runtime as `surface.clearColor`; a pass `clear` color still wins for that pass. Four finite numbers, or a `GPUColor` object. |
+| opts.label          | `string`                               |        ✖ | `undefined`                                                                                                        | Used in error messages and texture labels.                                                                                                                                                                                  |
+| onResize.cb         | `(event: SurfaceResizeEvent) => void`  |        ✔ | —                                                                                                                  | Called synchronously immediately on subscription and after future size changes.                                                                                                                                             |
+| event.width         | `number`                               |        ✔ | —                                                                                                                  | Physical pixel width, equal to `surface.size[0]` and `canvas.width`.                                                                                                                                                        |
+| event.height        | `number`                               |        ✔ | —                                                                                                                  | Physical pixel height, equal to `surface.size[1]` and `canvas.height`.                                                                                                                                                      |
+| event.dpr           | `number`                               |        ✔ | —                                                                                                                  | Effective DPR used for the current size.                                                                                                                                                                                    |
+| event.surface       | `Surface`                              |        ✔ | —                                                                                                                  | Surface that resized, useful for shared handlers.                                                                                                                                                                           |
+| surface.resize.size | `readonly [number, number]`            |        ✔ | —                                                                                                                  | Manual physical pixel size. Values are floored and clamped to at least `1`.                                                                                                                                                 |
 
 **Returns:** `surface(gpu)` returns `Surface`; `onResize()` returns an unsubscribe function; `dispose()` returns `void`.
 
@@ -72,7 +72,7 @@ interface Surface extends Target {
 ## Examples
 
 ```ts
-import { init, effect, frame, surface } from "vgpu";
+import { init, effect, frame, surface } from 'vgpu';
 
 declare const canvas: HTMLCanvasElement;
 
@@ -80,13 +80,13 @@ const gpu = await init();
 const canvasSurface = surface(gpu, canvas, { dpr: [1, 2] });
 const wave = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.2, 0.6, 1, 1); }`);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: canvasSurface }, (pass) => pass.draw(wave));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: canvasSurface }, pass => pass.draw(wave));
 });
 ```
 
 ```ts
-import { init, effect, frame, surface, target } from "vgpu/mock";
+import { init, effect, frame, surface, target } from 'vgpu/mock';
 
 const gpu = await init();
 declare const canvas: HTMLCanvasElement;
@@ -94,11 +94,15 @@ const canvasSurface = surface(gpu, canvas);
 
 const bloomSize = (w: number, h: number): [number, number] => [w / 2, h / 2];
 const bloom = target(gpu, { size: bloomSize(canvasSurface.size[0], canvasSurface.size[1]) });
-const brightPass = effect(gpu, `
+const brightPass = effect(
+  gpu,
+  `
   struct Params { resolution: vec2f }
   @group(0) @binding(0) var<uniform> params: Params;
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }
-`, { set: { params: { resolution: bloom.size } } });
+`,
+  { set: { params: { resolution: bloom.size } } },
+);
 const composite = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
 canvasSurface.onResize(({ width, height }) => {
@@ -106,14 +110,14 @@ canvasSurface.onResize(({ width, height }) => {
   brightPass.set({ params: { resolution: bloom.size } });
 });
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: bloom }, (pass) => pass.draw(brightPass));
-  currentFrame.pass({ target: canvasSurface }, (pass) => pass.draw(composite));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: bloom }, pass => pass.draw(brightPass));
+  currentFrame.pass({ target: canvasSurface }, pass => pass.draw(composite));
 });
 ```
 
 ```ts
-import { init, effect, frame, surface } from "vgpu";
+import { init, effect, frame, surface } from 'vgpu';
 
 declare const canvasA: HTMLCanvasElement;
 declare const canvasB: HTMLCanvasElement;
@@ -123,14 +127,14 @@ const main = surface(gpu, canvasA);
 const preview = surface(gpu, canvasB, { autoResize: false, size: [320, 180] });
 const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: main }, (p) => p.draw(shader));
-  currentFrame.pass({ target: preview }, (p) => p.draw(shader));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: main }, p => p.draw(shader));
+  currentFrame.pass({ target: preview }, p => p.draw(shader));
 });
 ```
 
 ```ts
-import { init, surface, target } from "vgpu";
+import { init, surface, target } from 'vgpu';
 
 declare const offscreen: OffscreenCanvas;
 declare function postMessage(message: unknown): void;
@@ -141,24 +145,24 @@ const half = target(gpu, { size: [Math.max(1, canvasSurface.size[0] / 2), Math.m
 
 canvasSurface.onResize(({ width, height }) => {
   half.resize([width / 2, height / 2]);
-  postMessage({ type: "resized", width, height });
+  postMessage({ type: 'resized', width, height });
 });
 
 canvasSurface.resize([640, 360]);
 ```
 
 ```ts
-import { init, bundle, effect, frame, surface } from "vgpu/mock";
+import { init, bundle, effect, frame, surface } from 'vgpu/mock';
 
 declare const canvas: HTMLCanvasElement;
 
 const gpu = await init();
 const canvasSurface = surface(gpu, canvas);
 const draw = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
-let statics = bundle(gpu, { target: canvasSurface }, (recorded) => recorded.draw(draw));
+let statics = bundle(gpu, { target: canvasSurface }, recorded => recorded.draw(draw));
 
 // Drawing onto a resized surface keeps the same bundle valid as long as the render signature matches.
-frame(gpu, (currentFrame) => currentFrame.pass({ target: canvasSurface }, (pass) => pass.bundles(statics)));
+frame(gpu, currentFrame => currentFrame.pass({ target: canvasSurface }, pass => pass.bundles(statics)));
 ```
 
 ## Notes

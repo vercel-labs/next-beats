@@ -7,13 +7,13 @@
 ## Import
 
 ```ts
-import { Queue } from "vgpu/core";
+import { Queue } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { BufferWriteData } from "vgpu/core";
+import type { BufferWriteData } from 'vgpu/core';
 
 declare class Queue {
   readonly gpu: GPUQueue;
@@ -27,23 +27,23 @@ declare class Queue {
 
 ### Constructor
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| gpu | `GPUQueue` | ✔ | — | Raw WebGPU queue exposed again as `queue.gpu`. `Device` constructs `new Queue(gpu.queue)` for you. |
+| Param | Type       | Required | Default | Notes                                                                                              |
+| ----- | ---------- | -------: | ------- | -------------------------------------------------------------------------------------------------- |
+| gpu   | `GPUQueue` |        ✔ | —       | Raw WebGPU queue exposed again as `queue.gpu`. `Device` constructs `new Queue(gpu.queue)` for you. |
 
 ### `writeBuffer(buffer, offset, data)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| buffer | `GPUBuffer` | ✔ | — | Raw destination buffer. Pass `buffer.gpu` when you have a vgpu `Buffer`. |
-| offset | `number` | ✔ | — | Destination byte offset. Unlike `Buffer.write(...)`, there is no default at this level. |
-| data | `ArrayBuffer \| ArrayBufferView<ArrayBuffer>` | ✔ | — | Bytes forwarded to `GPUQueue.writeBuffer(buffer, offset, data)`. |
+| Param  | Type                                          | Required | Default | Notes                                                                                   |
+| ------ | --------------------------------------------- | -------: | ------- | --------------------------------------------------------------------------------------- |
+| buffer | `GPUBuffer`                                   |        ✔ | —       | Raw destination buffer. Pass `buffer.gpu` when you have a vgpu `Buffer`.                |
+| offset | `number`                                      |        ✔ | —       | Destination byte offset. Unlike `Buffer.write(...)`, there is no default at this level. |
+| data   | `ArrayBuffer \| ArrayBufferView<ArrayBuffer>` |        ✔ | —       | Bytes forwarded to `GPUQueue.writeBuffer(buffer, offset, data)`.                        |
 
 ### `flush()`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| — | — | — | — | Takes no parameters. Awaits `gpu.onSubmittedWorkDone?.()`. |
+| Param | Type | Required | Default | Notes                                                      |
+| ----- | ---- | -------: | ------- | ---------------------------------------------------------- |
+| —     | —    |        — | —       | Takes no parameters. Awaits `gpu.onSubmittedWorkDone?.()`. |
 
 **Returns:**
 
@@ -56,10 +56,10 @@ declare class Queue {
 ## Examples
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
-const buffer = device.createBuffer({ size: 8, usage: ["copy_dst", "copy_src"] });
+const buffer = device.createBuffer({ size: 8, usage: ['copy_dst', 'copy_src'] });
 
 device.queue.writeBuffer(buffer.gpu, 0, new Uint32Array([10, 20]));
 await device.queue.flush();
@@ -71,8 +71,8 @@ device.destroy();
 ```
 
 ```ts
-import { Queue } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import { Queue } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const queue = new Queue(device.gpu.queue);

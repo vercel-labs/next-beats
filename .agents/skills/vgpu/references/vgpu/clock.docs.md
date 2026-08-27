@@ -7,13 +7,13 @@ The frame clock of a gpu: elapsed time, last delta, frame count, and the manual 
 ## Import
 
 ```ts
-import { clock } from "vgpu";
+import { clock } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { Gpu } from "vgpu";
+import type { Gpu } from 'vgpu';
 
 interface Clock {
   readonly time: number;
@@ -27,16 +27,16 @@ declare function clock(gpu: Gpu): Clock;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| gpu | `Gpu` | ✔ | — | The context returned by `init()`. One clock per gpu: `clock(gpu) === clock(gpu)`. |
-| advance.dtSeconds | `number` | ✔ | — | Seconds to move the clock forward, finite and `>= 0`. Scale it for a timescale (`dt * 0.5`), or pass a constant for a fixed timestep (`1 / 60`). |
+| Param             | Type     | Required | Default | Notes                                                                                                                                            |
+| ----------------- | -------- | -------: | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| gpu               | `Gpu`    |        ✔ | —       | The context returned by `init()`. One clock per gpu: `clock(gpu) === clock(gpu)`.                                                                |
+| advance.dtSeconds | `number` |        ✔ | —       | Seconds to move the clock forward, finite and `>= 0`. Scale it for a timescale (`dt * 0.5`), or pass a constant for a fixed timestep (`1 / 60`). |
 
-| Property | Type | Default | Notes |
-|---|---|---|---|
-| time | `number` | `0` | Seconds since the first frame. Advances once per frame: with the wall-clock delta, or with the value the last `advance()` was given. |
-| deltaTime | `number` | `0` | Seconds between the last two ticks. Exactly the argument of the last `advance()` when driving the clock manually. |
-| frameCount | `number` | `0` | Frames opened by `frame(gpu)` / `frameLoop(gpu)`. `advance()` never counts a frame. |
+| Property   | Type     | Default | Notes                                                                                                                                |
+| ---------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| time       | `number` | `0`     | Seconds since the first frame. Advances once per frame: with the wall-clock delta, or with the value the last `advance()` was given. |
+| deltaTime  | `number` | `0`     | Seconds between the last two ticks. Exactly the argument of the last `advance()` when driving the clock manually.                    |
+| frameCount | `number` | `0`     | Frames opened by `frame(gpu)` / `frameLoop(gpu)`. `advance()` never counts a frame.                                                  |
 
 **Returns:** `Clock` — a live view of this gpu's frame clock. It reads through to the clock, so a single instance can be captured outside the loop and read inside it.
 
@@ -45,30 +45,34 @@ declare function clock(gpu: Gpu): Clock;
 ## Examples
 
 ```ts
-import { init, clock, effect, frameLoop, surface } from "vgpu";
+import { init, clock, effect, frameLoop, surface } from 'vgpu';
 
 declare const canvas: HTMLCanvasElement;
 
 const gpu = await init();
 const canvasSurface = surface(gpu, canvas);
-const wave = effect(gpu, `
+const wave = effect(
+  gpu,
+  `
   struct Params { time: f32 }
   @group(0) @binding(0) var<uniform> params: Params;
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv, sin(params.time) * 0.5 + 0.5, 1.0);
   }
-`, { set: { params: { time: 0 } } });
+`,
+  { set: { params: { time: 0 } } },
+);
 
 // Automatic: every frame advances the clock with the wall-clock delta.
 const time = clock(gpu);
-frameLoop(gpu, (frame) => {
+frameLoop(gpu, frame => {
   wave.set({ params: { time: time.time } });
   frame.pass(canvasSurface, wave);
 });
 ```
 
 ```ts
-import { init, clock, effect, frame, target } from "vgpu/mock";
+import { init, clock, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [64, 64] });
@@ -78,13 +82,13 @@ const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { retur
 const time = clock(gpu);
 for (let step = 0; step < 120; step++) {
   time.advance(1 / 60);
-  frame(gpu, (currentFrame) => currentFrame.pass(scene, shader));
+  frame(gpu, currentFrame => currentFrame.pass(scene, shader));
 }
 console.log(time.time, time.frameCount); // 2, 120
 ```
 
 ```ts
-import { init, clock, frameLoop } from "vgpu/mock";
+import { init, clock, frameLoop } from 'vgpu/mock';
 
 const gpu = await init();
 const time = clock(gpu);
@@ -106,4 +110,4 @@ frameLoop(gpu, () => {
 - Mixing is allowed and useful: drive the clock manually while an external ticker runs, then drop back to plain `frame(gpu)` calls and the wall clock takes over again, measured from the last tick.
 - The clock is not a global. It belongs to the gpu, and it is created lazily: a program that never opens a frame and never calls `clock(gpu)` never allocates it.
 - There is no clock on `Frame`. Pass `clock(gpu)` (or the numbers you read from it) into render helpers instead of reaching for frame state.
-- **See also:** `frame`, `frameLoop`, `Gpu`, and the guide *Driving vgpu with an external ticker*.
+- **See also:** `frame`, `frameLoop`, `Gpu`, and the guide _Driving vgpu with an external ticker_.

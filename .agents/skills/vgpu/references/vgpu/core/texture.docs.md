@@ -7,15 +7,15 @@
 ## Import
 
 ```ts
-import { Texture } from "vgpu/core";
+import { Texture } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "vgpu/core";
+import type { Device } from 'vgpu/core';
 
-type TextureUsageName = "copy_src" | "copy_dst" | "texture_binding" | "storage_binding" | "render_attachment";
+type TextureUsageName = 'copy_src' | 'copy_dst' | 'texture_binding' | 'storage_binding' | 'render_attachment';
 
 interface TextureOptions {
   readonly size: readonly [width: number, height: number, depthOrArrayLayers?: number];
@@ -29,12 +29,12 @@ interface TextureOptions {
 }
 
 declare class Texture {
-  constructor(device: Device, gpu: GPUTexture, options: TextureOptions, ownership?: "owned" | "external");
+  constructor(device: Device, gpu: GPUTexture, options: TextureOptions, ownership?: 'owned' | 'external');
   get gpu(): GPUTexture;
   get options(): TextureOptions;
-  get size(): TextureOptions["size"];
+  get size(): TextureOptions['size'];
   get format(): GPUTextureFormat;
-  get usage(): TextureOptions["usage"];
+  get usage(): TextureOptions['usage'];
   get mipLevelCount(): number;
   get sampleCount(): 1 | 4;
   get dimension(): GPUTextureDimension;
@@ -54,34 +54,34 @@ declare class Texture {
 
 ### `Device.createTexture(opts)` / `TextureOptions`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts.size | `readonly [width: number, height: number, depthOrArrayLayers?: number]` | ✔ | — | Stored as tuple and converted to `{ width, height, depthOrArrayLayers: opts.size[2] ?? 1 }` for WebGPU. |
-| opts.format | `GPUTextureFormat` | ✔ | — | Forwarded to `GPUTextureDescriptor.format`. `read()`/`readFloats()` support the color formats listed under [Readback formats](#readback-formats). |
-| opts.usage | `readonly TextureUsageName[]` | ✔ | — | Vgpu usage names mapped to `GPUTextureUsage` flags. |
-| opts.mipLevelCount | `number` | ✖ | WebGPU default (`1`) | Only included in the native descriptor when provided; getter returns `opts.mipLevelCount ?? 1`. |
-| opts.sampleCount | `1 \| 4` | ✖ | WebGPU default (`1`) | Only included when provided; getter returns `opts.sampleCount ?? 1`. Use `4` for MSAA where WebGPU allows it. |
-| opts.dimension | `GPUTextureDimension` | ✖ | WebGPU default (`"2d"`) | Only included when provided; getter returns `opts.dimension ?? "2d"`. |
-| opts.viewFormats | `readonly GPUTextureFormat[]` | ✖ | `[]` | Only included when provided; getter returns `opts.viewFormats ?? []`. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to `GPUTextureDescriptor.label` and exposed via `texture.label`. |
+| Param              | Type                                                                    | Required | Default                 | Notes                                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------- | -------: | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| opts.size          | `readonly [width: number, height: number, depthOrArrayLayers?: number]` |        ✔ | —                       | Stored as tuple and converted to `{ width, height, depthOrArrayLayers: opts.size[2] ?? 1 }` for WebGPU.                                           |
+| opts.format        | `GPUTextureFormat`                                                      |        ✔ | —                       | Forwarded to `GPUTextureDescriptor.format`. `read()`/`readFloats()` support the color formats listed under [Readback formats](#readback-formats). |
+| opts.usage         | `readonly TextureUsageName[]`                                           |        ✔ | —                       | Vgpu usage names mapped to `GPUTextureUsage` flags.                                                                                               |
+| opts.mipLevelCount | `number`                                                                |        ✖ | WebGPU default (`1`)    | Only included in the native descriptor when provided; getter returns `opts.mipLevelCount ?? 1`.                                                   |
+| opts.sampleCount   | `1 \| 4`                                                                |        ✖ | WebGPU default (`1`)    | Only included when provided; getter returns `opts.sampleCount ?? 1`. Use `4` for MSAA where WebGPU allows it.                                     |
+| opts.dimension     | `GPUTextureDimension`                                                   |        ✖ | WebGPU default (`"2d"`) | Only included when provided; getter returns `opts.dimension ?? "2d"`.                                                                             |
+| opts.viewFormats   | `readonly GPUTextureFormat[]`                                           |        ✖ | `[]`                    | Only included when provided; getter returns `opts.viewFormats ?? []`.                                                                             |
+| opts.label         | `string`                                                                |        ✖ | `undefined`             | Forwarded to `GPUTextureDescriptor.label` and exposed via `texture.label`.                                                                        |
 
 Valid `TextureUsageName` values: `"copy_src"`, `"copy_dst"`, `"texture_binding"`, `"storage_binding"`, `"render_attachment"`.
 
 ### Constructor
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Owning device wrapper. Normally supplied by `Device.createTexture(...)`. |
-| gpu | `GPUTexture` | ✔ | — | Raw WebGPU texture. |
-| options | `TextureOptions` | ✔ | — | Original vgpu descriptor exposed as `texture.options`. |
-| ownership | `"owned" \| "external"` | ✖ | `"owned"` | Owned textures can be resized and destroyed by the wrapper; external textures cannot be resized or destroyed by the wrapper. |
+| Param     | Type                    | Required | Default   | Notes                                                                                                                        |
+| --------- | ----------------------- | -------: | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| device    | `Device`                |        ✔ | —         | Owning device wrapper. Normally supplied by `Device.createTexture(...)`.                                                     |
+| gpu       | `GPUTexture`            |        ✔ | —         | Raw WebGPU texture.                                                                                                          |
+| options   | `TextureOptions`        |        ✔ | —         | Original vgpu descriptor exposed as `texture.options`.                                                                       |
+| ownership | `"owned" \| "external"` |        ✖ | `"owned"` | Owned textures can be resized and destroyed by the wrapper; external textures cannot be resized or destroyed by the wrapper. |
 
 ### Views, resize, readback
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| desc | `GPUTextureViewDescriptor` | ✖ | `undefined` | `createView(desc?)` forwards directly to `gpu.createView(desc)`. |
-| size | `readonly [number, number] \| readonly [number, number, number]` | ✔ | — | New extent for `resize(...)`. A 2-tuple preserves the current depth/array layers. |
+| Param | Type                                                             | Required | Default     | Notes                                                                             |
+| ----- | ---------------------------------------------------------------- | -------: | ----------- | --------------------------------------------------------------------------------- |
+| desc  | `GPUTextureViewDescriptor`                                       |        ✖ | `undefined` | `createView(desc?)` forwards directly to `gpu.createView(desc)`.                  |
+| size  | `readonly [number, number] \| readonly [number, number, number]` |        ✔ | —           | New extent for `resize(...)`. A 2-tuple preserves the current depth/array layers. |
 
 **Returns:**
 
@@ -104,31 +104,31 @@ Valid `TextureUsageName` values: `"copy_src"`, `"copy_dst"`, `"texture_binding"`
 ## Examples
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const target = device.createTexture({
-  label: "offscreen-target",
+  label: 'offscreen-target',
   size: [4, 4],
-  format: "rgba8unorm",
-  usage: ["render_attachment", "texture_binding", "copy_src"],
+  format: 'rgba8unorm',
+  usage: ['render_attachment', 'texture_binding', 'copy_src'],
 });
 
 const defaultView = target.view;
-const explicitView = target.createView({ label: "offscreen-target.view" });
+const explicitView = target.createView({ label: 'offscreen-target.view' });
 console.log(defaultView, explicitView, target.sampleCount); // sampleCount defaults to 1
 
 device.destroy();
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const texture = device.createTexture({
   size: [1, 1, 6],
-  format: "rgba8unorm",
-  usage: ["texture_binding", "copy_src"],
+  format: 'rgba8unorm',
+  usage: ['texture_binding', 'copy_src'],
 });
 
 console.log(texture.resize([2, 2])); // true; depthOrArrayLayers stays 6
@@ -142,13 +142,13 @@ device.destroy();
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const hdr = device.createTexture({
   size: [2, 2],
-  format: "rgba16float",
-  usage: ["render_attachment", "copy_src"],
+  format: 'rgba16float',
+  usage: ['render_attachment', 'copy_src'],
 });
 
 const bytes = await hdr.read();
@@ -162,18 +162,18 @@ device.destroy();
 
 ## Readback formats
 
-| Format | Bytes per texel | Components | `readFloats()` decoding |
-|---|---:|---:|---|
-| `r8unorm` | 1 | 1 | `byte / 255` |
-| `rg8unorm` | 2 | 2 | `byte / 255` |
-| `rgba8unorm`, `rgba8unorm-srgb` | 4 | 4 | `byte / 255` (no srgb gamma conversion) |
-| `bgra8unorm`, `bgra8unorm-srgb` | 4 | 4 | `byte / 255`, channels swizzled to RGBA |
-| `r16float` | 2 | 1 | binary16 widened to f32 |
-| `rg16float` | 4 | 2 | binary16 widened to f32 |
-| `rgba16float` | 8 | 4 | binary16 widened to f32 |
-| `r32float` | 4 | 1 | verbatim f32 |
-| `rg32float` | 8 | 2 | verbatim f32 |
-| `rgba32float` | 16 | 4 | verbatim f32 |
+| Format                          | Bytes per texel | Components | `readFloats()` decoding                 |
+| ------------------------------- | --------------: | ---------: | --------------------------------------- |
+| `r8unorm`                       |               1 |          1 | `byte / 255`                            |
+| `rg8unorm`                      |               2 |          2 | `byte / 255`                            |
+| `rgba8unorm`, `rgba8unorm-srgb` |               4 |          4 | `byte / 255` (no srgb gamma conversion) |
+| `bgra8unorm`, `bgra8unorm-srgb` |               4 |          4 | `byte / 255`, channels swizzled to RGBA |
+| `r16float`                      |               2 |          1 | binary16 widened to f32                 |
+| `rg16float`                     |               4 |          2 | binary16 widened to f32                 |
+| `rgba16float`                   |               8 |          4 | binary16 widened to f32                 |
+| `r32float`                      |               4 |          1 | verbatim f32                            |
+| `rg32float`                     |               8 |          2 | verbatim f32                            |
+| `rgba32float`                   |              16 |          4 | verbatim f32                            |
 
 Subnormals, infinities, and NaN survive the binary16 → f32 widening unchanged.
 

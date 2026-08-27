@@ -19,10 +19,10 @@ export fn fullscreenTriangleUv(clipXy: vec2f) -> vec2f;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| index | `u32` | ✔ | — | Vertex index for `fullscreenTriangleClip`. Use `@builtin(vertex_index)` and draw exactly 3 vertices. Values `0`, `1`, and `2` map to the oversized fullscreen triangle. |
-| clipXy | `vec2f` | ✔ | — | Clip-space XY position, normally `fullscreenTriangleClip(index).xy`, for UV conversion with a render-target-friendly Y flip. |
+| Param  | Type    | Required | Default | Notes                                                                                                                                                                   |
+| ------ | ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| index  | `u32`   | ✔        | —       | Vertex index for `fullscreenTriangleClip`. Use `@builtin(vertex_index)` and draw exactly 3 vertices. Values `0`, `1`, and `2` map to the oversized fullscreen triangle. |
+| clipXy | `vec2f` | ✔        | —       | Clip-space XY position, normally `fullscreenTriangleClip(index).xy`, for UV conversion with a render-target-friendly Y flip.                                            |
 
 **Returns:** `fullscreenTriangleClip` returns clip-space `vec4f`; `fullscreenTriangleUv` returns `vec2f` UVs where clip-space top-left `(-1.0, 1.0)` maps to `(0.0, 0.0)`.
 
@@ -48,7 +48,7 @@ fn vs_main(@builtin(vertex_index) index: u32) -> VertexOutput {
 }
 `;
 
-console.log(fullscreenVertexWgsl.includes("vs_main"));
+console.log(fullscreenVertexWgsl.includes('vs_main'));
 ```
 
 ```ts

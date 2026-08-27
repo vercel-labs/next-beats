@@ -7,7 +7,7 @@ Creates a monotonic time source with pause/resume support for ad-hoc render loop
 ## Import
 
 ```ts
-import { frameClock } from "@vgpu/render/utils";
+import { frameClock } from '@vgpu/render/utils';
 ```
 
 ## Signature
@@ -18,16 +18,16 @@ export function frameClock(): FrameClock;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| — | — | — | — | `frameClock` does not take arguments; it captures `performance.now()` internally. |
+| Param | Type | Required | Default | Notes                                                                             |
+| ----- | ---- | -------- | ------- | --------------------------------------------------------------------------------- |
+| —     | —    | —        | —       | `frameClock` does not take arguments; it captures `performance.now()` internally. |
 
 **Returns:** `FrameClock` — exposes `now()`, `delta()`, `reset()`, `pause()`, `resume()`, and an `isPaused` getter. All time values are expressed in seconds.
 
 ## Examples
 
 ```ts
-import { frameClock } from "@vgpu/render/utils";
+import { frameClock } from '@vgpu/render/utils';
 
 const clock = frameClock();
 

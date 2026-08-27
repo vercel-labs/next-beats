@@ -7,34 +7,30 @@ Shape returned by inspect materials such as `wireframeMaterial` and `normalDebug
 ## Import
 
 ```ts
-import type { InspectMaterial } from "@vgpu/render/inspect";
+import type { InspectMaterial } from '@vgpu/render/inspect';
 ```
 
 ## Signature
 
 ```ts
-import type { InspectMaterialUniformParams } from "@vgpu/render/inspect";
+import type { InspectMaterialUniformParams } from '@vgpu/render/inspect';
 
 export interface InspectMaterial {
   readonly pipeline: GPURenderPipeline;
   readonly bindGroupLayout: GPUBindGroupLayout;
   readonly uniformByteSize: number;
-  readonly writeUniforms: (
-    buffer: GPUBuffer,
-    offset: number,
-    params: InspectMaterialUniformParams,
-  ) => void;
+  readonly writeUniforms: (buffer: GPUBuffer, offset: number, params: InspectMaterialUniformParams) => void;
 }
 ```
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| pipeline | `GPURenderPipeline` | ✔ | — | Ready-to-use pipeline configured for the corresponding inspector material. |
-| bindGroupLayout | `GPUBindGroupLayout` | ✔ | — | Group 0 layout with binding 0 as a uniform buffer. Allocate a buffer with at least `uniformByteSize` bytes and bind it with this layout. |
-| uniformByteSize | `number` | ✔ | — | Exact byte size that `writeUniforms` writes. `normalDebugMaterial()` returns `128`; `wireframeMaterial()` returns `144` because it appends RGB color data. |
-| writeUniforms | `(buffer: GPUBuffer, offset: number, params: InspectMaterialUniformParams) => void` | ✔ | — | Packs `viewProjectionMatrix` at float offset 0 and `modelMatrix` at float offset 16, then writes bytes with `device.gpu.queue.writeBuffer(...)`. Wireframe materials also write color at float offset 32. |
+| Field           | Type                                                                                | Required | Default | Notes                                                                                                                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| pipeline        | `GPURenderPipeline`                                                                 | ✔        | —       | Ready-to-use pipeline configured for the corresponding inspector material.                                                                                                                                |
+| bindGroupLayout | `GPUBindGroupLayout`                                                                | ✔        | —       | Group 0 layout with binding 0 as a uniform buffer. Allocate a buffer with at least `uniformByteSize` bytes and bind it with this layout.                                                                  |
+| uniformByteSize | `number`                                                                            | ✔        | —       | Exact byte size that `writeUniforms` writes. `normalDebugMaterial()` returns `128`; `wireframeMaterial()` returns `144` because it appends RGB color data.                                                |
+| writeUniforms   | `(buffer: GPUBuffer, offset: number, params: InspectMaterialUniformParams) => void` | ✔        | —       | Packs `viewProjectionMatrix` at float offset 0 and `modelMatrix` at float offset 16, then writes bytes with `device.gpu.queue.writeBuffer(...)`. Wireframe materials also write color at float offset 32. |
 
 **Returns:** Not applicable for the interface itself. Inspector factory functions return frozen `InspectMaterial` objects whose fields can be reused across frames.
 
@@ -43,15 +39,15 @@ export interface InspectMaterial {
 ## Examples
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { normalDebugMaterial } from "@vgpu/render/inspect";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { normalDebugMaterial } from '@vgpu/render/inspect';
 
 const device = await createMockAdapter().requestDevice();
-const material = normalDebugMaterial({ device, targetFormat: "rgba8unorm-srgb" });
+const material = normalDebugMaterial({ device, targetFormat: 'rgba8unorm-srgb' });
 const uniformBuffer = device.createBuffer({
-  label: "inspect.normal.uniforms",
+  label: 'inspect.normal.uniforms',
   size: material.uniformByteSize,
-  usage: ["uniform", "copy_dst"],
+  usage: ['uniform', 'copy_dst'],
 });
 
 const identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -65,17 +61,17 @@ device.destroy();
 ```
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { wireframeMaterial } from "@vgpu/render/inspect";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { wireframeMaterial } from '@vgpu/render/inspect';
 
 const device = await createMockAdapter().requestDevice();
 const material = wireframeMaterial({
   device,
   color: [0.25, 0.5, 1],
-  targetFormat: "rgba8unorm-srgb",
+  targetFormat: 'rgba8unorm-srgb',
 });
 
-const uniformBuffer = device.createBuffer({ size: material.uniformByteSize, usage: ["uniform", "copy_dst"] });
+const uniformBuffer = device.createBuffer({ size: material.uniformByteSize, usage: ['uniform', 'copy_dst'] });
 const identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 material.writeUniforms(uniformBuffer.gpu, 0, { viewProjectionMatrix: identity, modelMatrix: identity });
 
@@ -99,7 +95,7 @@ Uniform inputs shared by all inspect materials. Additional inspector-specific un
 ## Import
 
 ```ts
-import type { InspectMaterialUniformParams } from "@vgpu/render/inspect";
+import type { InspectMaterialUniformParams } from '@vgpu/render/inspect';
 ```
 
 ## Signature
@@ -115,10 +111,10 @@ export interface InspectMaterialUniformParams {
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| viewProjectionMatrix | `Mat4` | ✔ | — | Combined camera matrix written to the inspector's uniform buffer slots 0–63 bytes. |
-| modelMatrix | `Mat4` | ✔ | — | Object transform written immediately after `viewProjectionMatrix`, in slots 64–127 bytes. |
+| Field                | Type   | Required | Default | Notes                                                                                     |
+| -------------------- | ------ | -------- | ------- | ----------------------------------------------------------------------------------------- |
+| viewProjectionMatrix | `Mat4` | ✔        | —       | Combined camera matrix written to the inspector's uniform buffer slots 0–63 bytes.        |
+| modelMatrix          | `Mat4` | ✔        | —       | Object transform written immediately after `viewProjectionMatrix`, in slots 64–127 bytes. |
 
 **Returns:** Not applicable. This is a parameter object passed to `InspectMaterial.writeUniforms(...)`.
 
@@ -127,7 +123,7 @@ export interface InspectMaterialUniformParams {
 ## Examples
 
 ```ts
-import type { InspectMaterialUniformParams } from "@vgpu/render/inspect";
+import type { InspectMaterialUniformParams } from '@vgpu/render/inspect';
 
 const identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const params: InspectMaterialUniformParams = {

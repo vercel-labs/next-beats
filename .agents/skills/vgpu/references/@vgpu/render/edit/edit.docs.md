@@ -17,7 +17,7 @@ CPU-side triangle mesh editing built on the render package's half-edge kernel. U
 All imports in this file use the public edit entrypoint:
 
 ```ts
-import { EditableMesh } from "@vgpu/render/edit";
+import { EditableMesh } from '@vgpu/render/edit';
 ```
 
 ## EditableMesh
@@ -27,14 +27,14 @@ Factory object for creating and baking `EditableMeshValue` instances. Use `fromA
 ## Import
 
 ```ts
-import { EditableMesh } from "@vgpu/render/edit";
+import { EditableMesh } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "@vgpu/core";
-import type { EditableMeshValue } from "@vgpu/render/edit";
+import type { Device } from '@vgpu/core';
+import type { EditableMeshValue } from '@vgpu/render/edit';
 
 declare const EditableMesh: {
   fromArrays(opts: {
@@ -53,18 +53,18 @@ declare const EditableMesh: {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| opts.positions | Float32Array | ✔ | — | XYZ triples. Vertices with identical XYZ are welded by position during kernel build. |
-| opts.indices | Uint16Array \| Uint32Array | ✖ | sequential `0..positions.length / 3 - 1` | Triangle indices; length must represent triangles. |
-| opts.normals | Float32Array | ✖ | omitted | Preserved only as `hasNormals`; edit operators recompute face topology. |
-| opts.uvs | Float32Array | ✖ | omitted | Preserved only as `hasUVs`; operators may drop seams. |
-| opts.colors | Float32Array | ✖ | omitted | Preserved only as `hasVertexColors`. |
-| opts.sharpEdges | Uint8Array | ✖ | auto from `creaseAngle` | Per-edge sharp mask in kernel edge order; if present it overrides auto-sharp detection. |
-| opts.useSmooth | Uint8Array | ✖ | all faces smooth (`1`) | Per-face smoothing flags. |
-| opts.creaseAngle | number | ✖ | `Math.PI / 6` | Radians used to auto-mark sharp edges when `sharpEdges` is omitted. |
-| em | EditableMeshValue | ✔ | — | Mesh to bake for static `EditableMesh.toRenderMesh`. |
-| opts.device | Device | ✔ | — | Device used to create the render mesh buffers. |
+| Param            | Type                       | Required | Default                                  | Notes                                                                                   |
+| ---------------- | -------------------------- | -------- | ---------------------------------------- | --------------------------------------------------------------------------------------- |
+| opts.positions   | Float32Array               | ✔        | —                                        | XYZ triples. Vertices with identical XYZ are welded by position during kernel build.    |
+| opts.indices     | Uint16Array \| Uint32Array | ✖        | sequential `0..positions.length / 3 - 1` | Triangle indices; length must represent triangles.                                      |
+| opts.normals     | Float32Array               | ✖        | omitted                                  | Preserved only as `hasNormals`; edit operators recompute face topology.                 |
+| opts.uvs         | Float32Array               | ✖        | omitted                                  | Preserved only as `hasUVs`; operators may drop seams.                                   |
+| opts.colors      | Float32Array               | ✖        | omitted                                  | Preserved only as `hasVertexColors`.                                                    |
+| opts.sharpEdges  | Uint8Array                 | ✖        | auto from `creaseAngle`                  | Per-edge sharp mask in kernel edge order; if present it overrides auto-sharp detection. |
+| opts.useSmooth   | Uint8Array                 | ✖        | all faces smooth (`1`)                   | Per-face smoothing flags.                                                               |
+| opts.creaseAngle | number                     | ✖        | `Math.PI / 6`                            | Radians used to auto-mark sharp edges when `sharpEdges` is omitted.                     |
+| em               | EditableMeshValue          | ✔        | —                                        | Mesh to bake for static `EditableMesh.toRenderMesh`.                                    |
+| opts.device      | Device                     | ✔        | —                                        | Device used to create the render mesh buffers.                                          |
 
 **Returns:** `EditableMeshValue` from `fromArrays`; render `Mesh` from `toRenderMesh`.
 **Throws:** — no `MeshEditError` is thrown directly. Invalid or mismatched raw arrays can still produce invalid geometry at JavaScript/WebGPU boundaries.
@@ -72,7 +72,7 @@ declare const EditableMesh: {
 ## Examples
 
 ```ts
-import { EditableMesh } from "@vgpu/render/edit";
+import { EditableMesh } from '@vgpu/render/edit';
 
 const editableMeshExample = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -95,25 +95,28 @@ Converts a render `Mesh` into an editable half-edge mesh and discards diagnostic
 ## Import
 
 ```ts
-import { toEditable } from "@vgpu/render/edit";
+import { toEditable } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import { toEditable } from "@vgpu/render/edit";
-import type { EditableMeshValue } from "@vgpu/render/edit";
+import { toEditable } from '@vgpu/render/edit';
+import type { EditableMeshValue } from '@vgpu/render/edit';
 
 type EditableInputMesh = Parameters<typeof toEditable>[0];
-declare function toEditableSignature(mesh: EditableInputMesh, opts?: { readonly creaseAngle?: number }): EditableMeshValue;
+declare function toEditableSignature(
+  mesh: EditableInputMesh,
+  opts?: { readonly creaseAngle?: number },
+): EditableMeshValue;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| mesh | Mesh | ✔ | — | Render mesh-like object with attributes and bounds. Source arrays are used when available; otherwise a bbox box fallback is built. |
-| opts.creaseAngle | number | ✖ | `Math.PI / 6` through `EditableMesh.fromArrays` | Radians for auto-sharp edge detection. |
+| Param            | Type   | Required | Default                                         | Notes                                                                                                                              |
+| ---------------- | ------ | -------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| mesh             | Mesh   | ✔        | —                                               | Render mesh-like object with attributes and bounds. Source arrays are used when available; otherwise a bbox box fallback is built. |
+| opts.creaseAngle | number | ✖        | `Math.PI / 6` through `EditableMesh.fromArrays` | Radians for auto-sharp edge detection.                                                                                             |
 
 **Returns:** `EditableMeshValue` — editable mesh ready for selections/operators.
 **Throws:** — no `MeshEditError` is thrown directly.
@@ -121,12 +124,12 @@ declare function toEditableSignature(mesh: EditableInputMesh, opts?: { readonly 
 ## Examples
 
 ```ts
-import { toEditable } from "@vgpu/render/edit";
+import { toEditable } from '@vgpu/render/edit';
 
 const renderMeshForEdit = {
   vertexBuffer: {},
   vertexCount: 3,
-  attributes: { stride: 12, position: { offset: 0, format: "float32x3" as const } },
+  attributes: { stride: 12, position: { offset: 0, format: 'float32x3' as const } },
   bbox: { min: new Float32Array([0, 0, 0]), max: new Float32Array([1, 1, 1]) },
 } as unknown as Parameters<typeof toEditable>[0];
 const toEditableMesh = toEditable(renderMeshForEdit, { creaseAngle: Math.PI / 4 });
@@ -144,14 +147,14 @@ Converts a render `Mesh` and returns warnings such as stripped tangents. Use thi
 ## Import
 
 ```ts
-import { toEditableWithDiagnostics } from "@vgpu/render/edit";
+import { toEditableWithDiagnostics } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import { toEditableWithDiagnostics } from "@vgpu/render/edit";
-import type { EditableMeshValue, MeshEditWarning } from "@vgpu/render/edit";
+import { toEditableWithDiagnostics } from '@vgpu/render/edit';
+import type { EditableMeshValue, MeshEditWarning } from '@vgpu/render/edit';
 
 type DiagnosticInputMesh = Parameters<typeof toEditableWithDiagnostics>[0];
 declare function toEditableWithDiagnosticsSignature(
@@ -162,10 +165,10 @@ declare function toEditableWithDiagnosticsSignature(
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| mesh | Mesh | ✔ | — | Render mesh-like object. If edit-source arrays are absent, bbox fallback arrays are generated. |
-| opts.creaseAngle | number | ✖ | `Math.PI / 6` through `EditableMesh.fromArrays` | Radians for auto-sharp edge detection. |
+| Param            | Type   | Required | Default                                         | Notes                                                                                          |
+| ---------------- | ------ | -------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| mesh             | Mesh   | ✔        | —                                               | Render mesh-like object. If edit-source arrays are absent, bbox fallback arrays are generated. |
+| opts.creaseAngle | number | ✖        | `Math.PI / 6` through `EditableMesh.fromArrays` | Radians for auto-sharp edge detection.                                                         |
 
 **Returns:** `{ mesh, warnings }` — `warnings` is an array of `MeshEditWarning` objects.
 **Throws:** — no `MeshEditError` is thrown directly.
@@ -173,16 +176,16 @@ declare function toEditableWithDiagnosticsSignature(
 ## Examples
 
 ```ts
-import { toEditableWithDiagnostics } from "@vgpu/render/edit";
+import { toEditableWithDiagnostics } from '@vgpu/render/edit';
 
 const renderMeshWithDiagnostics = {
   vertexBuffer: {},
   vertexCount: 3,
-  attributes: { stride: 12, position: { offset: 0, format: "float32x3" as const } },
+  attributes: { stride: 12, position: { offset: 0, format: 'float32x3' as const } },
   bbox: { min: new Float32Array([0, 0, 0]), max: new Float32Array([1, 1, 1]) },
 } as unknown as Parameters<typeof toEditableWithDiagnostics>[0];
 const diagnostics = toEditableWithDiagnostics(renderMeshWithDiagnostics);
-const diagnosticsWarnings = diagnostics.warnings.map((warning) => warning.code);
+const diagnosticsWarnings = diagnostics.warnings.map(warning => warning.code);
 ```
 
 ## Notes
@@ -197,14 +200,14 @@ Runtime shape of an editable mesh. It exposes counts, bounds, typed element sets
 ## Import
 
 ```ts
-import type { EditableMeshValue } from "@vgpu/render/edit";
+import type { EditableMeshValue } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "@vgpu/core";
-import type { ElementSelection, ElementSet, KernelHandle } from "@vgpu/render/edit";
+import type { Device } from '@vgpu/core';
+import type { ElementSelection, ElementSet, KernelHandle } from '@vgpu/render/edit';
 
 type Vec3 = Float32Array;
 
@@ -213,9 +216,9 @@ declare interface EditableMeshValue {
   readonly edgeCount: number;
   readonly faceCount: number;
   readonly bounds: { readonly min: Vec3; readonly max: Vec3 };
-  readonly vertices: ElementSet<"vertex">;
-  readonly edges: ElementSet<"edge">;
-  readonly faces: ElementSet<"face">;
+  readonly vertices: ElementSet<'vertex'>;
+  readonly edges: ElementSet<'edge'>;
+  readonly faces: ElementSet<'face'>;
   readonly isManifold: boolean;
   readonly hasUVs: boolean;
   readonly hasNormals: boolean;
@@ -228,16 +231,16 @@ declare interface EditableMeshValue {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| vertexCount / edgeCount / faceCount | number | ✔ | — | Counts in the current immutable editable mesh value. |
-| bounds.min / bounds.max | Vec3 | ✔ | — | Axis-aligned bounds computed from positions. |
-| vertices / edges / faces | ElementSet | ✔ | — | Selection factories and traversal helpers for each domain. |
-| isManifold | boolean | ✔ | — | `true` only when every edge has two incident faces in the current kernel. |
-| hasUVs / hasNormals / hasVertexColors | boolean | ✔ | — | Flags copied from input arrays; most operators rebuild topology arrays. |
-| hardEdges | ElementSelection | ✔ | — | Edge selection where the kernel `isSharp` mask is nonzero. |
-| gpu.halfEdgeKernel | KernelHandle | ✔ | — | Opaque handle; do not construct or mutate directly. |
-| toRenderMesh | function | ✔ | — | Bakes the editable mesh with `{ device }`. |
+| Field                                 | Type             | Required | Default | Notes                                                                     |
+| ------------------------------------- | ---------------- | -------- | ------- | ------------------------------------------------------------------------- |
+| vertexCount / edgeCount / faceCount   | number           | ✔        | —       | Counts in the current immutable editable mesh value.                      |
+| bounds.min / bounds.max               | Vec3             | ✔        | —       | Axis-aligned bounds computed from positions.                              |
+| vertices / edges / faces              | ElementSet       | ✔        | —       | Selection factories and traversal helpers for each domain.                |
+| isManifold                            | boolean          | ✔        | —       | `true` only when every edge has two incident faces in the current kernel. |
+| hasUVs / hasNormals / hasVertexColors | boolean          | ✔        | —       | Flags copied from input arrays; most operators rebuild topology arrays.   |
+| hardEdges                             | ElementSelection | ✔        | —       | Edge selection where the kernel `isSharp` mask is nonzero.                |
+| gpu.halfEdgeKernel                    | KernelHandle     | ✔        | —       | Opaque handle; do not construct or mutate directly.                       |
+| toRenderMesh                          | function         | ✔        | —       | Bakes the editable mesh with `{ device }`.                                |
 
 **Returns:** N/A — this is an interface/type export.
 **Throws:** N/A — `toRenderMesh` can fail at render/WebGPU boundaries if passed an invalid `Device`.
@@ -245,7 +248,7 @@ declare interface EditableMeshValue {
 ## Examples
 
 ```ts
-import { EditableMesh, type EditableMeshValue } from "@vgpu/render/edit";
+import { EditableMesh, type EditableMeshValue } from '@vgpu/render/edit';
 
 const editableValueExample: EditableMeshValue = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -265,23 +268,23 @@ String union naming the selectable topology domains.
 ## Import
 
 ```ts
-import type { ElementDomain } from "@vgpu/render/edit";
+import type { ElementDomain } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-export type ElementDomain = "vertex" | "edge" | "face" | "loop";
+export type ElementDomain = 'vertex' | 'edge' | 'face' | 'loop';
 ```
 
 ## Parameters
 
-| Variant | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| `"vertex"` | ElementDomain | ✔ | — | Vertex selections and `VertexView`. |
-| `"edge"` | ElementDomain | ✔ | — | Edge selections, loops, rings, bridge/fill boundaries. |
-| `"face"` | ElementDomain | ✔ | — | Face selections for extrusion/inset/dissolve. |
-| `"loop"` | ElementDomain | ✔ | — | Declared domain variant; public element sets currently operate on vertex/edge/face. |
+| Variant    | Type          | Required | Default | Notes                                                                               |
+| ---------- | ------------- | -------- | ------- | ----------------------------------------------------------------------------------- |
+| `"vertex"` | ElementDomain | ✔        | —       | Vertex selections and `VertexView`.                                                 |
+| `"edge"`   | ElementDomain | ✔        | —       | Edge selections, loops, rings, bridge/fill boundaries.                              |
+| `"face"`   | ElementDomain | ✔        | —       | Face selections for extrusion/inset/dissolve.                                       |
+| `"loop"`   | ElementDomain | ✔        | —       | Declared domain variant; public element sets currently operate on vertex/edge/face. |
 
 **Returns:** N/A — type alias.
 **Throws:** N/A.
@@ -289,9 +292,9 @@ export type ElementDomain = "vertex" | "edge" | "face" | "loop";
 ## Examples
 
 ```ts
-import type { ElementDomain } from "@vgpu/render/edit";
+import type { ElementDomain } from '@vgpu/render/edit';
 
-const selectedDomain: ElementDomain = "edge";
+const selectedDomain: ElementDomain = 'edge';
 ```
 
 ## Notes
@@ -306,13 +309,13 @@ Immutable selection object passed to operators. Use `ElementSet` helpers (`mesh.
 ## Import
 
 ```ts
-import type { ElementSelection } from "@vgpu/render/edit";
+import type { ElementSelection } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { ElementDomain } from "@vgpu/render/edit";
+import type { ElementDomain } from '@vgpu/render/edit';
 
 declare interface ElementSelection {
   readonly domain: ElementDomain;
@@ -324,12 +327,12 @@ declare interface ElementSelection {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| domain | ElementDomain | ✔ | — | Must match the operator target domain. |
-| indices | ReadonlyArray<number> | ✔ | — | Element indices in the mesh that owns the selection. |
-| count | number | ✔ | — | Usually `indices.length`; operators check `count === 0` for empty selections. |
-| ordered | boolean | ✖ | omitted / `false` | Required as `true` for loop-boundary operators (`bridge`, `fillHole`, `gridFill`). |
+| Field   | Type                  | Required | Default           | Notes                                                                              |
+| ------- | --------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------- |
+| domain  | ElementDomain         | ✔        | —                 | Must match the operator target domain.                                             |
+| indices | ReadonlyArray<number> | ✔        | —                 | Element indices in the mesh that owns the selection.                               |
+| count   | number                | ✔        | —                 | Usually `indices.length`; operators check `count === 0` for empty selections.      |
+| ordered | boolean               | ✖        | omitted / `false` | Required as `true` for loop-boundary operators (`bridge`, `fillHole`, `gridFill`). |
 
 **Returns:** N/A — interface.
 **Throws:** N/A.
@@ -337,7 +340,7 @@ declare interface ElementSelection {
 ## Examples
 
 ```ts
-import { EditableMesh, type ElementSelection } from "@vgpu/render/edit";
+import { EditableMesh, type ElementSelection } from '@vgpu/render/edit';
 
 const selectionMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -357,15 +360,28 @@ Domain-specific helper collection available as `mesh.vertices`, `mesh.edges`, an
 ## Import
 
 ```ts
-import type { ElementSet } from "@vgpu/render/edit";
+import type { ElementSet } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { ElementDomain, ElementSelection, EdgeView, FaceView, ScoredSelection, VertexView } from "@vgpu/render/edit";
+import type {
+  ElementDomain,
+  ElementSelection,
+  EdgeView,
+  FaceView,
+  ScoredSelection,
+  VertexView,
+} from '@vgpu/render/edit';
 
-type ElementView<D extends ElementDomain> = D extends "vertex" ? VertexView : D extends "edge" ? EdgeView : D extends "face" ? FaceView : never;
+type ElementView<D extends ElementDomain> = D extends 'vertex'
+  ? VertexView
+  : D extends 'edge'
+    ? EdgeView
+    : D extends 'face'
+      ? FaceView
+      : never;
 
 declare interface ElementSet<D extends ElementDomain> {
   readonly domain: D;
@@ -375,8 +391,8 @@ declare interface ElementSet<D extends ElementDomain> {
   byIndex(indices: readonly number[]): ElementSelection;
   all(): ElementSelection;
   none(): ElementSelection;
-  loop(seedEdge: number): D extends "edge" ? ElementSelection : never;
-  ring(seedEdge: number): D extends "edge" ? ElementSelection : never;
+  loop(seedEdge: number): D extends 'edge' ? ElementSelection : never;
+  ring(seedEdge: number): D extends 'edge' ? ElementSelection : never;
   grow(sel: ElementSelection, layers?: number): ElementSelection;
   shrink(sel: ElementSelection, layers?: number): ElementSelection;
   boundaryOf(sel: ElementSelection): ElementSelection;
@@ -386,17 +402,17 @@ declare interface ElementSet<D extends ElementDomain> {
 
 ## Parameters
 
-| Method/Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| domain | D | ✔ | — | `"vertex"`, `"edge"`, or `"face"` for the owning set. |
-| count | number | ✔ | — | Number of elements in the owning domain. |
-| where.pred | function | ✔ | — | Called with `VertexView`, `EdgeView`, or `FaceView`; returned indices are sorted/deduped. |
-| scoreBy.score | function | ✔ | — | Produces a `ScoredSelection` sorted by score descending. |
-| byIndex.indices | readonly number[] | ✔ | — | Out-of-range indices are filtered out. |
-| loop.seedEdge / ring.seedEdge | number | ✔ | — | For edge sets only; current implementation returns connected edge walk with `ordered: true`. |
-| grow.layers / shrink.layers | number | ✖ | `1` | Number of adjacency layers to expand or contract. |
-| boundaryOf.sel | ElementSelection | ✔ | — | Returns an edge selection around face/vertex selections; edge input returns itself. |
-| connectedComponentOf.seed | number | ✔ | — | Flood-fills adjacent elements in the same domain. |
+| Method/Field                  | Type              | Required | Default | Notes                                                                                        |
+| ----------------------------- | ----------------- | -------- | ------- | -------------------------------------------------------------------------------------------- |
+| domain                        | D                 | ✔        | —       | `"vertex"`, `"edge"`, or `"face"` for the owning set.                                        |
+| count                         | number            | ✔        | —       | Number of elements in the owning domain.                                                     |
+| where.pred                    | function          | ✔        | —       | Called with `VertexView`, `EdgeView`, or `FaceView`; returned indices are sorted/deduped.    |
+| scoreBy.score                 | function          | ✔        | —       | Produces a `ScoredSelection` sorted by score descending.                                     |
+| byIndex.indices               | readonly number[] | ✔        | —       | Out-of-range indices are filtered out.                                                       |
+| loop.seedEdge / ring.seedEdge | number            | ✔        | —       | For edge sets only; current implementation returns connected edge walk with `ordered: true`. |
+| grow.layers / shrink.layers   | number            | ✖        | `1`     | Number of adjacency layers to expand or contract.                                            |
+| boundaryOf.sel                | ElementSelection  | ✔        | —       | Returns an edge selection around face/vertex selections; edge input returns itself.          |
+| connectedComponentOf.seed     | number            | ✔        | —       | Flood-fills adjacent elements in the same domain.                                            |
 
 **Returns:** `ElementSelection` or `ScoredSelection` depending on the method.
 **Throws:** — no `MeshEditError` is thrown directly by the public methods.
@@ -404,12 +420,12 @@ declare interface ElementSet<D extends ElementDomain> {
 ## Examples
 
 ```ts
-import { EditableMesh } from "@vgpu/render/edit";
+import { EditableMesh } from '@vgpu/render/edit';
 
 const elementSetMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
 });
-const longEdges = elementSetMesh.edges.where((edge) => edge.length > 0.5);
+const longEdges = elementSetMesh.edges.where(edge => edge.length > 0.5);
 ```
 
 ## Notes
@@ -424,13 +440,13 @@ Ranked selection helper returned by `ElementSet.scoreBy`. Use it to pick stronge
 ## Import
 
 ```ts
-import type { ScoredSelection } from "@vgpu/render/edit";
+import type { ScoredSelection } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { ElementDomain, ElementSelection } from "@vgpu/render/edit";
+import type { ElementDomain, ElementSelection } from '@vgpu/render/edit';
 
 declare interface ScoredSelection {
   readonly domain: ElementDomain;
@@ -445,13 +461,13 @@ declare interface ScoredSelection {
 
 ## Parameters
 
-| Method/Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| domain | ElementDomain | ✔ | — | Domain of all ranked entries. |
-| entries | ReadonlyArray | ✔ | — | Sorted by score descending, then index ascending. |
-| top / bottom | function | ✔ | — | Equivalent to `topN(1)` / `bottomN(1)`. |
-| topN.n / bottomN.n | number | ✔ | — | Negative values clamp to `0`. |
-| threshold.min | number | ✔ | — | Keeps entries with `score >= min`. |
+| Method/Field       | Type          | Required | Default | Notes                                             |
+| ------------------ | ------------- | -------- | ------- | ------------------------------------------------- |
+| domain             | ElementDomain | ✔        | —       | Domain of all ranked entries.                     |
+| entries            | ReadonlyArray | ✔        | —       | Sorted by score descending, then index ascending. |
+| top / bottom       | function      | ✔        | —       | Equivalent to `topN(1)` / `bottomN(1)`.           |
+| topN.n / bottomN.n | number        | ✔        | —       | Negative values clamp to `0`.                     |
+| threshold.min      | number        | ✔        | —       | Keeps entries with `score >= min`.                |
 
 **Returns:** `ElementSelection` from ranking methods.
 **Throws:** — no `MeshEditError` is thrown directly.
@@ -459,12 +475,12 @@ declare interface ScoredSelection {
 ## Examples
 
 ```ts
-import { EditableMesh, type ScoredSelection } from "@vgpu/render/edit";
+import { EditableMesh, type ScoredSelection } from '@vgpu/render/edit';
 
 const scoredMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 2, 0, 0, 0, 1, 0]),
 });
-const scoredEdges: ScoredSelection = scoredMesh.edges.scoreBy((edge) => edge.length);
+const scoredEdges: ScoredSelection = scoredMesh.edges.scoreBy(edge => edge.length);
 const longestEdge = scoredEdges.top();
 ```
 
@@ -480,7 +496,7 @@ Read-only per-vertex data passed to vertex `where`/`scoreBy` callbacks.
 ## Import
 
 ```ts
-import type { VertexView } from "@vgpu/render/edit";
+import type { VertexView } from '@vgpu/render/edit';
 ```
 
 ## Signature
@@ -500,14 +516,14 @@ declare interface VertexView {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| index | number | ✔ | — | Vertex index in the current mesh. |
-| position | Vec3 | ✔ | — | XYZ position. |
-| normal | Vec3 | ✔ | — | Kernel-computed vertex normal. |
-| valence | number | ✔ | — | Number of incident edges. |
-| isBoundary | boolean | ✔ | — | True if any incident edge is boundary. |
-| isManifold | boolean | ✔ | — | True when local incident topology is manifold. |
+| Field      | Type    | Required | Default | Notes                                          |
+| ---------- | ------- | -------- | ------- | ---------------------------------------------- |
+| index      | number  | ✔        | —       | Vertex index in the current mesh.              |
+| position   | Vec3    | ✔        | —       | XYZ position.                                  |
+| normal     | Vec3    | ✔        | —       | Kernel-computed vertex normal.                 |
+| valence    | number  | ✔        | —       | Number of incident edges.                      |
+| isBoundary | boolean | ✔        | —       | True if any incident edge is boundary.         |
+| isManifold | boolean | ✔        | —       | True when local incident topology is manifold. |
 
 **Returns:** N/A — interface.
 **Throws:** N/A.
@@ -515,7 +531,7 @@ declare interface VertexView {
 ## Examples
 
 ```ts
-import { EditableMesh, type VertexView } from "@vgpu/render/edit";
+import { EditableMesh, type VertexView } from '@vgpu/render/edit';
 
 const vertexViewMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -535,7 +551,7 @@ Read-only per-edge data passed to edge `where`/`scoreBy` callbacks.
 ## Import
 
 ```ts
-import type { EdgeView } from "@vgpu/render/edit";
+import type { EdgeView } from '@vgpu/render/edit';
 ```
 
 ## Signature
@@ -560,16 +576,16 @@ declare interface EdgeView {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| index | number | ✔ | — | Edge index in current mesh. |
-| midpoint / direction | Vec3 | ✔ | — | Derived from endpoints. |
-| length | number | ✔ | — | Euclidean length. |
-| vertexA / vertexB | number | ✔ | — | Endpoint vertex indices. |
-| faceA / faceB | number \| null | ✔ | — | Incident faces; `faceB === null` indicates boundary. |
-| isBoundary | boolean | ✔ | — | True for one-sided edges. |
-| isManifold | boolean | ✔ | — | True when the edge has manifold incidence. |
-| isSharp | boolean | ✔ | — | True when the kernel sharp mask is set. |
+| Field                | Type           | Required | Default | Notes                                                |
+| -------------------- | -------------- | -------- | ------- | ---------------------------------------------------- |
+| index                | number         | ✔        | —       | Edge index in current mesh.                          |
+| midpoint / direction | Vec3           | ✔        | —       | Derived from endpoints.                              |
+| length               | number         | ✔        | —       | Euclidean length.                                    |
+| vertexA / vertexB    | number         | ✔        | —       | Endpoint vertex indices.                             |
+| faceA / faceB        | number \| null | ✔        | —       | Incident faces; `faceB === null` indicates boundary. |
+| isBoundary           | boolean        | ✔        | —       | True for one-sided edges.                            |
+| isManifold           | boolean        | ✔        | —       | True when the edge has manifold incidence.           |
+| isSharp              | boolean        | ✔        | —       | True when the kernel sharp mask is set.              |
 
 **Returns:** N/A — interface.
 **Throws:** N/A.
@@ -577,7 +593,7 @@ declare interface EdgeView {
 ## Examples
 
 ```ts
-import { EditableMesh, type EdgeView } from "@vgpu/render/edit";
+import { EditableMesh, type EdgeView } from '@vgpu/render/edit';
 
 const edgeViewMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -597,7 +613,7 @@ Read-only per-face data passed to face `where`/`scoreBy` callbacks.
 ## Import
 
 ```ts
-import type { FaceView } from "@vgpu/render/edit";
+import type { FaceView } from '@vgpu/render/edit';
 ```
 
 ## Signature
@@ -619,14 +635,14 @@ declare interface FaceView {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| index | number | ✔ | — | Face index in current mesh. |
-| center / normal | Vec3 | ✔ | — | Derived from triangle vertices and face normal. |
-| area | number | ✔ | — | Triangle area. |
-| vertexCount | number | ✔ | — | Always `3` for the triangle-only editable kernel. |
-| vertexIndices / edgeIndices | ReadonlyArray<number> | ✔ | — | Triangle vertex/edge indices. |
-| useSmooth | boolean | ✔ | — | Per-face smoothing flag. |
+| Field                       | Type                  | Required | Default | Notes                                             |
+| --------------------------- | --------------------- | -------- | ------- | ------------------------------------------------- |
+| index                       | number                | ✔        | —       | Face index in current mesh.                       |
+| center / normal             | Vec3                  | ✔        | —       | Derived from triangle vertices and face normal.   |
+| area                        | number                | ✔        | —       | Triangle area.                                    |
+| vertexCount                 | number                | ✔        | —       | Always `3` for the triangle-only editable kernel. |
+| vertexIndices / edgeIndices | ReadonlyArray<number> | ✔        | —       | Triangle vertex/edge indices.                     |
+| useSmooth                   | boolean               | ✔        | —       | Per-face smoothing flag.                          |
 
 **Returns:** N/A — interface.
 **Throws:** N/A.
@@ -634,7 +650,7 @@ declare interface FaceView {
 ## Examples
 
 ```ts
-import { EditableMesh, type FaceView } from "@vgpu/render/edit";
+import { EditableMesh, type FaceView } from '@vgpu/render/edit';
 
 const faceViewMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -654,7 +670,7 @@ Opaque branded handle to the internal half-edge kernel. It exists so editable va
 ## Import
 
 ```ts
-import type { KernelHandle } from "@vgpu/render/edit";
+import type { KernelHandle } from '@vgpu/render/edit';
 ```
 
 ## Signature
@@ -666,9 +682,9 @@ export type KernelHandle = { readonly [kernelBrand]: never };
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| branded property | unique symbol | ✔ | — | Compile-time brand only; not constructible through public API. |
+| Field            | Type          | Required | Default | Notes                                                          |
+| ---------------- | ------------- | -------- | ------- | -------------------------------------------------------------- |
+| branded property | unique symbol | ✔        | —       | Compile-time brand only; not constructible through public API. |
 
 **Returns:** N/A — type alias.
 **Throws:** N/A.
@@ -676,7 +692,7 @@ export type KernelHandle = { readonly [kernelBrand]: never };
 ## Examples
 
 ```ts
-import { EditableMesh, type KernelHandle } from "@vgpu/render/edit";
+import { EditableMesh, type KernelHandle } from '@vgpu/render/edit';
 
 const kernelHandleMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -696,19 +712,19 @@ Extrudes selected faces along their face normals or an explicit direction. Use i
 ## Import
 
 ```ts
-import { extrude } from "@vgpu/render/edit";
+import { extrude } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface ExtrudeOptions {
   readonly distance: number;
   readonly inset?: number;
   readonly direction?: readonly [number, number, number];
-  readonly mode?: "region" | "individual";
+  readonly mode?: 'region' | 'individual';
 }
 
 declare interface ExtrudeResult {
@@ -724,14 +740,14 @@ declare function extrude(em: EditableMeshValue, faces: ElementSelection, opts: E
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| faces | ElementSelection | ✔ | — | Must be a non-empty face selection from `em`. |
-| opts.distance | number | ✔ | — | Offset distance along selected face normal or normalized `direction`. |
-| opts.inset | number | ✖ | `0` | Fraction toward each face center before lifting. No clamp is applied. |
-| opts.direction | `[number, number, number]` | ✖ | selected face normal | Normalized internally; zero vector behaves as length `1` denominator. |
-| opts.mode | `"region" \| "individual"` | ✖ | accepted but not used in v1 | Current implementation extrudes each selected triangle independently. |
+| Param          | Type                       | Required | Default                     | Notes                                                                 |
+| -------------- | -------------------------- | -------- | --------------------------- | --------------------------------------------------------------------- |
+| em             | EditableMeshValue          | ✔        | —                           | Source mesh.                                                          |
+| faces          | ElementSelection           | ✔        | —                           | Must be a non-empty face selection from `em`.                         |
+| opts.distance  | number                     | ✔        | —                           | Offset distance along selected face normal or normalized `direction`. |
+| opts.inset     | number                     | ✖        | `0`                         | Fraction toward each face center before lifting. No clamp is applied. |
+| opts.direction | `[number, number, number]` | ✖        | selected face normal        | Normalized internally; zero vector behaves as length `1` denominator. |
+| opts.mode      | `"region" \| "individual"` | ✖        | accepted but not used in v1 | Current implementation extrudes each selected triangle independently. |
 
 **Returns:** `ExtrudeResult` — edited mesh plus side, cap, and boundary-edge selections on the result mesh.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `faces.domain !== "face"`; `EMPTY_SELECTION` if `faces.count === 0`.
@@ -739,7 +755,7 @@ declare function extrude(em: EditableMeshValue, faces: ElementSelection, opts: E
 ## Examples
 
 ```ts
-import { EditableMesh, extrude } from "@vgpu/render/edit";
+import { EditableMesh, extrude } from '@vgpu/render/edit';
 
 const extrudeMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -759,19 +775,19 @@ Bevels selected edges by shrinking incident faces and inserting strip faces. Use
 ## Import
 
 ```ts
-import { bevel } from "@vgpu/render/edit";
+import { bevel } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface BevelOptions {
   readonly offset: number;
   readonly segments?: number;
   readonly profile?: number;
-  readonly affect?: "edges" | "vertices";
+  readonly affect?: 'edges' | 'vertices';
   readonly markSharp?: boolean;
 }
 
@@ -788,15 +804,15 @@ declare function bevel(em: EditableMeshValue, edges: ElementSelection, opts: Bev
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| edges | ElementSelection | ✔ | — | Must be a non-empty edge selection. |
-| opts.offset | number | ✔ | — | Fraction toward each incident face center; clamped to `[0, 0.49]`. |
-| opts.segments | number | ✖ | `1` | Any value other than `1` emits `BEVEL_SEGMENTS_CLAMPED`; geometry remains one segment. |
-| opts.profile | number | ✖ | accepted but not used in v1 | Present in type for future bevel profiles. |
-| opts.affect | `"edges" \| "vertices"` | ✖ | accepted but not used in v1 | Current implementation bevels selected edges/incident faces. |
-| opts.markSharp | boolean | ✖ | `true` | Marks selected original/profile edges sharp when true. |
+| Param          | Type                    | Required | Default                     | Notes                                                                                  |
+| -------------- | ----------------------- | -------- | --------------------------- | -------------------------------------------------------------------------------------- |
+| em             | EditableMeshValue       | ✔        | —                           | Source mesh.                                                                           |
+| edges          | ElementSelection        | ✔        | —                           | Must be a non-empty edge selection.                                                    |
+| opts.offset    | number                  | ✔        | —                           | Fraction toward each incident face center; clamped to `[0, 0.49]`.                     |
+| opts.segments  | number                  | ✖        | `1`                         | Any value other than `1` emits `BEVEL_SEGMENTS_CLAMPED`; geometry remains one segment. |
+| opts.profile   | number                  | ✖        | accepted but not used in v1 | Present in type for future bevel profiles.                                             |
+| opts.affect    | `"edges" \| "vertices"` | ✖        | accepted but not used in v1 | Current implementation bevels selected edges/incident faces.                           |
+| opts.markSharp | boolean                 | ✖        | `true`                      | Marks selected original/profile edges sharp when true.                                 |
 
 **Returns:** `BevelResult` — edited mesh, strip faces, shrunken original faces, and profile loop edge selections.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `edges.domain !== "edge"`; `EMPTY_SELECTION` if `edges.count === 0`.
@@ -804,7 +820,7 @@ declare function bevel(em: EditableMeshValue, edges: ElementSelection, opts: Bev
 ## Examples
 
 ```ts
-import { EditableMesh, bevel } from "@vgpu/render/edit";
+import { EditableMesh, bevel } from '@vgpu/render/edit';
 
 const bevelMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -824,13 +840,13 @@ Insets selected faces by adding an inner triangle and boundary rim faces. Use it
 ## Import
 
 ```ts
-import { inset } from "@vgpu/render/edit";
+import { inset } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface InsetOptions {
   readonly thickness: number;
@@ -851,13 +867,13 @@ declare function inset(em: EditableMeshValue, faces: ElementSelection, opts: Ins
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| faces | ElementSelection | ✔ | — | Must be a non-empty face selection. |
-| opts.thickness | number | ✔ | — | Fraction toward face center; clamped to `[0, 0.49]`. Clamp emits `INSET_OVERLAP_CLAMPED`. |
-| opts.depth | number | ✖ | `0` | Offset along each face normal after insetting. |
-| opts.individual | boolean | ✖ | accepted but not used in v1 | Current implementation processes selected triangles individually. |
+| Param           | Type              | Required | Default                     | Notes                                                                                     |
+| --------------- | ----------------- | -------- | --------------------------- | ----------------------------------------------------------------------------------------- |
+| em              | EditableMeshValue | ✔        | —                           | Source mesh.                                                                              |
+| faces           | ElementSelection  | ✔        | —                           | Must be a non-empty face selection.                                                       |
+| opts.thickness  | number            | ✔        | —                           | Fraction toward face center; clamped to `[0, 0.49]`. Clamp emits `INSET_OVERLAP_CLAMPED`. |
+| opts.depth      | number            | ✖        | `0`                         | Offset along each face normal after insetting.                                            |
+| opts.individual | boolean           | ✖        | accepted but not used in v1 | Current implementation processes selected triangles individually.                         |
 
 **Returns:** `InsetResult` — edited mesh plus inner faces, rim/boundary faces, and rim edges on the result mesh.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `faces.domain !== "face"`; `EMPTY_SELECTION` if `faces.count === 0`.
@@ -865,7 +881,7 @@ declare function inset(em: EditableMeshValue, faces: ElementSelection, opts: Ins
 ## Examples
 
 ```ts
-import { EditableMesh, inset } from "@vgpu/render/edit";
+import { EditableMesh, inset } from '@vgpu/render/edit';
 
 const insetMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -885,32 +901,38 @@ Splits selected edges and retriangulates incident triangles. Use it to add local
 ## Import
 
 ```ts
-import { subdivideEdges } from "@vgpu/render/edit";
+import { subdivideEdges } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection } from '@vgpu/render/edit';
 
-declare interface SubdivideEdgesOptions { readonly cuts?: number }
+declare interface SubdivideEdgesOptions {
+  readonly cuts?: number;
+}
 declare interface SubdivideEdgesResult {
   readonly mesh: EditableMeshValue;
   readonly newVertices: ElementSelection;
   readonly newEdges: ElementSelection;
 }
 
-declare function subdivideEdges(em: EditableMeshValue, edges: ElementSelection, opts?: SubdivideEdgesOptions): SubdivideEdgesResult;
+declare function subdivideEdges(
+  em: EditableMeshValue,
+  edges: ElementSelection,
+  opts?: SubdivideEdgesOptions,
+): SubdivideEdgesResult;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| edges | ElementSelection | ✔ | — | Must be a non-empty edge selection. |
-| opts | SubdivideEdgesOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.cuts | number | ✖ | `1` | Floored and clamped to minimum `1`; inserts this many points per selected edge. |
+| Param     | Type                  | Required | Default | Notes                                                                           |
+| --------- | --------------------- | -------- | ------- | ------------------------------------------------------------------------------- |
+| em        | EditableMeshValue     | ✔        | —       | Source mesh.                                                                    |
+| edges     | ElementSelection      | ✔        | —       | Must be a non-empty edge selection.                                             |
+| opts      | SubdivideEdgesOptions | ✖        | `{}`    | Options object may be omitted.                                                  |
+| opts.cuts | number                | ✖        | `1`     | Floored and clamped to minimum `1`; inserts this many points per selected edge. |
 
 **Returns:** `SubdivideEdgesResult` — edited mesh with selections for inserted vertices and child edges.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `edges.domain !== "edge"`; `EMPTY_SELECTION` if `edges.count === 0`.
@@ -918,7 +940,7 @@ declare function subdivideEdges(em: EditableMeshValue, edges: ElementSelection, 
 ## Examples
 
 ```ts
-import { EditableMesh, subdivideEdges } from "@vgpu/render/edit";
+import { EditableMesh, subdivideEdges } from '@vgpu/render/edit';
 
 const subdivideEdgesMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -938,32 +960,38 @@ Subdivides selected triangles into four triangles per cut iteration using edge m
 ## Import
 
 ```ts
-import { subdivideFaces } from "@vgpu/render/edit";
+import { subdivideFaces } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection } from '@vgpu/render/edit';
 
-declare interface SubdivideFacesOptions { readonly cuts?: number }
+declare interface SubdivideFacesOptions {
+  readonly cuts?: number;
+}
 declare interface SubdivideFacesResult {
   readonly mesh: EditableMeshValue;
   readonly newFaces: ElementSelection;
   readonly newEdges: ElementSelection;
 }
 
-declare function subdivideFaces(em: EditableMeshValue, faces: ElementSelection, opts?: SubdivideFacesOptions): SubdivideFacesResult;
+declare function subdivideFaces(
+  em: EditableMeshValue,
+  faces: ElementSelection,
+  opts?: SubdivideFacesOptions,
+): SubdivideFacesResult;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| faces | ElementSelection | ✔ | — | Must be a non-empty face selection. |
-| opts | SubdivideFacesOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.cuts | number | ✖ | `1` | Floored and clamped to minimum `1`; repeated cut iterations apply to newly-created faces. |
+| Param     | Type                  | Required | Default | Notes                                                                                     |
+| --------- | --------------------- | -------- | ------- | ----------------------------------------------------------------------------------------- |
+| em        | EditableMeshValue     | ✔        | —       | Source mesh.                                                                              |
+| faces     | ElementSelection      | ✔        | —       | Must be a non-empty face selection.                                                       |
+| opts      | SubdivideFacesOptions | ✖        | `{}`    | Options object may be omitted.                                                            |
+| opts.cuts | number                | ✖        | `1`     | Floored and clamped to minimum `1`; repeated cut iterations apply to newly-created faces. |
 
 **Returns:** `SubdivideFacesResult` — edited mesh with selections for descendant faces and new edges.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `faces.domain !== "face"`; `EMPTY_SELECTION` if `faces.count === 0`.
@@ -971,7 +999,7 @@ declare function subdivideFaces(em: EditableMeshValue, faces: ElementSelection, 
 ## Examples
 
 ```ts
-import { EditableMesh, subdivideFaces } from "@vgpu/render/edit";
+import { EditableMesh, subdivideFaces } from '@vgpu/render/edit';
 
 const subdivideFacesMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -991,13 +1019,13 @@ Attempts to cut an edge loop/ring through coplanar triangle pairs. Falls back to
 ## Import
 
 ```ts
-import { loopCut } from "@vgpu/render/edit";
+import { loopCut } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface LoopCutOptions {
   readonly cuts?: number;
@@ -1016,14 +1044,14 @@ declare function loopCut(em: EditableMeshValue, seedEdge: number, opts?: LoopCut
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| seedEdge | number | ✔ | — | Edge index; must be `0 <= seedEdge < em.edgeCount`. |
-| opts | LoopCutOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.cuts | number | ✖ | `1` in fallback only | Used only when ambiguous continuation falls back to `subdivideEdges`. |
-| opts.slide | number | ✖ | `0` | Maps to split factor `0.5 + slide * 0.5`, clamped to `[0.001, 0.999]`. |
-| opts.markSharp | boolean | ✖ | `false` | Marks inserted loop edges sharp only in successful ring cuts. |
+| Param          | Type              | Required | Default              | Notes                                                                  |
+| -------------- | ----------------- | -------- | -------------------- | ---------------------------------------------------------------------- |
+| em             | EditableMeshValue | ✔        | —                    | Source mesh.                                                           |
+| seedEdge       | number            | ✔        | —                    | Edge index; must be `0 <= seedEdge < em.edgeCount`.                    |
+| opts           | LoopCutOptions    | ✖        | `{}`                 | Options object may be omitted.                                         |
+| opts.cuts      | number            | ✖        | `1` in fallback only | Used only when ambiguous continuation falls back to `subdivideEdges`.  |
+| opts.slide     | number            | ✖        | `0`                  | Maps to split factor `0.5 + slide * 0.5`, clamped to `[0.001, 0.999]`. |
+| opts.markSharp | boolean           | ✖        | `false`              | Marks inserted loop edges sharp only in successful ring cuts.          |
 
 **Returns:** `LoopCutResult` — edited mesh plus ordered inserted-loop edge selection.
 **Throws:** `MeshEditError` `EMPTY_SELECTION` when `seedEdge` is out of range.
@@ -1031,7 +1059,7 @@ declare function loopCut(em: EditableMeshValue, seedEdge: number, opts?: LoopCut
 ## Examples
 
 ```ts
-import { EditableMesh, loopCut } from "@vgpu/render/edit";
+import { EditableMesh, loopCut } from '@vgpu/render/edit';
 
 const loopCutMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -1051,17 +1079,17 @@ Creates faces between two ordered edge loops in one selection. Use for connectin
 ## Import
 
 ```ts
-import { bridge } from "@vgpu/render/edit";
+import { bridge } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface BridgeOptions {
   readonly twist?: number;
-  readonly mode?: "faces" | "merge";
+  readonly mode?: 'faces' | 'merge';
 }
 
 declare interface BridgeResult {
@@ -1076,13 +1104,13 @@ declare function bridge(em: EditableMeshValue, sel: ElementSelection, opts?: Bri
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| sel | ElementSelection | ✔ | — | Must be a non-empty ordered edge selection containing two loops. |
-| opts | BridgeOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.twist | number | ✖ | auto by shortest squared endpoint distance | Shift applied to second loop correspondence; returned as positive modulo loop length. |
-| opts.mode | `"faces" \| "merge"` | ✖ | `"faces"` | `"merge"` throws `UNSUPPORTED_INPUT` in the triangle-only kernel. |
+| Param      | Type                 | Required | Default                                    | Notes                                                                                 |
+| ---------- | -------------------- | -------- | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| em         | EditableMeshValue    | ✔        | —                                          | Source mesh.                                                                          |
+| sel        | ElementSelection     | ✔        | —                                          | Must be a non-empty ordered edge selection containing two loops.                      |
+| opts       | BridgeOptions        | ✖        | `{}`                                       | Options object may be omitted.                                                        |
+| opts.twist | number               | ✖        | auto by shortest squared endpoint distance | Shift applied to second loop correspondence; returned as positive modulo loop length. |
+| opts.mode  | `"faces" \| "merge"` | ✖        | `"faces"`                                  | `"merge"` throws `UNSUPPORTED_INPUT` in the triangle-only kernel.                     |
 
 **Returns:** `BridgeResult` — edited mesh, bridge face selection, chosen twist, optional length-mismatch warnings.
 **Throws:** `MeshEditError` `WRONG_DOMAIN`, `EMPTY_SELECTION`, or `NOT_ORDERED` from loop validation; `AMBIGUOUS_TOPOLOGY` when two loops cannot be split; `UNSUPPORTED_INPUT` for `mode: "merge"`; `DEGENERATE_RESULT` can propagate from invalid loop vertices.
@@ -1090,13 +1118,13 @@ declare function bridge(em: EditableMeshValue, sel: ElementSelection, opts?: Bri
 ## Examples
 
 ```ts
-import { EditableMesh, bridge, type ElementSelection } from "@vgpu/render/edit";
+import { EditableMesh, bridge, type ElementSelection } from '@vgpu/render/edit';
 
 const bridgeMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1]),
   indices: new Uint32Array([0, 1, 2, 3, 4, 5]),
 });
-const twoTriangleLoops: ElementSelection = { domain: "edge", indices: [0, 1, 2, 3, 4, 5], count: 6, ordered: true };
+const twoTriangleLoops: ElementSelection = { domain: 'edge', indices: [0, 1, 2, 3, 4, 5], count: 6, ordered: true };
 const bridged = bridge(bridgeMesh, twoTriangleLoops, { twist: 0 });
 ```
 
@@ -1112,15 +1140,17 @@ Fills an ordered boundary loop with a triangle fan.
 ## Import
 
 ```ts
-import { fillHole } from "@vgpu/render/edit";
+import { fillHole } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
-declare interface FillHoleOptions { readonly method?: "triangulate" | "ngon" | "beautify" }
+declare interface FillHoleOptions {
+  readonly method?: 'triangulate' | 'ngon' | 'beautify';
+}
 declare interface FillHoleResult {
   readonly mesh: EditableMeshValue;
   readonly newFaces: ElementSelection;
@@ -1132,12 +1162,12 @@ declare function fillHole(em: EditableMeshValue, boundary: ElementSelection, opt
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| boundary | ElementSelection | ✔ | — | Must be a non-empty ordered edge loop. |
-| opts | FillHoleOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.method | `"triangulate" \| "ngon" \| "beautify"` | ✖ | `"triangulate"` | Non-triangulate methods still emit a triangle fan and warn `FILL_HOLE_TRIANGULATED`. |
+| Param       | Type                                    | Required | Default         | Notes                                                                                |
+| ----------- | --------------------------------------- | -------- | --------------- | ------------------------------------------------------------------------------------ |
+| em          | EditableMeshValue                       | ✔        | —               | Source mesh.                                                                         |
+| boundary    | ElementSelection                        | ✔        | —               | Must be a non-empty ordered edge loop.                                               |
+| opts        | FillHoleOptions                         | ✖        | `{}`            | Options object may be omitted.                                                       |
+| opts.method | `"triangulate" \| "ngon" \| "beautify"` | ✖        | `"triangulate"` | Non-triangulate methods still emit a triangle fan and warn `FILL_HOLE_TRIANGULATED`. |
 
 **Returns:** `FillHoleResult` — edited mesh and newly-created faces.
 **Throws:** `MeshEditError` `WRONG_DOMAIN`, `EMPTY_SELECTION`, or `NOT_ORDERED` from loop validation; `AMBIGUOUS_TOPOLOGY`/`DEGENERATE_RESULT` can propagate from invalid loop vertices.
@@ -1145,12 +1175,12 @@ declare function fillHole(em: EditableMeshValue, boundary: ElementSelection, opt
 ## Examples
 
 ```ts
-import { EditableMesh, fillHole, type ElementSelection } from "@vgpu/render/edit";
+import { EditableMesh, fillHole, type ElementSelection } from '@vgpu/render/edit';
 
 const fillHoleMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
 });
-const triangleBoundary: ElementSelection = { domain: "edge", indices: [0, 1, 2], count: 3, ordered: true };
+const triangleBoundary: ElementSelection = { domain: 'edge', indices: [0, 1, 2], count: 3, ordered: true };
 const filledHole = fillHole(fillHoleMesh, triangleBoundary);
 ```
 
@@ -1166,15 +1196,17 @@ Deterministically represents a grid fill as triangles around the boundary center
 ## Import
 
 ```ts
-import { gridFill } from "@vgpu/render/edit";
+import { gridFill } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
-declare interface GridFillOptions { readonly spanMode?: "auto" | number }
+declare interface GridFillOptions {
+  readonly spanMode?: 'auto' | number;
+}
 declare interface GridFillResult {
   readonly mesh: EditableMeshValue;
   readonly newFaces: ElementSelection;
@@ -1186,12 +1218,12 @@ declare function gridFill(em: EditableMeshValue, boundary: ElementSelection, opt
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| boundary | ElementSelection | ✔ | — | Must be a non-empty ordered edge loop. |
-| opts | GridFillOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.spanMode | `"auto" \| number` | ✖ | `"auto"` for warning text | Numeric values `< 1` throw `DEGENERATE_RESULT`; all modes triangulate. |
+| Param         | Type               | Required | Default                   | Notes                                                                  |
+| ------------- | ------------------ | -------- | ------------------------- | ---------------------------------------------------------------------- |
+| em            | EditableMeshValue  | ✔        | —                         | Source mesh.                                                           |
+| boundary      | ElementSelection   | ✔        | —                         | Must be a non-empty ordered edge loop.                                 |
+| opts          | GridFillOptions    | ✖        | `{}`                      | Options object may be omitted.                                         |
+| opts.spanMode | `"auto" \| number` | ✖        | `"auto"` for warning text | Numeric values `< 1` throw `DEGENERATE_RESULT`; all modes triangulate. |
 
 **Returns:** `GridFillResult` — edited mesh, new fan faces, and warnings.
 **Throws:** `MeshEditError` `WRONG_DOMAIN`, `EMPTY_SELECTION`, or `NOT_ORDERED` from loop validation; `DEGENERATE_RESULT` for numeric `spanMode < 1`; `AMBIGUOUS_TOPOLOGY` can propagate from invalid loop vertices.
@@ -1199,13 +1231,13 @@ declare function gridFill(em: EditableMeshValue, boundary: ElementSelection, opt
 ## Examples
 
 ```ts
-import { EditableMesh, gridFill, type ElementSelection } from "@vgpu/render/edit";
+import { EditableMesh, gridFill, type ElementSelection } from '@vgpu/render/edit';
 
 const gridFillMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
 });
-const gridBoundary: ElementSelection = { domain: "edge", indices: [0, 1, 2], count: 3, ordered: true };
-const gridFilled = gridFill(gridFillMesh, gridBoundary, { spanMode: "auto" });
+const gridBoundary: ElementSelection = { domain: 'edge', indices: [0, 1, 2], count: 3, ordered: true };
+const gridFilled = gridFill(gridFillMesh, gridBoundary, { spanMode: 'auto' });
 ```
 
 ## Notes
@@ -1220,13 +1252,13 @@ Dissolves selected non-boundary vertices by dissolving their surrounding faces.
 ## Import
 
 ```ts
-import { dissolveVertices } from "@vgpu/render/edit";
+import { dissolveVertices } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface DissolveVerticesOptions {
   readonly useFaceSplit?: boolean;
@@ -1239,18 +1271,22 @@ declare interface DissolveVerticesResult {
   readonly warnings?: readonly MeshEditWarning[];
 }
 
-declare function dissolveVertices(em: EditableMeshValue, vertices: ElementSelection, opts?: DissolveVerticesOptions): DissolveVerticesResult;
+declare function dissolveVertices(
+  em: EditableMeshValue,
+  vertices: ElementSelection,
+  opts?: DissolveVerticesOptions,
+): DissolveVerticesResult;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| vertices | ElementSelection | ✔ | — | Must be a non-empty vertex selection. |
-| opts | DissolveVerticesOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.useFaceSplit | boolean | ✖ | accepted but not used in v1 | Present in type only. |
-| opts.useBoundaryTear | boolean | ✖ | accepted but not used in v1 | Boundary vertices are skipped with warnings. |
+| Param                | Type                    | Required | Default                     | Notes                                        |
+| -------------------- | ----------------------- | -------- | --------------------------- | -------------------------------------------- |
+| em                   | EditableMeshValue       | ✔        | —                           | Source mesh.                                 |
+| vertices             | ElementSelection        | ✔        | —                           | Must be a non-empty vertex selection.        |
+| opts                 | DissolveVerticesOptions | ✖        | `{}`                        | Options object may be omitted.               |
+| opts.useFaceSplit    | boolean                 | ✖        | accepted but not used in v1 | Present in type only.                        |
+| opts.useBoundaryTear | boolean                 | ✖        | accepted but not used in v1 | Boundary vertices are skipped with warnings. |
 
 **Returns:** `DissolveVerticesResult` — edited mesh and resulting surrounding face selection.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `vertices.domain !== "vertex"`; `EMPTY_SELECTION` if `vertices.count === 0`.
@@ -1258,7 +1294,7 @@ declare function dissolveVertices(em: EditableMeshValue, vertices: ElementSelect
 ## Examples
 
 ```ts
-import { EditableMesh, dissolveVertices } from "@vgpu/render/edit";
+import { EditableMesh, dissolveVertices } from '@vgpu/render/edit';
 
 const dissolveVerticesMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -1278,32 +1314,38 @@ Removes selected internal edges by merging each adjacent face pair and retriangu
 ## Import
 
 ```ts
-import { dissolveEdges } from "@vgpu/render/edit";
+import { dissolveEdges } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
-declare interface DissolveEdgesOptions { readonly useVerts?: boolean }
+declare interface DissolveEdgesOptions {
+  readonly useVerts?: boolean;
+}
 declare interface DissolveEdgesResult {
   readonly mesh: EditableMeshValue;
   readonly mergedFaces: ElementSelection;
   readonly warnings?: readonly MeshEditWarning[];
 }
 
-declare function dissolveEdges(em: EditableMeshValue, edges: ElementSelection, opts?: DissolveEdgesOptions): DissolveEdgesResult;
+declare function dissolveEdges(
+  em: EditableMeshValue,
+  edges: ElementSelection,
+  opts?: DissolveEdgesOptions,
+): DissolveEdgesResult;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| edges | ElementSelection | ✔ | — | Must be a non-empty edge selection. Boundary/overlapping jobs are skipped with warnings. |
-| opts | DissolveEdgesOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.useVerts | boolean | ✖ | accepted but not used in v1 | Present in type only. |
+| Param         | Type                 | Required | Default                     | Notes                                                                                    |
+| ------------- | -------------------- | -------- | --------------------------- | ---------------------------------------------------------------------------------------- |
+| em            | EditableMeshValue    | ✔        | —                           | Source mesh.                                                                             |
+| edges         | ElementSelection     | ✔        | —                           | Must be a non-empty edge selection. Boundary/overlapping jobs are skipped with warnings. |
+| opts          | DissolveEdgesOptions | ✖        | `{}`                        | Options object may be omitted.                                                           |
+| opts.useVerts | boolean              | ✖        | accepted but not used in v1 | Present in type only.                                                                    |
 
 **Returns:** `DissolveEdgesResult` — edited mesh and merged face selection.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `edges.domain !== "edge"`; `EMPTY_SELECTION` if `edges.count === 0`.
@@ -1311,7 +1353,7 @@ declare function dissolveEdges(em: EditableMeshValue, edges: ElementSelection, o
 ## Examples
 
 ```ts
-import { EditableMesh, dissolveEdges } from "@vgpu/render/edit";
+import { EditableMesh, dissolveEdges } from '@vgpu/render/edit';
 
 const dissolveEdgesMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -1331,13 +1373,13 @@ Removes selected face regions and retriangulates each region boundary as a fan.
 ## Import
 
 ```ts
-import { dissolveFaces } from "@vgpu/render/edit";
+import { dissolveFaces } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface DissolveFacesResult {
   readonly mesh: EditableMeshValue;
@@ -1350,10 +1392,10 @@ declare function dissolveFaces(em: EditableMeshValue, faces: ElementSelection): 
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| faces | ElementSelection | ✔ | — | Must be a non-empty face selection. Connected components are dissolved independently. |
+| Param | Type              | Required | Default | Notes                                                                                 |
+| ----- | ----------------- | -------- | ------- | ------------------------------------------------------------------------------------- |
+| em    | EditableMeshValue | ✔        | —       | Source mesh.                                                                          |
+| faces | ElementSelection  | ✔        | —       | Must be a non-empty face selection. Connected components are dissolved independently. |
 
 **Returns:** `DissolveFacesResult` — edited mesh and result face selection.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `faces.domain !== "face"`; `EMPTY_SELECTION` if `faces.count === 0`.
@@ -1361,7 +1403,7 @@ declare function dissolveFaces(em: EditableMeshValue, faces: ElementSelection): 
 ## Examples
 
 ```ts
-import { EditableMesh, dissolveFaces } from "@vgpu/render/edit";
+import { EditableMesh, dissolveFaces } from '@vgpu/render/edit';
 
 const dissolveFacesMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -1381,18 +1423,18 @@ Welds vertices whose positions are within a threshold, removes collapsed faces, 
 ## Import
 
 ```ts
-import { mergeByDistance } from "@vgpu/render/edit";
+import { mergeByDistance } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, ElementSelection, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, ElementSelection, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface MergeByDistanceOptions {
   readonly threshold?: number;
   readonly selection?: ElementSelection;
-  readonly key?: "position" | "full-vertex";
+  readonly key?: 'position' | 'full-vertex';
 }
 
 declare interface MergeByDistanceResult {
@@ -1407,13 +1449,13 @@ declare function mergeByDistance(em: EditableMeshValue, opts?: MergeByDistanceOp
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
-| opts | MergeByDistanceOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.threshold | number | ✖ | `1e-4` | Euclidean position distance for clustering. |
-| opts.selection | ElementSelection | ✖ | `em.vertices.all()` | Must be a vertex selection. Only selected vertices are clustered; all faces are remapped. |
-| opts.key | `"position" \| "full-vertex"` | ✖ | warning mode equivalent to `"full-vertex"` | Clustering is position-based in v1. `"position"` emits `SEAM_DESTROYED` when UV/normal/color flags exist. |
+| Param          | Type                          | Required | Default                                    | Notes                                                                                                     |
+| -------------- | ----------------------------- | -------- | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| em             | EditableMeshValue             | ✔        | —                                          | Source mesh.                                                                                              |
+| opts           | MergeByDistanceOptions        | ✖        | `{}`                                       | Options object may be omitted.                                                                            |
+| opts.threshold | number                        | ✖        | `1e-4`                                     | Euclidean position distance for clustering.                                                               |
+| opts.selection | ElementSelection              | ✖        | `em.vertices.all()`                        | Must be a vertex selection. Only selected vertices are clustered; all faces are remapped.                 |
+| opts.key       | `"position" \| "full-vertex"` | ✖        | warning mode equivalent to `"full-vertex"` | Clustering is position-based in v1. `"position"` emits `SEAM_DESTROYED` when UV/normal/color flags exist. |
 
 **Returns:** `MergeByDistanceResult` — welded mesh, old vertex index to new vertex index map (`-1` for unused), and welded count.
 **Throws:** `MeshEditError` `WRONG_DOMAIN` if `opts.selection.domain !== "vertex"`; `EMPTY_SELECTION` if `opts.selection.count === 0`.
@@ -1421,7 +1463,7 @@ declare function mergeByDistance(em: EditableMeshValue, opts?: MergeByDistanceOp
 ## Examples
 
 ```ts
-import { EditableMesh, mergeByDistance } from "@vgpu/render/edit";
+import { EditableMesh, mergeByDistance } from '@vgpu/render/edit';
 
 const mergeMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 0.00001, 0, 0, 0, 1, 0]),
@@ -1441,13 +1483,13 @@ Deterministic cleanup pass that removes duplicate, degenerate, and overused-edge
 ## Import
 
 ```ts
-import { healManifold } from "@vgpu/render/edit";
+import { healManifold } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue, MeshEditWarning } from "@vgpu/render/edit";
+import type { EditableMeshValue, MeshEditWarning } from '@vgpu/render/edit';
 
 declare interface HealManifoldReport {
   readonly nonManifoldEdgesFixed: number;
@@ -1467,9 +1509,9 @@ declare function healManifold(em: EditableMeshValue): HealManifoldResult;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. |
+| Param | Type              | Required | Default | Notes        |
+| ----- | ----------------- | -------- | ------- | ------------ |
+| em    | EditableMeshValue | ✔        | —       | Source mesh. |
 
 **Returns:** `HealManifoldResult` — cleaned mesh plus report. `nonManifoldVerticesFixed` and `holesFixed` are currently always `0`.
 **Throws:** — no `MeshEditError` is thrown directly.
@@ -1477,7 +1519,7 @@ declare function healManifold(em: EditableMeshValue): HealManifoldResult;
 ## Examples
 
 ```ts
-import { EditableMesh, healManifold } from "@vgpu/render/edit";
+import { EditableMesh, healManifold } from '@vgpu/render/edit';
 
 const healMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
@@ -1498,16 +1540,16 @@ Rebuilds the editable mesh and recomputes face normals using smoothing component
 ## Import
 
 ```ts
-import { recomputeNormals } from "@vgpu/render/edit";
+import { recomputeNormals } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
-import type { EditableMeshValue } from "@vgpu/render/edit";
+import type { EditableMeshValue } from '@vgpu/render/edit';
 
 declare interface RecomputeNormalsOptions {
-  readonly weighting?: "angle" | "area" | "uniform";
+  readonly weighting?: 'angle' | 'area' | 'uniform';
   readonly creaseAngle?: number;
 }
 
@@ -1516,12 +1558,12 @@ declare function recomputeNormals(em: EditableMeshValue, opts?: RecomputeNormals
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| em | EditableMeshValue | ✔ | — | Source mesh. Empty meshes are returned unchanged. |
-| opts | RecomputeNormalsOptions | ✖ | `{}` | Options object may be omitted. |
-| opts.weighting | `"angle" \| "area" \| "uniform"` | ✖ | `"angle"` | Weighting mode for smoothing component normals. |
-| opts.creaseAngle | number | ✖ | preserve current sharp-edge mask | If provided, rebuilds sharp edges from the crease angle instead of preserving `isSharp`. |
+| Param            | Type                             | Required | Default                          | Notes                                                                                    |
+| ---------------- | -------------------------------- | -------- | -------------------------------- | ---------------------------------------------------------------------------------------- |
+| em               | EditableMeshValue                | ✔        | —                                | Source mesh. Empty meshes are returned unchanged.                                        |
+| opts             | RecomputeNormalsOptions          | ✖        | `{}`                             | Options object may be omitted.                                                           |
+| opts.weighting   | `"angle" \| "area" \| "uniform"` | ✖        | `"angle"`                        | Weighting mode for smoothing component normals.                                          |
+| opts.creaseAngle | number                           | ✖        | preserve current sharp-edge mask | If provided, rebuilds sharp edges from the crease angle instead of preserving `isSharp`. |
 
 **Returns:** `EditableMeshValue` — new mesh with recomputed kernel face normals, or the same mesh when `faceCount === 0`.
 **Throws:** — no `MeshEditError` is thrown directly.
@@ -1529,12 +1571,12 @@ declare function recomputeNormals(em: EditableMeshValue, opts?: RecomputeNormals
 ## Examples
 
 ```ts
-import { EditableMesh, recomputeNormals } from "@vgpu/render/edit";
+import { EditableMesh, recomputeNormals } from '@vgpu/render/edit';
 
 const normalsMesh = EditableMesh.fromArrays({
   positions: new Float32Array([0, 0, 0, 1, 0, 0, 0, 1, 0]),
 });
-const normalsRecomputed = recomputeNormals(normalsMesh, { weighting: "area" });
+const normalsRecomputed = recomputeNormals(normalsMesh, { weighting: 'area' });
 ```
 
 ## Notes
@@ -1549,21 +1591,21 @@ Error class thrown by validation and topology operators. Catch by `instanceof Me
 ## Import
 
 ```ts
-import { MeshEditError } from "@vgpu/render/edit";
+import { MeshEditError } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
 export type MeshEditErrorCode =
-  | "NON_MANIFOLD"
-  | "STALE_SELECTION"
-  | "EMPTY_SELECTION"
-  | "WRONG_DOMAIN"
-  | "NOT_ORDERED"
-  | "DEGENERATE_RESULT"
-  | "AMBIGUOUS_TOPOLOGY"
-  | "UNSUPPORTED_INPUT";
+  | 'NON_MANIFOLD'
+  | 'STALE_SELECTION'
+  | 'EMPTY_SELECTION'
+  | 'WRONG_DOMAIN'
+  | 'NOT_ORDERED'
+  | 'DEGENERATE_RESULT'
+  | 'AMBIGUOUS_TOPOLOGY'
+  | 'UNSUPPORTED_INPUT';
 
 declare class MeshEditError extends Error {
   readonly code: MeshEditErrorCode;
@@ -1574,14 +1616,14 @@ declare class MeshEditError extends Error {
 
 ## Parameters
 
-| Param/Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| opts.code | MeshEditErrorCode | ✔ | — | Machine-readable error code. |
-| opts.message | string | ✖ | `opts.code` | Error message passed to `Error`. |
-| opts.suggestion | string | ✖ | omitted | Optional recovery hint. |
-| code | MeshEditErrorCode | ✔ | — | Public readonly field copied from constructor. |
-| suggestion | string | ✖ | omitted | Public readonly optional field. |
-| name | string | ✔ | `"MeshEditError"` | Set by constructor. |
+| Param/Field     | Type              | Required | Default           | Notes                                          |
+| --------------- | ----------------- | -------- | ----------------- | ---------------------------------------------- |
+| opts.code       | MeshEditErrorCode | ✔        | —                 | Machine-readable error code.                   |
+| opts.message    | string            | ✖        | `opts.code`       | Error message passed to `Error`.               |
+| opts.suggestion | string            | ✖        | omitted           | Optional recovery hint.                        |
+| code            | MeshEditErrorCode | ✔        | —                 | Public readonly field copied from constructor. |
+| suggestion      | string            | ✖        | omitted           | Public readonly optional field.                |
+| name            | string            | ✔        | `"MeshEditError"` | Set by constructor.                            |
 
 **Returns:** `MeshEditError` instance from `new MeshEditError(...)`.
 **Throws:** — constructor does not throw.
@@ -1589,9 +1631,9 @@ declare class MeshEditError extends Error {
 ## Examples
 
 ```ts
-import { MeshEditError } from "@vgpu/render/edit";
+import { MeshEditError } from '@vgpu/render/edit';
 
-const meshEditError = new MeshEditError({ code: "EMPTY_SELECTION", suggestion: "Select at least one face." });
+const meshEditError = new MeshEditError({ code: 'EMPTY_SELECTION', suggestion: 'Select at least one face.' });
 const meshEditErrorCode = meshEditError.code;
 ```
 
@@ -1607,49 +1649,49 @@ Non-fatal diagnostic emitted in operator result `warnings` arrays. Use warnings 
 ## Import
 
 ```ts
-import { MeshEditWarning } from "@vgpu/render/edit";
+import { MeshEditWarning } from '@vgpu/render/edit';
 ```
 
 ## Signature
 
 ```ts
 export type MeshEditWarningCode =
-  | "NON_MANIFOLD_EDGE_SKIPPED"
-  | "NON_MANIFOLD_VERTEX_SKIPPED"
-  | "DEGENERATE_FACE_DROPPED"
-  | "TANGENTS_STRIPPED"
-  | "BEVEL_ACUTE_CLAMPED"
-  | "BEVEL_SEGMENTS_CLAMPED"
-  | "INSET_OVERLAP_CLAMPED"
-  | "SEAM_DESTROYED"
-  | "BRIDGE_LOOP_LENGTH_MISMATCH"
-  | "FILL_NON_PLANAR_BOUNDARY"
-  | "LOOP_CUT_AMBIGUOUS_CONTINUATION"
-  | "FILL_HOLE_TRIANGULATED"
-  | "GRID_FILL_TRIANGULATED"
-  | "DISSOLVE_FACES_RETRIANGULATED"
-  | "MERGE_DEGENERATE_FACES_REMOVED"
-  | "HEAL_NON_MANIFOLD_RESIDUE";
+  | 'NON_MANIFOLD_EDGE_SKIPPED'
+  | 'NON_MANIFOLD_VERTEX_SKIPPED'
+  | 'DEGENERATE_FACE_DROPPED'
+  | 'TANGENTS_STRIPPED'
+  | 'BEVEL_ACUTE_CLAMPED'
+  | 'BEVEL_SEGMENTS_CLAMPED'
+  | 'INSET_OVERLAP_CLAMPED'
+  | 'SEAM_DESTROYED'
+  | 'BRIDGE_LOOP_LENGTH_MISMATCH'
+  | 'FILL_NON_PLANAR_BOUNDARY'
+  | 'LOOP_CUT_AMBIGUOUS_CONTINUATION'
+  | 'FILL_HOLE_TRIANGULATED'
+  | 'GRID_FILL_TRIANGULATED'
+  | 'DISSOLVE_FACES_RETRIANGULATED'
+  | 'MERGE_DEGENERATE_FACES_REMOVED'
+  | 'HEAL_NON_MANIFOLD_RESIDUE';
 
 declare class MeshEditWarning {
   readonly code: MeshEditWarningCode;
   readonly reason: string;
-  readonly element?: { readonly domain: "vertex" | "edge" | "face"; readonly index: number };
+  readonly element?: { readonly domain: 'vertex' | 'edge' | 'face'; readonly index: number };
   constructor(
     code: MeshEditWarningCode,
     reason: string,
-    element?: { readonly domain: "vertex" | "edge" | "face"; readonly index: number },
+    element?: { readonly domain: 'vertex' | 'edge' | 'face'; readonly index: number },
   );
 }
 ```
 
 ## Parameters
 
-| Param/Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| code | MeshEditWarningCode | ✔ | — | Machine-readable warning code. |
-| reason | string | ✔ | — | Human-readable explanation. |
-| element | `{ domain: "vertex" \| "edge" \| "face"; index: number }` | ✖ | omitted | Optional source element associated with the warning. |
+| Param/Field | Type                                                      | Required | Default | Notes                                                |
+| ----------- | --------------------------------------------------------- | -------- | ------- | ---------------------------------------------------- |
+| code        | MeshEditWarningCode                                       | ✔        | —       | Machine-readable warning code.                       |
+| reason      | string                                                    | ✔        | —       | Human-readable explanation.                          |
+| element     | `{ domain: "vertex" \| "edge" \| "face"; index: number }` | ✖        | omitted | Optional source element associated with the warning. |
 
 **Returns:** `MeshEditWarning` instance from `new MeshEditWarning(...)`.
 **Throws:** — constructor does not throw.
@@ -1657,9 +1699,9 @@ declare class MeshEditWarning {
 ## Examples
 
 ```ts
-import { MeshEditWarning } from "@vgpu/render/edit";
+import { MeshEditWarning } from '@vgpu/render/edit';
 
-const meshEditWarning = new MeshEditWarning("GRID_FILL_TRIANGULATED", "Triangle-only output was used.");
+const meshEditWarning = new MeshEditWarning('GRID_FILL_TRIANGULATED', 'Triangle-only output was used.');
 const warningReason = meshEditWarning.reason;
 ```
 

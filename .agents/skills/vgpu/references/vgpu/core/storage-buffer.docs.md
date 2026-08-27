@@ -7,19 +7,19 @@ Low-level user-owned storage buffer with a stable bind group at binding `0`. Use
 ## Import
 
 ```ts
-import { StorageBuffer } from "vgpu/core";
-import type { StorageBufferOptions } from "vgpu/core";
+import { StorageBuffer } from 'vgpu/core';
+import type { StorageBufferOptions } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "vgpu/core";
+import type { Device } from 'vgpu/core';
 
 declare interface StorageBufferOptions {
   readonly size: number;
   readonly label?: string;
-  readonly access?: "read" | "read-write";
+  readonly access?: 'read' | 'read-write';
   readonly visibility?: GPUShaderStageFlags;
   readonly bindGroupLayout?: GPUBindGroupLayout;
 }
@@ -27,8 +27,8 @@ declare interface StorageBufferOptions {
 declare class StorageBuffer {
   readonly device: Device;
   readonly size: number;
-  readonly access: "read" | "read-write";
-  readonly buffer: import("vgpu/core").Buffer;
+  readonly access: 'read' | 'read-write';
+  readonly buffer: import('vgpu/core').Buffer;
   readonly bindGroupLayout: GPUBindGroupLayout;
   readonly bindGroup: GPUBindGroup;
   constructor(device: Device, opts: StorageBufferOptions);
@@ -41,17 +41,17 @@ declare class StorageBuffer {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Core device, usually `gpu.device`. |
-| opts | `StorageBufferOptions` | ✔ | — | Buffer/layout options. |
-| opts.size | `number` | ✔ | — | Byte size. Used for storage buffer allocation and `minBindingSize`. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to buffer label; layout label becomes `${label}.bgl`; bind group label becomes `${label}.bg`. |
-| opts.access | `"read" \| "read-write"` | ✖ | `"read"` | Chooses bind group layout type: `"read-only-storage"` or `"storage"`. |
-| opts.visibility | `GPUShaderStageFlags` | ✖ | `GPUShaderStage.FRAGMENT \| GPUShaderStage.COMPUTE` with numeric fallback `2 \| 4` | Ignored when `opts.bindGroupLayout` is supplied. Default intentionally excludes vertex stage. |
-| opts.bindGroupLayout | `GPUBindGroupLayout` | ✖ | A new binding-0 storage layout | Reuse a pipeline-owned layout. Binding `0` must match size/access. |
-| storage.write.data | `BufferSource` | ✔ | — | Bytes uploaded with `queue.writeBuffer`. |
-| storage.write.offset | `number` | ✖ | `0` | Destination byte offset. |
+| Param                | Type                     | Required | Default                                                                            | Notes                                                                                                   |
+| -------------------- | ------------------------ | -------: | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| device               | `Device`                 |        ✔ | —                                                                                  | Core device, usually `gpu.device`.                                                                      |
+| opts                 | `StorageBufferOptions`   |        ✔ | —                                                                                  | Buffer/layout options.                                                                                  |
+| opts.size            | `number`                 |        ✔ | —                                                                                  | Byte size. Used for storage buffer allocation and `minBindingSize`.                                     |
+| opts.label           | `string`                 |        ✖ | `undefined`                                                                        | Forwarded to buffer label; layout label becomes `${label}.bgl`; bind group label becomes `${label}.bg`. |
+| opts.access          | `"read" \| "read-write"` |        ✖ | `"read"`                                                                           | Chooses bind group layout type: `"read-only-storage"` or `"storage"`.                                   |
+| opts.visibility      | `GPUShaderStageFlags`    |        ✖ | `GPUShaderStage.FRAGMENT \| GPUShaderStage.COMPUTE` with numeric fallback `2 \| 4` | Ignored when `opts.bindGroupLayout` is supplied. Default intentionally excludes vertex stage.           |
+| opts.bindGroupLayout | `GPUBindGroupLayout`     |        ✖ | A new binding-0 storage layout                                                     | Reuse a pipeline-owned layout. Binding `0` must match size/access.                                      |
+| storage.write.data   | `BufferSource`           |        ✔ | —                                                                                  | Bytes uploaded with `queue.writeBuffer`.                                                                |
+| storage.write.offset | `number`                 |        ✖ | `0`                                                                                | Destination byte offset.                                                                                |
 
 **Returns:** Constructor returns `StorageBuffer`; `gpu` returns the underlying `GPUBuffer`; `write()`, `destroy()`, and `dispose()` return `void`.
 
@@ -60,31 +60,37 @@ declare class StorageBuffer {
 ## Examples
 
 ```ts
-import { init, compute } from "vgpu/mock";
-import { StorageBuffer } from "vgpu/core";
+import { init, compute } from 'vgpu/mock';
+import { StorageBuffer } from 'vgpu/core';
 
 const gpu = await init();
-const values = new StorageBuffer(gpu.device, { size: 4 * 16, label: "values" });
+const values = new StorageBuffer(gpu.device, { size: 4 * 16, label: 'values' });
 values.write(new Float32Array(16));
 
-const sim = compute(gpu, `
+const sim = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read> values: array<f32>;
   @compute @workgroup_size(1)
   fn cs_main(@builtin(global_invocation_id) id: vec3u) { _ = values[id.x]; }
-`, { set: { values } });
+`,
+  { set: { values } },
+);
 sim.dispatch(1);
 ```
 
 ```ts
-import { init, draw } from "vgpu/mock";
-import { StorageBuffer } from "vgpu/core";
+import { init, draw } from 'vgpu/mock';
+import { StorageBuffer } from 'vgpu/core';
 
 const gpu = await init();
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   @group(0) @binding(0) var<storage, read> positions: array<vec4f>;
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f { return positions[vi]; }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }
-` });
+`,
+});
 const positions = new StorageBuffer(gpu.device, {
   size: 3 * 16,
   visibility: GPUShaderStage.VERTEX,

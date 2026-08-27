@@ -6,15 +6,15 @@ Choose a target format from the operations it must support, not just its channel
 
 ## Common color and scalar formats
 
-| Format | Render target | `sampler` with linear filtering | Readback | Practical use |
-|---|---:|---:|---|---|
-| `rgba8unorm` | Yes | Yes | `read()` — 4 bytes/texel | Default target; screenshots, debug probes, and LDR color. |
-| `rgba8unorm-srgb` | Yes | Yes | `read()` — 4 bytes/texel | LDR color encoded as sRGB; do color math in linear space. |
-| `rgba16float` | Yes | Yes | `readFloats()` — 4 f32/texel | Filterable HDR color, bloom, and lighting intermediates. |
-| `rgba32float` | Yes | No by default | `readFloats()` — 4 f32/texel | Full-precision HDR/data; requires `float32-filterable` to bind to a filtering sampler. |
-| `r16float` | Yes | Yes | `readFloats()` — 1 f32/texel | Filterable scalar data such as a height or distance field. |
-| `r32float` | Yes | No by default | `readFloats()` — 1 f32/texel | Full-precision scalar data; requires `float32-filterable` for linear sampling. |
-| `r8unorm` | Yes | Yes | `read()` — 1 byte/texel | Compact normalized scalar/mask data. |
+| Format            | Render target | `sampler` with linear filtering | Readback                     | Practical use                                                                          |
+| ----------------- | ------------: | ------------------------------: | ---------------------------- | -------------------------------------------------------------------------------------- |
+| `rgba8unorm`      |           Yes |                             Yes | `read()` — 4 bytes/texel     | Default target; screenshots, debug probes, and LDR color.                              |
+| `rgba8unorm-srgb` |           Yes |                             Yes | `read()` — 4 bytes/texel     | LDR color encoded as sRGB; do color math in linear space.                              |
+| `rgba16float`     |           Yes |                             Yes | `readFloats()` — 4 f32/texel | Filterable HDR color, bloom, and lighting intermediates.                               |
+| `rgba32float`     |           Yes |                   No by default | `readFloats()` — 4 f32/texel | Full-precision HDR/data; requires `float32-filterable` to bind to a filtering sampler. |
+| `r16float`        |           Yes |                             Yes | `readFloats()` — 1 f32/texel | Filterable scalar data such as a height or distance field.                             |
+| `r32float`        |           Yes |                   No by default | `readFloats()` — 1 f32/texel | Full-precision scalar data; requires `float32-filterable` for linear sampling.         |
+| `r8unorm`         |           Yes |                             Yes | `read()` — 1 byte/texel      | Compact normalized scalar/mask data.                                                   |
 
 `rg8unorm`, `rg16float`, `rg32float`, and the `bgra8unorm` canvas formats read back too; `read()` always hands back the raw unpadded texel bytes of the format, and `readFloats()` decodes any of them to a `Float32Array` of components (`unorm8` normalized to `[0, 1]`). Depth/stencil, packed (`rgb10a2unorm`, `rg11b10ufloat`), snorm/uint/sint, and compressed formats still throw `VGPU-CORE-UNSUPPORTED-FORMAT`.
 
@@ -25,10 +25,10 @@ Choose a target format from the operations it must support, not just its channel
 `read()` returns `Uint8Array` raw texel bytes for every supported format — 4 bytes per texel for `rgba8unorm`, 8 for `rgba16float`, 16 for `rgba32float` — with row padding removed and BGRA swizzled to RGBA. For anything but 8-bit formats, prefer `readFloats()`, which decodes half/float texels into a `Float32Array` of components and preserves values above `1` and below `0`:
 
 ```typescript
-import { init, target } from "vgpu/node";
+import { init, target } from 'vgpu/node';
 
 const gpu = await init();
-const hdr = target(gpu, { size: [256, 256], format: "rgba16float" });
+const hdr = target(gpu, { size: [256, 256], format: 'rgba16float' });
 // ...render into hdr...
 const floats = await hdr.readFloats(); // 256 * 256 * 4 components, HDR values intact
 console.log(floats[0]);

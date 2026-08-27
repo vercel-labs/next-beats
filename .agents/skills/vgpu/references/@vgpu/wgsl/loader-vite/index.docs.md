@@ -7,17 +7,20 @@ Vite/Rollup transform that turns `.wgsl` files into JavaScript modules exporting
 ## Import
 
 ```ts
-import wgslVitePlugin, { transformWgsl } from "@vgpu/wgsl/loader-vite";
-import type { ViteLoadResult } from "@vgpu/wgsl/loader-vite";
+import wgslVitePlugin, { transformWgsl } from '@vgpu/wgsl/loader-vite';
+import type { ViteLoadResult } from '@vgpu/wgsl/loader-vite';
 ```
 
 ## Signature
 
 ```ts
-interface ViteLoadResult { readonly code: string; readonly map: null }
+interface ViteLoadResult {
+  readonly code: string;
+  readonly map: null;
+}
 
 interface WgslVitePluginOptions {
-  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: "none" | "safe" };
+  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: 'none' | 'safe' };
 }
 
 interface TransformWgslOptions extends WgslVitePluginOptions {
@@ -30,20 +33,24 @@ declare function transformWgsl(source: string, id: string, options?: WgslVitePlu
 declare function transformWgsl(opts: TransformWgslOptions): Promise<ViteLoadResult>;
 declare function wgslVitePlugin(options?: WgslVitePluginOptions): {
   readonly name: string;
-  readonly transform: (this: { addWatchFile(fileName: string): void }, source: string, id: string) => Promise<ViteLoadResult | null>;
+  readonly transform: (
+    this: { addWatchFile(fileName: string): void },
+    source: string,
+    id: string,
+  ) => Promise<ViteLoadResult | null>;
 };
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options.minify | `boolean | MinifyOptions` | ✖ | `false` | Shared plugin/transform minify option. `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`. |
-| source | string | ✔ | — | Raw WGSL file contents. Leaf files without top-level imports are emitted directly, optionally minified. |
-| id | string | ✔ | — | WGSL file id/path. Used as resolver entry for import graphs. Plugin transform ignores ids that do not end with `.wgsl`. |
-| opts.source | string | ✔ | — | Object-overload source field. |
-| opts.id | string | ✔ | — | Object-overload id field. |
-| opts.onDependency | `(absPath: string) => void` | ✖ | no callback | Called for each transitive dependency as soon as its path resolves, before it is loaded. Discovered dependencies are still reported when a later resolution step throws. Leaf files intentionally do not call it. |
+| Param             | Type                        | Required       | Default     | Notes                                                                                                                                                                                                             |
+| ----------------- | --------------------------- | -------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| options.minify    | `boolean                    | MinifyOptions` | ✖           | `false`                                                                                                                                                                                                           | Shared plugin/transform minify option. `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`. |
+| source            | string                      | ✔              | —           | Raw WGSL file contents. Leaf files without top-level imports are emitted directly, optionally minified.                                                                                                           |
+| id                | string                      | ✔              | —           | WGSL file id/path. Used as resolver entry for import graphs. Plugin transform ignores ids that do not end with `.wgsl`.                                                                                           |
+| opts.source       | string                      | ✔              | —           | Object-overload source field.                                                                                                                                                                                     |
+| opts.id           | string                      | ✔              | —           | Object-overload id field.                                                                                                                                                                                         |
+| opts.onDependency | `(absPath: string) => void` | ✖              | no callback | Called for each transitive dependency as soon as its path resolves, before it is loaded. Discovered dependencies are still reported when a later resolution step throws. Leaf files intentionally do not call it. |
 
 **Returns:** `Promise<ViteLoadResult>` from `transformWgsl()` with JavaScript module `code` and `map: null`; plugin `transform` returns that result for `.wgsl` ids or `null` for other ids.
 
@@ -53,7 +60,7 @@ declare function wgslVitePlugin(options?: WgslVitePluginOptions): {
 ## Examples
 
 ```ts
-import wgslVitePlugin from "@vgpu/wgsl/loader-vite";
+import wgslVitePlugin from '@vgpu/wgsl/loader-vite';
 
 const viteConfig = {
   plugins: [wgslVitePlugin({ minify: true })],
@@ -63,15 +70,13 @@ export default viteConfig;
 ```
 
 ```ts
-import { transformWgsl } from "@vgpu/wgsl/loader-vite";
+import { transformWgsl } from '@vgpu/wgsl/loader-vite';
 
-const result = await transformWgsl(
-  "@compute @workgroup_size(1) fn main() {}",
-  "/shader.wgsl",
-  { minify: { whitespace: true } },
-);
+const result = await transformWgsl('@compute @workgroup_size(1) fn main() {}', '/shader.wgsl', {
+  minify: { whitespace: true },
+});
 
-console.log(result.map === null, result.code.includes("version"));
+console.log(result.map === null, result.code.includes('version'));
 ```
 
 ## Notes

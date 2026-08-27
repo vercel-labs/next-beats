@@ -13,7 +13,7 @@ Measures GPU frame time statistics for a render routine. The harness handles war
 ## Import
 
 ```ts
-import { gpuFrameTime } from "@vgpu/render/perf";
+import { gpuFrameTime } from '@vgpu/render/perf';
 ```
 
 ## Signature
@@ -28,16 +28,16 @@ export function gpuFrameTime(
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| device | Device | ✔ | — | Source device used to create command encoders, submit work, and flush the queue. Must expose `timestamp-query` if you want GPU timestamps. |
-| encode | GpuFrameEncoder | ✔ | — | Callback invoked per frame with a fresh `GPUCommandEncoder`; record passes exactly as in production. |
-| options | GpuFrameTimeOptions | ✖ | `{}` | Tunables for warmup, sample count, and measurement mode. |
-| options.frames | number | ✖ | 120 | Measured frames after warmup. Values below 1 are clamped to 1. |
-| options.warmup | number | ✖ | 30 | Throws away the first N frames so shader compilation and lazy allocations settle. |
-| options.batch | number | ✖ | 8 | Frames per batch when falling back to wall-clock. Ignored for timestamp queries. |
-| options.forceWallClock | boolean | ✖ | false | Forces the wall-clock path even if `timestamp-query` is available. Useful when you intentionally want queue-submit timings. |
-| options.label | string | ✖ | "vgpu-gpuFrameTime" | Assigns encoder labels and buffer names to make debugging captures easier. |
+| Param                  | Type                | Required | Default             | Notes                                                                                                                                      |
+| ---------------------- | ------------------- | -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| device                 | Device              | ✔        | —                   | Source device used to create command encoders, submit work, and flush the queue. Must expose `timestamp-query` if you want GPU timestamps. |
+| encode                 | GpuFrameEncoder     | ✔        | —                   | Callback invoked per frame with a fresh `GPUCommandEncoder`; record passes exactly as in production.                                       |
+| options                | GpuFrameTimeOptions | ✖        | `{}`                | Tunables for warmup, sample count, and measurement mode.                                                                                   |
+| options.frames         | number              | ✖        | 120                 | Measured frames after warmup. Values below 1 are clamped to 1.                                                                             |
+| options.warmup         | number              | ✖        | 30                  | Throws away the first N frames so shader compilation and lazy allocations settle.                                                          |
+| options.batch          | number              | ✖        | 8                   | Frames per batch when falling back to wall-clock. Ignored for timestamp queries.                                                           |
+| options.forceWallClock | boolean             | ✖        | false               | Forces the wall-clock path even if `timestamp-query` is available. Useful when you intentionally want queue-submit timings.                |
+| options.label          | string              | ✖        | "vgpu-gpuFrameTime" | Assigns encoder labels and buffer names to make debugging captures easier.                                                                 |
 
 **Returns:** `Promise<GpuFrameTimeResult>` — resolves with median, mean, min, p95, sample count, and the measurement `method` (`"timestamp-query"` or `"wall-clock"`).
 
@@ -46,31 +46,48 @@ export function gpuFrameTime(
 ## Examples
 
 ```ts
-import { gpuFrameTime } from "@vgpu/render/perf";
-import { createMockAdapter } from "@vgpu/adapter-mock";
+import { gpuFrameTime } from '@vgpu/render/perf';
+import { createMockAdapter } from '@vgpu/adapter-mock';
 
 async function bench(): Promise<void> {
   const adapter = createMockAdapter();
   const device = await adapter.requestDevice();
-  const renderPassDescriptor: GPURenderPassDescriptor = { colorAttachments: [{ view: {} as GPUTextureView, loadOp: "clear", storeOp: "store" }] };
+  const renderPassDescriptor: GPURenderPassDescriptor = {
+    colorAttachments: [{ view: {} as GPUTextureView, loadOp: 'clear', storeOp: 'store' }],
+  };
   const pipeline = device.gpu.createRenderPipeline({
-    layout: "auto",
-    vertex: { module: device.gpu.createShaderModule({ code: "@vertex fn vs_main() -> @builtin(position) vec4f { return vec4f(); }" }), entryPoint: "vs_main" },
-    fragment: { module: device.gpu.createShaderModule({ code: "@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1.0); }" }), entryPoint: "fs_main", targets: [{ format: "bgra8unorm" }] },
-    primitive: { topology: "triangle-list" },
+    layout: 'auto',
+    vertex: {
+      module: device.gpu.createShaderModule({
+        code: '@vertex fn vs_main() -> @builtin(position) vec4f { return vec4f(); }',
+      }),
+      entryPoint: 'vs_main',
+    },
+    fragment: {
+      module: device.gpu.createShaderModule({
+        code: '@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1.0); }',
+      }),
+      entryPoint: 'fs_main',
+      targets: [{ format: 'bgra8unorm' }],
+    },
+    primitive: { topology: 'triangle-list' },
   });
 
-  const result = await gpuFrameTime(device, (encoder) => {
-    const pass = encoder.beginRenderPass(renderPassDescriptor);
-    pass.setPipeline(pipeline);
-    pass.draw(3);
-    pass.end();
-  }, { frames: 60, warmup: 10 });
+  const result = await gpuFrameTime(
+    device,
+    encoder => {
+      const pass = encoder.beginRenderPass(renderPassDescriptor);
+      pass.setPipeline(pipeline);
+      pass.draw(3);
+      pass.end();
+    },
+    { frames: 60, warmup: 10 },
+  );
 
   console.log(result.method, result.medianMs);
 }
 
-bench().catch((error) => {
+bench().catch(error => {
   console.error(error);
 });
 ```
@@ -90,13 +107,13 @@ Optional configuration passed to `gpuFrameTime`.
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| frames | number | ✖ | 120 | Number of measured frames (post-warmup). Clamped to at least 1. |
-| warmup | number | ✖ | 30 | Frames to submit and discard before measuring. |
-| batch | number | ✖ | 8 | Wall-clock batch size; ignored for timestamp mode. |
-| forceWallClock | boolean | ✖ | false | Skip timestamp queries even when supported. |
-| label | string | ✖ | "vgpu-gpuFrameTime" | Label used for encoders and buffers created internally. |
+| Field          | Type    | Required | Default             | Notes                                                           |
+| -------------- | ------- | -------- | ------------------- | --------------------------------------------------------------- |
+| frames         | number  | ✖        | 120                 | Number of measured frames (post-warmup). Clamped to at least 1. |
+| warmup         | number  | ✖        | 30                  | Frames to submit and discard before measuring.                  |
+| batch          | number  | ✖        | 8                   | Wall-clock batch size; ignored for timestamp mode.              |
+| forceWallClock | boolean | ✖        | false               | Skip timestamp queries even when supported.                     |
+| label          | string  | ✖        | "vgpu-gpuFrameTime" | Label used for encoders and buffers created internally.         |
 
 ---
 
@@ -106,14 +123,14 @@ Return type for `gpuFrameTime`.
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| medianMs | number | ✔ | — | 50th percentile frame time, the main number to compare across builds. |
-| meanMs | number | ✔ | — | Arithmetic mean of collected samples. |
-| minMs | number | ✔ | — | Fastest observed frame. |
-| p95Ms | number | ✔ | — | 95th percentile; highlights long tails. |
-| samples | number | ✔ | — | Count of valid samples captured. |
-| method | "timestamp-query" \| "wall-clock" | ✔ | — | Measurement backend used. |
+| Field    | Type                              | Required | Default | Notes                                                                 |
+| -------- | --------------------------------- | -------- | ------- | --------------------------------------------------------------------- |
+| medianMs | number                            | ✔        | —       | 50th percentile frame time, the main number to compare across builds. |
+| meanMs   | number                            | ✔        | —       | Arithmetic mean of collected samples.                                 |
+| minMs    | number                            | ✔        | —       | Fastest observed frame.                                               |
+| p95Ms    | number                            | ✔        | —       | 95th percentile; highlights long tails.                               |
+| samples  | number                            | ✔        | —       | Count of valid samples captured.                                      |
+| method   | "timestamp-query" \| "wall-clock" | ✔        | —       | Measurement backend used.                                             |
 
 ---
 
@@ -124,24 +141,21 @@ Compares two renders byte-for-byte. Accepts either `Texture` instances (will cal
 ## Import
 
 ```ts
-import { pixelDiff } from "@vgpu/render/perf";
+import { pixelDiff } from '@vgpu/render/perf';
 ```
 
 ## Signature
 
 ```ts
-export function pixelDiff(
-  a: Texture | Uint8Array,
-  b: Texture | Uint8Array,
-): Promise<PixelDiffResult>;
+export function pixelDiff(a: Texture | Uint8Array, b: Texture | Uint8Array): Promise<PixelDiffResult>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| a | Texture \| Uint8Array | ✔ | — | First render; when a `Texture`, it is read via `Texture.read()`. |
-| b | Texture \| Uint8Array | ✔ | — | Second render to compare against `a`. |
+| Param | Type                  | Required | Default | Notes                                                            |
+| ----- | --------------------- | -------- | ------- | ---------------------------------------------------------------- |
+| a     | Texture \| Uint8Array | ✔        | —       | First render; when a `Texture`, it is read via `Texture.read()`. |
+| b     | Texture \| Uint8Array | ✔        | —       | Second render to compare against `a`.                            |
 
 **Returns:** `Promise<PixelDiffResult>` — contains `maxByte`, `meanByte`, `changedBytes`, `totalBytes`, and `changedFraction`.
 
@@ -150,8 +164,8 @@ export function pixelDiff(
 ## Examples
 
 ```ts
-import { pixelDiff } from "@vgpu/render/perf";
-import type { Texture } from "@vgpu/core";
+import { pixelDiff } from '@vgpu/render/perf';
+import type { Texture } from '@vgpu/core';
 
 async function assertVisualParity(before: Texture, after: Texture): Promise<void> {
   const result = await pixelDiff(before, after);
@@ -176,10 +190,10 @@ Shape returned by `pixelDiff`.
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| maxByte | number | ✔ | — | Largest absolute per-byte difference (0–255). Use this as the headline regression metric. |
-| meanByte | number | ✔ | — | Mean absolute per-byte difference across compared buffers. |
-| changedBytes | number | ✔ | — | Count of bytes whose value differs at all. |
-| totalBytes | number | ✔ | — | Number of bytes compared (min of both buffer lengths). |
-| changedFraction | number | ✔ | — | `changedBytes / totalBytes`; near-zero fractions with low `maxByte` typically indicate harmless rounding noise. |
+| Field           | Type   | Required | Default | Notes                                                                                                           |
+| --------------- | ------ | -------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| maxByte         | number | ✔        | —       | Largest absolute per-byte difference (0–255). Use this as the headline regression metric.                       |
+| meanByte        | number | ✔        | —       | Mean absolute per-byte difference across compared buffers.                                                      |
+| changedBytes    | number | ✔        | —       | Count of bytes whose value differs at all.                                                                      |
+| totalBytes      | number | ✔        | —       | Number of bytes compared (min of both buffer lengths).                                                          |
+| changedFraction | number | ✔        | —       | `changedBytes / totalBytes`; near-zero fractions with low `maxByte` typically indicate harmless rounding noise. |

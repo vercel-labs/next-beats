@@ -7,7 +7,7 @@ Builds a deduplicated line-list index buffer out of a readable triangle-list mes
 ## Import
 
 ```ts
-import { meshToWireframe } from "@vgpu/render/inspect";
+import { meshToWireframe } from '@vgpu/render/inspect';
 ```
 
 ## Signature
@@ -18,10 +18,10 @@ export function meshToWireframe(mesh: Mesh, device: Device): Promise<WireframeMe
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| mesh | Mesh | ✔ | — | Must have a vertex buffer created with `GPUBufferUsage.COPY_SRC`; otherwise the function cannot read vertex positions. |
-| device | Device | ✔ | — | Supplies the command encoder, index buffer, and queue submit used to bake the wireframe lines. |
+| Param  | Type   | Required | Default | Notes                                                                                                                  |
+| ------ | ------ | -------- | ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| mesh   | Mesh   | ✔        | —       | Must have a vertex buffer created with `GPUBufferUsage.COPY_SRC`; otherwise the function cannot read vertex positions. |
+| device | Device | ✔        | —       | Supplies the command encoder, index buffer, and queue submit used to bake the wireframe lines.                         |
 
 **Returns:** `Promise<WireframeMesh>` — frozen mesh-like object that reuses the source `vertexBuffer`, exposes a raw `indexBuffer`, reports whether the index data is `uint16` or `uint32`, and includes the deduplicated `lineCount`.
 
@@ -30,10 +30,10 @@ export function meshToWireframe(mesh: Mesh, device: Device): Promise<WireframeMe
 ## Examples
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { meshToReadable, meshToWireframe, wireframeMaterial } from "@vgpu/render/inspect";
-import { init, geometry } from "vgpu/mock";
-import { box } from "vgpu/scene";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { meshToReadable, meshToWireframe, wireframeMaterial } from '@vgpu/render/inspect';
+import { init, geometry } from 'vgpu/mock';
+import { box } from 'vgpu/scene';
 
 async function main(): Promise<void> {
   const adapter = createMockAdapter();
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
   inspector.pipeline; // ready-to-use GPURenderPipeline
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
 });
 ```

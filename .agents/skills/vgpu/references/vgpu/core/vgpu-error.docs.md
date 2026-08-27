@@ -7,13 +7,13 @@
 ## Import
 
 ```ts
-import { VGPUError, ValidationError } from "vgpu/core";
+import { VGPUError, ValidationError } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-type VGPUErrorSeverity = "error" | "warning" | "info";
+type VGPUErrorSeverity = 'error' | 'warning' | 'info';
 
 interface VGPUErrorData {
   readonly code: string;
@@ -34,7 +34,7 @@ declare class VGPUError extends Error {
 }
 
 declare class ValidationError extends VGPUError {
-  constructor(data: Omit<VGPUErrorData, "severity">);
+  constructor(data: Omit<VGPUErrorData, 'severity'>);
 }
 ```
 
@@ -42,24 +42,24 @@ declare class ValidationError extends VGPUError {
 
 ### `new VGPUError(data)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| data.code | `string` | ✔ | — | Stable machine-readable code. Core validation sites use `VGPU-CORE-*` codes. |
-| data.message | `string` | ✔ | — | Human-readable message passed to `Error`. |
-| data.severity | `"error" \| "warning" \| "info"` | ✖ | `"error"` | Stored as `.severity`; omitted data becomes an error. |
-| data.fix | `string` | ✖ | `undefined` | Optional remediation text. |
-| data.where | `string` | ✖ | `undefined` | Optional source/context label such as `"Device.createBuffer"`. |
-| data.cause | `unknown` | ✖ | `undefined` | Forwarded to `Error` via `{ cause }` and stored as `.cause`. |
+| Param         | Type                             | Required | Default     | Notes                                                                        |
+| ------------- | -------------------------------- | -------: | ----------- | ---------------------------------------------------------------------------- |
+| data.code     | `string`                         |        ✔ | —           | Stable machine-readable code. Core validation sites use `VGPU-CORE-*` codes. |
+| data.message  | `string`                         |        ✔ | —           | Human-readable message passed to `Error`.                                    |
+| data.severity | `"error" \| "warning" \| "info"` |        ✖ | `"error"`   | Stored as `.severity`; omitted data becomes an error.                        |
+| data.fix      | `string`                         |        ✖ | `undefined` | Optional remediation text.                                                   |
+| data.where    | `string`                         |        ✖ | `undefined` | Optional source/context label such as `"Device.createBuffer"`.               |
+| data.cause    | `unknown`                        |        ✖ | `undefined` | Forwarded to `Error` via `{ cause }` and stored as `.cause`.                 |
 
 ### `new ValidationError(data)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| data.code | `string` | ✔ | — | Stable machine-readable validation code. |
-| data.message | `string` | ✔ | — | Human-readable validation message. |
-| data.fix | `string` | ✖ | `undefined` | Optional remediation text. |
-| data.where | `string` | ✖ | `undefined` | Optional source/context label. |
-| data.cause | `unknown` | ✖ | `undefined` | Optional original error or validation detail. |
+| Param        | Type      | Required | Default     | Notes                                         |
+| ------------ | --------- | -------: | ----------- | --------------------------------------------- |
+| data.code    | `string`  |        ✔ | —           | Stable machine-readable validation code.      |
+| data.message | `string`  |        ✔ | —           | Human-readable validation message.            |
+| data.fix     | `string`  |        ✖ | `undefined` | Optional remediation text.                    |
+| data.where   | `string`  |        ✖ | `undefined` | Optional source/context label.                |
+| data.cause   | `unknown` |        ✖ | `undefined` | Optional original error or validation detail. |
 
 **Returns:**
 
@@ -71,28 +71,28 @@ declare class ValidationError extends VGPUError {
 ## Examples
 
 ```ts
-import { VGPUError } from "vgpu/core";
+import { VGPUError } from 'vgpu/core';
 
 const error = new VGPUError({
-  code: "VGPU-CORE-INVALID-USAGE",
-  message: "Buffer size must be greater than zero.",
-  severity: "error",
-  where: "Device.createBuffer",
-  fix: "Pass a positive byte length.",
+  code: 'VGPU-CORE-INVALID-USAGE',
+  message: 'Buffer size must be greater than zero.',
+  severity: 'error',
+  where: 'Device.createBuffer',
+  fix: 'Pass a positive byte length.',
 });
 
 console.log(error.name, error.code, error.severity, error.where);
 ```
 
 ```ts
-import { ValidationError } from "vgpu/core";
+import { ValidationError } from 'vgpu/core';
 
 function requirePositive(value: number): void {
   if (value <= 0) {
     throw new ValidationError({
-      code: "VGPU-CORE-INVALID-USAGE",
-      message: "Expected a positive value.",
-      where: "example.requirePositive",
+      code: 'VGPU-CORE-INVALID-USAGE',
+      message: 'Expected a positive value.',
+      where: 'example.requirePositive',
     });
   }
 }
@@ -107,13 +107,13 @@ try {
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
-import { VGPUError } from "vgpu/core";
+import { createMockAdapter } from 'vgpu/mock';
+import { VGPUError } from 'vgpu/core';
 
 const device = await createMockAdapter().requestDevice();
 
-device.pushErrorScope("validation");
-device.createBuffer({ size: 0, usage: ["copy_dst"] });
+device.pushErrorScope('validation');
+device.createBuffer({ size: 0, usage: ['copy_dst'] });
 const error = await device.popErrorScope();
 
 if (error instanceof VGPUError) {

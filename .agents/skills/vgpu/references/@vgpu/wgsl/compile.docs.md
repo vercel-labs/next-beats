@@ -7,22 +7,22 @@ Converts one raw runtime WGSL string into the data-only `ResolvedShader` shape u
 ## Import
 
 ```ts
-import { compile } from "@vgpu/wgsl";
+import { compile } from '@vgpu/wgsl';
 ```
 
 ## Signature
 
 ```ts
-import type { ResolvedShader } from "@vgpu/wgsl";
+import type { ResolvedShader } from '@vgpu/wgsl';
 
 declare function compile(wgsl: string): ResolvedShader;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| wgsl | string | ✔ | — | Complete WGSL source for one runtime shader. It is copied byte-for-byte to `resolved.wgsl`. Top-level `import` syntax is rejected; use `resolveShader` or a build-time loader for WGSL import graphs. |
+| Param | Type   | Required | Default | Notes                                                                                                                                                                                                 |
+| ----- | ------ | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| wgsl  | string | ✔        | —       | Complete WGSL source for one runtime shader. It is copied byte-for-byte to `resolved.wgsl`. Top-level `import` syntax is rejected; use `resolveShader` or a build-time loader for WGSL import graphs. |
 
 **Returns:** `ResolvedShader` — a data object with `kind: "wgsl"`, the original `wgsl`, passthrough source/AST/source-map metadata, deterministic `cacheKey`, detected `entryPoints`, and source `stats`.
 
@@ -31,7 +31,7 @@ declare function compile(wgsl: string): ResolvedShader;
 ## Examples
 
 ```ts
-import { compile } from "@vgpu/wgsl";
+import { compile } from '@vgpu/wgsl';
 
 const shader = compile(`
 @compute @workgroup_size(1)
@@ -39,19 +39,19 @@ fn main() {
 }
 `);
 
-shader.kind satisfies "wgsl";
+shader.kind satisfies 'wgsl';
 shader.entryPoints satisfies readonly string[];
-console.log(shader.entryPoints.includes("main"));
+console.log(shader.entryPoints.includes('main'));
 ```
 
 ```ts
-import { compile } from "@vgpu/wgsl";
+import { compile } from '@vgpu/wgsl';
 
 try {
   compile(`import { helper } from "./helper.wgsl";`);
 } catch (error) {
-  if (error instanceof Error && "code" in error) {
-    console.log(error.code === "VGPU-WGSL-RUNTIME-IMPORT");
+  if (error instanceof Error && 'code' in error) {
+    console.log(error.code === 'VGPU-WGSL-RUNTIME-IMPORT');
   }
 }
 ```

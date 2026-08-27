@@ -7,7 +7,7 @@ GPU occlusion query handles created by `visibility(gpu)`; core WebGPU, no device
 ## Import
 
 ```ts
-import type { Visibility, VisibilityOptions, VisibilityQuery } from "vgpu";
+import type { Visibility, VisibilityOptions, VisibilityQuery } from 'vgpu';
 ```
 
 ## Signature
@@ -26,7 +26,7 @@ interface Visibility {
 interface VisibilityQuery {
   readonly label: string;
   readonly hidden: boolean;
-  readonly state: "visible" | "hidden" | "unknown";
+  readonly state: 'visible' | 'hidden' | 'unknown';
   readonly age: number;
   reset(): void;
   dispose(): void;
@@ -35,14 +35,14 @@ interface VisibilityQuery {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| visibility.options | `VisibilityOptions` | ✖ | `{}` | Optional; `visibility(gpu)` equals `visibility(gpu, {})`. |
-| options.capacity | `number` | ✖ | `64` | Query slots per frame — the size of the one occlusion query set this instance owns. It never grows: the set is bound to pass descriptors mid-frame, so capacity is a declared contract. Size it to the number of handles queried in one frame. |
-| vis.query.label | `string` | ✔ | — | Non-empty result key. Handles are stable — create them once outside the loop. A label stays claimed until its handle is disposed. |
-| query.hidden | `boolean` | — | `false` | `true` only when a completed query confirmed zero passing samples (and no reset since). `"unknown"` and `"visible"` read as `false`: the safe default is to draw. |
-| query.state | `"visible" \| "hidden" \| "unknown"` | — | `"unknown"` | Latched result. `"visible"`: the last completed query saw at least one passing sample. `"unknown"`: no result since creation or the last reset. |
-| query.age | `number` | — | `Infinity` | Frames since the last applied result; `Infinity` before the first. Use it to distrust stale answers after the camera moved. |
+| Param              | Type                                 | Required | Default     | Notes                                                                                                                                                                                                                                          |
+| ------------------ | ------------------------------------ | -------: | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| visibility.options | `VisibilityOptions`                  |        ✖ | `{}`        | Optional; `visibility(gpu)` equals `visibility(gpu, {})`.                                                                                                                                                                                      |
+| options.capacity   | `number`                             |        ✖ | `64`        | Query slots per frame — the size of the one occlusion query set this instance owns. It never grows: the set is bound to pass descriptors mid-frame, so capacity is a declared contract. Size it to the number of handles queried in one frame. |
+| vis.query.label    | `string`                             |        ✔ | —           | Non-empty result key. Handles are stable — create them once outside the loop. A label stays claimed until its handle is disposed.                                                                                                              |
+| query.hidden       | `boolean`                            |        — | `false`     | `true` only when a completed query confirmed zero passing samples (and no reset since). `"unknown"` and `"visible"` read as `false`: the safe default is to draw.                                                                              |
+| query.state        | `"visible" \| "hidden" \| "unknown"` |        — | `"unknown"` | Latched result. `"visible"`: the last completed query saw at least one passing sample. `"unknown"`: no result since creation or the last reset.                                                                                                |
+| query.age          | `number`                             |        — | `Infinity`  | Frames since the last applied result; `Infinity` before the first. Use it to distrust stale answers after the camera moved.                                                                                                                    |
 
 **Returns:** `visibility(gpu)` returns `Visibility`; `query()` returns a stable `VisibilityQuery` handle; `reset()` and `dispose()` return `void`.
 
@@ -58,7 +58,7 @@ interface VisibilityQuery {
 ## Examples
 
 ```ts
-import { init, draw, effect, frameLoop, target, visibility } from "vgpu/mock";
+import { init, draw, effect, frameLoop, target, visibility } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [256, 256], depth: true });
@@ -66,17 +66,17 @@ const world = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return
 const statue = draw(gpu, { shader: `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.5); }` });
 const statueProxy = draw(gpu, {
   shader: `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0); }`,
-  writeMask: [],           // write no color channels
+  writeMask: [], // write no color channels
   depth: { write: false }, // test depth, never write it
 });
 
 const vis = visibility(gpu, { capacity: 8 });
-const qStatue = vis.query("statue");
+const qStatue = vis.query('statue');
 
-const loop = frameLoop(gpu, (f) => {
-  f.pass({ target: scene, visibility: vis }, (p) => {
-    p.draw(world);                       // occluders fill depth first
-    p.occlusion(qStatue, statueProxy);   // bounding proxy under the query
+const loop = frameLoop(gpu, f => {
+  f.pass({ target: scene, visibility: vis }, p => {
+    p.draw(world); // occluders fill depth first
+    p.occlusion(qStatue, statueProxy); // bounding proxy under the query
     if (!qStatue.hidden) p.draw(statue); // skip the real draw once confirmed hidden
   });
 });
@@ -86,13 +86,13 @@ loop.stop();
 The proxy must test against the scene without touching it: `writeMask: []` writes no color and `depth: { write: false }` tests but never writes depth — a writing proxy would stamp its pixels into the image. The query counts samples that pass the tests, so a non-writing draw still measures visibility; once a readback confirms zero passing samples, `qStatue.hidden` flips and the statue is skipped.
 
 ```ts
-import { init, visibility } from "vgpu/mock";
+import { init, visibility } from 'vgpu/mock';
 
 // Camera cut / teleport: last frame's occlusion answers are meaningless — reset to "unknown"
 // so everything draws until fresh results land.
 const gpu = await init();
 const vis = visibility(gpu);
-const q = vis.query("statue");
+const q = vis.query('statue');
 
 function onCameraTeleport(): void {
   vis.reset(); // every handle: state "unknown", hidden false, age Infinity

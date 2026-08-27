@@ -7,7 +7,7 @@ Listens for pointer movement over a canvas and exposes the latest coordinates. U
 ## Import
 
 ```ts
-import { canvasMouseTracker } from "@vgpu/render/utils";
+import { canvasMouseTracker } from '@vgpu/render/utils';
 ```
 
 ## Signature
@@ -18,22 +18,26 @@ export function canvasMouseTracker(spec: CanvasMouseTrackerSpec): CanvasMouseTra
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| spec | CanvasMouseTrackerSpec | ✔ | — | Configuration object describing the canvas and how to normalize coordinates. |
-| spec.canvas | HTMLCanvasElement | ✔ | — | Target element that receives `pointermove` events. |
-| spec.normalize | boolean | ✖ | false | When true, `position` is expressed in [0, 1] relative coordinates; otherwise uses raw canvas pixel coordinates. |
-| spec.flipY | boolean | ✖ | false | Reflects the Y axis (top → bottom) while preserving the chosen unit (normalized or pixel). |
+| Param          | Type                   | Required | Default | Notes                                                                                                           |
+| -------------- | ---------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| spec           | CanvasMouseTrackerSpec | ✔        | —       | Configuration object describing the canvas and how to normalize coordinates.                                    |
+| spec.canvas    | HTMLCanvasElement      | ✔        | —       | Target element that receives `pointermove` events.                                                              |
+| spec.normalize | boolean                | ✖        | false   | When true, `position` is expressed in [0, 1] relative coordinates; otherwise uses raw canvas pixel coordinates. |
+| spec.flipY     | boolean                | ✖        | false   | Reflects the Y axis (top → bottom) while preserving the chosen unit (normalized or pixel).                      |
 
 **Returns:** `CanvasMouseTracker` — exposes a live `position` tuple (`[x, y]`) and a `dispose()` method that removes the internal event listener.
 
 ## Examples
 
 ```ts
-import { canvasMouseTracker } from "@vgpu/render/utils";
+import { canvasMouseTracker } from '@vgpu/render/utils';
 
-const canvas = document.createElement("canvas");
-const effect = { set(values: { readonly mouse: readonly [number, number] }): void { void values; } };
+const canvas = document.createElement('canvas');
+const effect = {
+  set(values: { readonly mouse: readonly [number, number] }): void {
+    void values;
+  },
+};
 const mouse = canvasMouseTracker({ canvas, normalize: true, flipY: true });
 
 function frame() {
@@ -62,11 +66,11 @@ Configuration object accepted by `canvasMouseTracker`.
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| canvas | HTMLCanvasElement | ✔ | — | Canvas to observe. |
-| normalize | boolean | ✖ | false | Enables normalized `[0, 1]` output in both axes; otherwise uses raw pixel units. |
-| flipY | boolean | ✖ | false | Mirrors the Y coordinate so normalized output matches WebGPU clip space (`0` at bottom). |
+| Field     | Type              | Required | Default | Notes                                                                                    |
+| --------- | ----------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| canvas    | HTMLCanvasElement | ✔        | —       | Canvas to observe.                                                                       |
+| normalize | boolean           | ✖        | false   | Enables normalized `[0, 1]` output in both axes; otherwise uses raw pixel units.         |
+| flipY     | boolean           | ✖        | false   | Mirrors the Y coordinate so normalized output matches WebGPU clip space (`0` at bottom). |
 
 ---
 
@@ -76,7 +80,7 @@ Handle returned by `canvasMouseTracker`.
 
 ## Fields
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| position | readonly [number, number] | ✔ | — | Latest `[x, y]` coordinates (normalized or pixels depending on spec). Always returns a frozen tuple. |
-| dispose | () => void | ✔ | — | Removes the internal `pointermove` listener; idempotent. |
+| Field    | Type                      | Required | Default | Notes                                                                                                |
+| -------- | ------------------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------- |
+| position | readonly [number, number] | ✔        | —       | Latest `[x, y]` coordinates (normalized or pixels depending on spec). Always returns a frozen tuple. |
+| dispose  | () => void                | ✔        | —       | Removes the internal `pointermove` listener; idempotent.                                             |

@@ -7,16 +7,48 @@ The main API (`vgpu`) context returned by `init()`. It owns device lifetime and 
 ## Import
 
 ```ts
-import type { Gpu } from "vgpu";
-import { init } from "vgpu/mock";
+import type { Gpu } from 'vgpu';
+import { init } from 'vgpu/mock';
 ```
 
 ## Signature
 
 ```ts
-import type { Bundle, BundleOptions, BundleRecorder, Clock, Compute, ComputeOptions, Draw, DrawOptions, Effect, EffectOptions, Frame, FrameLoopHandle, FrameLoopOptions, Geometry, GeometryOptions, GeometryRecipe, GpuErrorListener, PingPongStorage, PingPongTargets, SharedUniforms, StorageAccess, StorageBuffer, StorageOptions, Surface, SurfaceOptions, Target, TargetOptions, TargetTextureOptions, Timer, Visibility, VisibilityOptions } from "vgpu";
-import type { Device } from "vgpu/core";
-import type { ShaderSource } from "vgpu";
+import type {
+  Bundle,
+  BundleOptions,
+  BundleRecorder,
+  Clock,
+  Compute,
+  ComputeOptions,
+  Draw,
+  DrawOptions,
+  Effect,
+  EffectOptions,
+  Frame,
+  FrameLoopHandle,
+  FrameLoopOptions,
+  Geometry,
+  GeometryOptions,
+  GeometryRecipe,
+  GpuErrorListener,
+  PingPongStorage,
+  PingPongTargets,
+  SharedUniforms,
+  StorageAccess,
+  StorageBuffer,
+  StorageOptions,
+  Surface,
+  SurfaceOptions,
+  Target,
+  TargetOptions,
+  TargetTextureOptions,
+  Timer,
+  Visibility,
+  VisibilityOptions,
+} from 'vgpu';
+import type { Device } from 'vgpu/core';
+import type { ShaderSource } from 'vgpu';
 
 interface Gpu {
   readonly device: Device;
@@ -52,32 +84,32 @@ declare function clock(gpu: Gpu): Clock;
 
 `Gpu` is an object, not a callable constructor: it carries no creation methods. Every factory below takes it as `gpu`, its first argument.
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| surface.canvas | `HTMLCanvasElement \| OffscreenCanvas` | ✔ | — | Canvas-like object with a `webgpu` context. A canvas may have one live `Surface`. |
-| surface.opts | `SurfaceOptions` | ✖ | `{}` | Per-surface canvas format, size, DPR, and auto-resize behavior. |
-| effect.source | `string \| ShaderSource` | ✔ | — | WGSL string or loader-produced `ShaderSource { version: 1, wgsl }`. |
-| effect.opts | `EffectOptions` | ✖ | `{}` | `label` defaults to `"effect"`; `set` defaults to no initial bindings. |
-| draw.opts | `DrawOptions` | ✔ | — | Includes required `shader`; see `DrawOptions`. |
-| target.opts | `TargetOptions` | ✔ | — | Offscreen target options. `size` is required. |
-| frame.cb | `(frame: Frame) => void` | ✖ | `undefined` | If provided, submits automatically in `finally`; if omitted, caller must call `frame.submit()`. |
-| sampler.desc | `GPUSamplerDescriptor` | ✖ | `undefined` | Cached by descriptor. `sampler(gpu)` is the canonical default sampler. |
-| geometry.input | `GeometryOptions \\| GeometryRecipe` | ✔ | — | A raw buffer descriptor, or a `vgpu/scene` recipe such as `box()` or `plane()`. |
-| compute.source | `string \| ShaderSource` | ✔ | — | WGSL string or `ShaderSource`. Must contain a `@compute` entry point. |
-| compute.opts | `ComputeOptions` | ✖ | `{}` | `label` defaults to `"compute"`; `set` defaults to no initial bindings. |
-| storage.bytes | `number` | ✔ | — | Byte size for a main API (`vgpu`) storage buffer. |
-| storage.access | `StorageAccess \| StorageOptions` | ✖ | `"read-write"` | Access string, or a `StorageOptions` bag `{ access?, indirect? }`. See `Compute` for storage buffer semantics, including `{ indirect: true }` for GPU-driven draw/dispatch arguments. |
-| timer | — | — | — | No parameters. GPU pass timing; needs the `"timestamp-query"` device feature. See `Timer` for feature gating, spans, and result delivery. |
-| visibility.options | `VisibilityOptions` | ✖ | `{}` | Occlusion queries for visibility culling — core WebGPU, no device feature required. See `Visibility` for capacity and handle semantics. |
-| pingPong.width | `number` | ✔ | — | Floored and clamped to at least `1`. |
-| pingPong.height | `number` | ✔ | — | Floored and clamped to at least `1`. |
-| pingPong.opts | `TargetTextureOptions` | ✖ | `{}` | Texture/attachment options only; size comes from positional width/height. |
-| pingPongStorage.bytes | `number` | ✔ | — | Creates two `"read-write"` storage buffers. |
-| uniforms.values | `Record<string, unknown>` | ✔ | — | Cloned initial JS values; WGSL layout is adopted when first bound. |
-| bundle.opts | `BundleOptions` | ✔ | — | Requires a `target` or target signature. |
-| bundle.cb | `(recorder: BundleRecorder) => void` | ✔ | — | Records bundle commands immediately. |
-| onError.cb | `GpuErrorListener` | ✔ | — | Receives asynchronous vgpu errors; returns an unsubscribe function. |
-| clock | — | — | — | No parameters. The frame clock of this gpu: `{ time, deltaTime, frameCount, advance(dtSeconds) }`, one instance per gpu. See `Clock`. |
+| Param                 | Type                                   |        Required | Default        | Notes                                                                                                                                                                                 |
+| --------------------- | -------------------------------------- | --------------: | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| surface.canvas        | `HTMLCanvasElement \| OffscreenCanvas` |               ✔ | —              | Canvas-like object with a `webgpu` context. A canvas may have one live `Surface`.                                                                                                     |
+| surface.opts          | `SurfaceOptions`                       |               ✖ | `{}`           | Per-surface canvas format, size, DPR, and auto-resize behavior.                                                                                                                       |
+| effect.source         | `string \| ShaderSource`               |               ✔ | —              | WGSL string or loader-produced `ShaderSource { version: 1, wgsl }`.                                                                                                                   |
+| effect.opts           | `EffectOptions`                        |               ✖ | `{}`           | `label` defaults to `"effect"`; `set` defaults to no initial bindings.                                                                                                                |
+| draw.opts             | `DrawOptions`                          |               ✔ | —              | Includes required `shader`; see `DrawOptions`.                                                                                                                                        |
+| target.opts           | `TargetOptions`                        |               ✔ | —              | Offscreen target options. `size` is required.                                                                                                                                         |
+| frame.cb              | `(frame: Frame) => void`               |               ✖ | `undefined`    | If provided, submits automatically in `finally`; if omitted, caller must call `frame.submit()`.                                                                                       |
+| sampler.desc          | `GPUSamplerDescriptor`                 |               ✖ | `undefined`    | Cached by descriptor. `sampler(gpu)` is the canonical default sampler.                                                                                                                |
+| geometry.input        | `GeometryOptions \\                    | GeometryRecipe` | ✔              | —                                                                                                                                                                                     | A raw buffer descriptor, or a `vgpu/scene` recipe such as `box()` or `plane()`. |
+| compute.source        | `string \| ShaderSource`               |               ✔ | —              | WGSL string or `ShaderSource`. Must contain a `@compute` entry point.                                                                                                                 |
+| compute.opts          | `ComputeOptions`                       |               ✖ | `{}`           | `label` defaults to `"compute"`; `set` defaults to no initial bindings.                                                                                                               |
+| storage.bytes         | `number`                               |               ✔ | —              | Byte size for a main API (`vgpu`) storage buffer.                                                                                                                                     |
+| storage.access        | `StorageAccess \| StorageOptions`      |               ✖ | `"read-write"` | Access string, or a `StorageOptions` bag `{ access?, indirect? }`. See `Compute` for storage buffer semantics, including `{ indirect: true }` for GPU-driven draw/dispatch arguments. |
+| timer                 | —                                      |               — | —              | No parameters. GPU pass timing; needs the `"timestamp-query"` device feature. See `Timer` for feature gating, spans, and result delivery.                                             |
+| visibility.options    | `VisibilityOptions`                    |               ✖ | `{}`           | Occlusion queries for visibility culling — core WebGPU, no device feature required. See `Visibility` for capacity and handle semantics.                                               |
+| pingPong.width        | `number`                               |               ✔ | —              | Floored and clamped to at least `1`.                                                                                                                                                  |
+| pingPong.height       | `number`                               |               ✔ | —              | Floored and clamped to at least `1`.                                                                                                                                                  |
+| pingPong.opts         | `TargetTextureOptions`                 |               ✖ | `{}`           | Texture/attachment options only; size comes from positional width/height.                                                                                                             |
+| pingPongStorage.bytes | `number`                               |               ✔ | —              | Creates two `"read-write"` storage buffers.                                                                                                                                           |
+| uniforms.values       | `Record<string, unknown>`              |               ✔ | —              | Cloned initial JS values; WGSL layout is adopted when first bound.                                                                                                                    |
+| bundle.opts           | `BundleOptions`                        |               ✔ | —              | Requires a `target` or target signature.                                                                                                                                              |
+| bundle.cb             | `(recorder: BundleRecorder) => void`   |               ✔ | —              | Records bundle commands immediately.                                                                                                                                                  |
+| onError.cb            | `GpuErrorListener`                     |               ✔ | —              | Receives asynchronous vgpu errors; returns an unsubscribe function.                                                                                                                   |
+| clock                 | —                                      |               — | —              | No parameters. The frame clock of this gpu: `{ time, deltaTime, frameCount, advance(dtSeconds) }`, one instance per gpu. See `Clock`.                                                 |
 
 **Returns:** each factory returns the resource named in its signature. `dispose()` and frame/pass callbacks return `void`.
 
@@ -86,7 +118,7 @@ declare function clock(gpu: Gpu): Clock;
 ## Examples
 
 ```ts
-import { init, draw, frame, target } from "vgpu/mock";
+import { init, draw, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [128, 128], depth: true });
@@ -102,13 +134,13 @@ const drawable = draw(gpu, {
   targets: [colorTarget],
 });
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: colorTarget, clear: [0, 0, 0, 1] }, (pass) => pass.draw(drawable));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: colorTarget, clear: [0, 0, 0, 1] }, pass => pass.draw(drawable));
 });
 ```
 
 ```ts
-import { init, effect, frameLoop, surface } from "vgpu";
+import { init, effect, frameLoop, surface } from 'vgpu';
 
 declare const canvas: HTMLCanvasElement;
 
@@ -116,8 +148,8 @@ const gpu = await init();
 const canvasSurface = surface(gpu, canvas, { dpr: [1, 2] });
 const wave = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.2, 0.4, 1.0, 1.0); }`);
 
-frameLoop(gpu, (frame) => {
-  frame.pass({ target: canvasSurface }, (pass) => pass.draw(wave));
+frameLoop(gpu, frame => {
+  frame.pass({ target: canvasSurface }, pass => pass.draw(wave));
 });
 ```
 

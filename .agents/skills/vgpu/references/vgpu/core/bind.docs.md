@@ -7,15 +7,15 @@
 ## Import
 
 ```ts
-import { bind, createBindGroup, createBindGroupLayout, createPipelineLayout, createSampler } from "vgpu/core";
+import { bind, createBindGroup, createBindGroupLayout, createPipelineLayout, createSampler } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Buffer, Device, Texture } from "vgpu/core";
+import type { Buffer, Device, Texture } from 'vgpu/core';
 
-type BindVisibility = GPUShaderStageFlags | string | readonly ("vertex" | "fragment" | "compute")[];
+type BindVisibility = GPUShaderStageFlags | string | readonly ('vertex' | 'fragment' | 'compute')[];
 type DeviceLike = GPUDevice | Device | { readonly gpu: GPUDevice };
 
 interface CreateBindGroupLayoutOptions {
@@ -35,8 +35,8 @@ interface CreateBindGroupOptions {
 }
 
 interface SamplerDescriptorWithSugar extends GPUSamplerDescriptor {
-  readonly filter?: "linear" | "nearest";
-  readonly wrap?: "clamp" | "repeat" | "mirror";
+  readonly filter?: 'linear' | 'nearest';
+  readonly wrap?: 'clamp' | 'repeat' | 'mirror';
 }
 
 declare function createBindGroupLayout(device: DeviceLike, opts: CreateBindGroupLayoutOptions): GPUBindGroupLayout;
@@ -45,13 +45,40 @@ declare function createBindGroup(device: DeviceLike, opts: CreateBindGroupOption
 declare function createSampler(device: DeviceLike, descriptor?: SamplerDescriptorWithSugar): GPUSampler;
 
 declare const bind: {
-  readonly uniform: (binding: number, visibility: BindVisibility, opts?: Omit<GPUBufferBindingLayout, "type">) => GPUBindGroupLayoutEntry;
-  readonly storage: (binding: number, visibility: BindVisibility, opts?: Omit<GPUBufferBindingLayout, "type">) => GPUBindGroupLayoutEntry;
-  readonly readonlyStorage: (binding: number, visibility: BindVisibility, opts?: Omit<GPUBufferBindingLayout, "type">) => GPUBindGroupLayoutEntry;
-  readonly texture: (binding: number, visibility: BindVisibility, opts?: GPUTextureBindingLayout) => GPUBindGroupLayoutEntry;
-  readonly storageTexture: (binding: number, visibility: BindVisibility, opts: GPUStorageTextureBindingLayout) => GPUBindGroupLayoutEntry;
-  readonly sampler: (binding: number, visibility: BindVisibility, opts?: GPUSamplerBindingLayout) => GPUBindGroupLayoutEntry;
-  readonly resource: (binding: number, value: Buffer | Texture | GPUBuffer | GPUBufferBinding | GPUBindingResource | unknown) => GPUBindGroupEntry;
+  readonly uniform: (
+    binding: number,
+    visibility: BindVisibility,
+    opts?: Omit<GPUBufferBindingLayout, 'type'>,
+  ) => GPUBindGroupLayoutEntry;
+  readonly storage: (
+    binding: number,
+    visibility: BindVisibility,
+    opts?: Omit<GPUBufferBindingLayout, 'type'>,
+  ) => GPUBindGroupLayoutEntry;
+  readonly readonlyStorage: (
+    binding: number,
+    visibility: BindVisibility,
+    opts?: Omit<GPUBufferBindingLayout, 'type'>,
+  ) => GPUBindGroupLayoutEntry;
+  readonly texture: (
+    binding: number,
+    visibility: BindVisibility,
+    opts?: GPUTextureBindingLayout,
+  ) => GPUBindGroupLayoutEntry;
+  readonly storageTexture: (
+    binding: number,
+    visibility: BindVisibility,
+    opts: GPUStorageTextureBindingLayout,
+  ) => GPUBindGroupLayoutEntry;
+  readonly sampler: (
+    binding: number,
+    visibility: BindVisibility,
+    opts?: GPUSamplerBindingLayout,
+  ) => GPUBindGroupLayoutEntry;
+  readonly resource: (
+    binding: number,
+    value: Buffer | Texture | GPUBuffer | GPUBufferBinding | GPUBindingResource | unknown,
+  ) => GPUBindGroupEntry;
 };
 ```
 
@@ -59,58 +86,58 @@ declare const bind: {
 
 ### Shared parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `DeviceLike` | ✔ | — | A raw `GPUDevice`, a vgpu `Device`, or an object with `.gpu: GPUDevice`. Helpers unwrap it before calling WebGPU. |
-| binding | `number` | ✔ | — | Explicit non-negative integer `@binding(n)`. Invalid values throw `VGPU-CORE-BINDING-INVALID`. |
-| visibility | `GPUShaderStageFlags \| string \| readonly ("vertex" \| "fragment" \| "compute")[]` | ✔ | — | Numeric flags pass through. Strings split on `|`, comma, or whitespace. Arrays use stage names directly. Unknown names throw `VGPU-CORE-VISIBILITY-INVALID`. |
+| Param      | Type                                                                                | Required | Default | Notes                                                                                                             |
+| ---------- | ----------------------------------------------------------------------------------- | -------: | ------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| device     | `DeviceLike`                                                                        |        ✔ | —       | A raw `GPUDevice`, a vgpu `Device`, or an object with `.gpu: GPUDevice`. Helpers unwrap it before calling WebGPU. |
+| binding    | `number`                                                                            |        ✔ | —       | Explicit non-negative integer `@binding(n)`. Invalid values throw `VGPU-CORE-BINDING-INVALID`.                    |
+| visibility | `GPUShaderStageFlags \| string \| readonly ("vertex" \| "fragment" \| "compute")[]` |        ✔ | —       | Numeric flags pass through. Strings split on `                                                                    | `, comma, or whitespace. Arrays use stage names directly. Unknown names throw `VGPU-CORE-VISIBILITY-INVALID`. |
 
 ### `createBindGroupLayout(device, opts)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `CreateBindGroupLayoutOptions` | ✔ | — | Layout descriptor wrapper. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to `GPUDevice.createBindGroupLayout`. |
-| opts.entries | `readonly GPUBindGroupLayoutEntry[]` | ✔ | — | Copied with `[...opts.entries]` before calling WebGPU; metadata is attached to the returned layout. |
+| Param        | Type                                 | Required | Default     | Notes                                                                                               |
+| ------------ | ------------------------------------ | -------: | ----------- | --------------------------------------------------------------------------------------------------- |
+| opts         | `CreateBindGroupLayoutOptions`       |        ✔ | —           | Layout descriptor wrapper.                                                                          |
+| opts.label   | `string`                             |        ✖ | `undefined` | Forwarded to `GPUDevice.createBindGroupLayout`.                                                     |
+| opts.entries | `readonly GPUBindGroupLayoutEntry[]` |        ✔ | —           | Copied with `[...opts.entries]` before calling WebGPU; metadata is attached to the returned layout. |
 
 ### `createPipelineLayout(device, opts)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `CreatePipelineLayoutOptions` | ✔ | — | Pipeline layout descriptor wrapper. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to `GPUDevice.createPipelineLayout`. |
-| opts.bindGroups | `readonly GPUBindGroupLayout[]` | ✔ | — | Copied to WebGPU as `bindGroupLayouts: [...opts.bindGroups]`. |
+| Param           | Type                            | Required | Default     | Notes                                                         |
+| --------------- | ------------------------------- | -------: | ----------- | ------------------------------------------------------------- |
+| opts            | `CreatePipelineLayoutOptions`   |        ✔ | —           | Pipeline layout descriptor wrapper.                           |
+| opts.label      | `string`                        |        ✖ | `undefined` | Forwarded to `GPUDevice.createPipelineLayout`.                |
+| opts.bindGroups | `readonly GPUBindGroupLayout[]` |        ✔ | —           | Copied to WebGPU as `bindGroupLayouts: [...opts.bindGroups]`. |
 
 ### `createBindGroup(device, opts)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `CreateBindGroupOptions` | ✔ | — | Bind group descriptor wrapper. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to `GPUDevice.createBindGroup`. |
-| opts.layout | `GPUBindGroupLayout` | ✔ | — | Required explicit layout. Missing/falsy layout throws `VGPU-CORE-BIND-GROUP-LAYOUT-REQUIRED`; vgpu never uses bind group `layout: "auto"`. |
-| opts.entries | `readonly GPUBindGroupEntry[]` | ✔ | — | Copied with `[...opts.entries]` before calling WebGPU; metadata is attached to the returned bind group. |
+| Param        | Type                           | Required | Default     | Notes                                                                                                                                      |
+| ------------ | ------------------------------ | -------: | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| opts         | `CreateBindGroupOptions`       |        ✔ | —           | Bind group descriptor wrapper.                                                                                                             |
+| opts.label   | `string`                       |        ✖ | `undefined` | Forwarded to `GPUDevice.createBindGroup`.                                                                                                  |
+| opts.layout  | `GPUBindGroupLayout`           |        ✔ | —           | Required explicit layout. Missing/falsy layout throws `VGPU-CORE-BIND-GROUP-LAYOUT-REQUIRED`; vgpu never uses bind group `layout: "auto"`. |
+| opts.entries | `readonly GPUBindGroupEntry[]` |        ✔ | —           | Copied with `[...opts.entries]` before calling WebGPU; metadata is attached to the returned bind group.                                    |
 
 ### `createSampler(device, descriptor?)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| descriptor | `SamplerDescriptorWithSugar` | ✖ | `{}` | Raw `GPUSamplerDescriptor` plus vgpu sugar. Sugar is stripped before calling WebGPU. |
-| descriptor.filter | `"linear" \| "nearest"` | ✖ | `undefined` | Expands to `magFilter` and `minFilter` only. Raw `magFilter`/`minFilter` override this per key. |
-| descriptor.wrap | `"clamp" \| "repeat" \| "mirror"` | ✖ | `undefined` | Expands to all three address modes: `"clamp"` → `"clamp-to-edge"`, `"repeat"` → `"repeat"`, `"mirror"` → `"mirror-repeat"`. Raw address fields override per axis. |
-| descriptor.mipmapFilter | `GPUMipmapFilterMode` | ✖ | WebGPU default | Not set by `filter`; pass `"linear"` explicitly for anisotropic sampling. |
-| descriptor.maxAnisotropy | `number` | ✖ | WebGPU default | If `filter` sugar is used and `maxAnisotropy > 1`, all three filters must resolve to `"linear"`. |
+| Param                    | Type                              | Required | Default        | Notes                                                                                                                                                             |
+| ------------------------ | --------------------------------- | -------: | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| descriptor               | `SamplerDescriptorWithSugar`      |        ✖ | `{}`           | Raw `GPUSamplerDescriptor` plus vgpu sugar. Sugar is stripped before calling WebGPU.                                                                              |
+| descriptor.filter        | `"linear" \| "nearest"`           |        ✖ | `undefined`    | Expands to `magFilter` and `minFilter` only. Raw `magFilter`/`minFilter` override this per key.                                                                   |
+| descriptor.wrap          | `"clamp" \| "repeat" \| "mirror"` |        ✖ | `undefined`    | Expands to all three address modes: `"clamp"` → `"clamp-to-edge"`, `"repeat"` → `"repeat"`, `"mirror"` → `"mirror-repeat"`. Raw address fields override per axis. |
+| descriptor.mipmapFilter  | `GPUMipmapFilterMode`             |        ✖ | WebGPU default | Not set by `filter`; pass `"linear"` explicitly for anisotropic sampling.                                                                                         |
+| descriptor.maxAnisotropy | `number`                          |        ✖ | WebGPU default | If `filter` sugar is used and `maxAnisotropy > 1`, all three filters must resolve to `"linear"`.                                                                  |
 
 ### `bind.*` layout entry helpers
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| bind.uniform opts | `Omit<GPUBufferBindingLayout, "type">` | ✖ | `{}` | Returns `{ binding, visibility, buffer: { ...opts, type: "uniform" } }`. |
-| bind.storage opts | `Omit<GPUBufferBindingLayout, "type">` | ✖ | `{}` | Returns `{ binding, visibility, buffer: { ...opts, type: "storage" } }`. |
-| bind.readonlyStorage opts | `Omit<GPUBufferBindingLayout, "type">` | ✖ | `{}` | Returns `{ binding, visibility, buffer: { ...opts, type: "read-only-storage" } }`. |
-| bind.texture opts | `GPUTextureBindingLayout` | ✖ | `{}` | Returns `{ binding, visibility, texture: opts }`. |
-| bind.storageTexture opts | `GPUStorageTextureBindingLayout` | ✔ | — | Returns `{ binding, visibility, storageTexture: opts }`; storage texture layout fields are not inferred. |
-| bind.sampler opts | `GPUSamplerBindingLayout` | ✖ | `{}` | Returns `{ binding, visibility, sampler: opts }`. |
-| bind.resource value | `unknown` | ✔ | — | Converts vgpu `Buffer` to `{ buffer: buffer.gpu }`, vgpu `Texture`/texture-like objects to `createView()`, raw `GPUBuffer` to `{ buffer }`, and passes through other binding resources. |
+| Param                     | Type                                   | Required | Default | Notes                                                                                                                                                                                   |
+| ------------------------- | -------------------------------------- | -------: | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bind.uniform opts         | `Omit<GPUBufferBindingLayout, "type">` |        ✖ | `{}`    | Returns `{ binding, visibility, buffer: { ...opts, type: "uniform" } }`.                                                                                                                |
+| bind.storage opts         | `Omit<GPUBufferBindingLayout, "type">` |        ✖ | `{}`    | Returns `{ binding, visibility, buffer: { ...opts, type: "storage" } }`.                                                                                                                |
+| bind.readonlyStorage opts | `Omit<GPUBufferBindingLayout, "type">` |        ✖ | `{}`    | Returns `{ binding, visibility, buffer: { ...opts, type: "read-only-storage" } }`.                                                                                                      |
+| bind.texture opts         | `GPUTextureBindingLayout`              |        ✖ | `{}`    | Returns `{ binding, visibility, texture: opts }`.                                                                                                                                       |
+| bind.storageTexture opts  | `GPUStorageTextureBindingLayout`       |        ✔ | —       | Returns `{ binding, visibility, storageTexture: opts }`; storage texture layout fields are not inferred.                                                                                |
+| bind.sampler opts         | `GPUSamplerBindingLayout`              |        ✖ | `{}`    | Returns `{ binding, visibility, sampler: opts }`.                                                                                                                                       |
+| bind.resource value       | `unknown`                              |        ✔ | —       | Converts vgpu `Buffer` to `{ buffer: buffer.gpu }`, vgpu `Texture`/texture-like objects to `createView()`, raw `GPUBuffer` to `{ buffer }`, and passes through other binding resources. |
 
 **Returns:**
 
@@ -132,35 +159,31 @@ declare const bind: {
 ## Examples
 
 ```ts
-import { bind, createBindGroup, createBindGroupLayout, createPipelineLayout, createSampler } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import { bind, createBindGroup, createBindGroupLayout, createPipelineLayout, createSampler } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
-const uniformBuffer = device.createBuffer({ size: 64, usage: ["uniform", "copy_dst"] });
+const uniformBuffer = device.createBuffer({ size: 64, usage: ['uniform', 'copy_dst'] });
 const texture = device.createTexture({
   size: [1, 1],
-  format: "rgba8unorm",
-  usage: ["texture_binding", "copy_src"],
+  format: 'rgba8unorm',
+  usage: ['texture_binding', 'copy_src'],
 });
-const sampler = createSampler(device, { filter: "linear", wrap: "clamp" });
+const sampler = createSampler(device, { filter: 'linear', wrap: 'clamp' });
 
 const groupLayout = createBindGroupLayout(device, {
-  label: "scene.group0",
+  label: 'scene.group0',
   entries: [
-    bind.uniform(0, "vertex|fragment"),
-    bind.texture(1, "fragment", { sampleType: "float" }),
-    bind.sampler(2, ["fragment"], { type: "filtering" }),
+    bind.uniform(0, 'vertex|fragment'),
+    bind.texture(1, 'fragment', { sampleType: 'float' }),
+    bind.sampler(2, ['fragment'], { type: 'filtering' }),
   ],
 });
 
 const pipelineLayout = createPipelineLayout(device, { bindGroups: [groupLayout] });
 const group = createBindGroup(device, {
   layout: groupLayout,
-  entries: [
-    bind.resource(0, uniformBuffer),
-    bind.resource(1, texture),
-    bind.resource(2, sampler),
-  ],
+  entries: [bind.resource(0, uniformBuffer), bind.resource(1, texture), bind.resource(2, sampler)],
 });
 
 console.log(pipelineLayout, group);
@@ -168,20 +191,20 @@ device.destroy();
 ```
 
 ```ts
-import { createSampler } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import { createSampler } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 
 const mixedSampler = createSampler(device, {
-  filter: "linear",
-  wrap: "repeat",
-  magFilter: "nearest", // raw field wins for this key only
+  filter: 'linear',
+  wrap: 'repeat',
+  magFilter: 'nearest', // raw field wins for this key only
 });
 
 const anisotropicSampler = createSampler(device, {
-  filter: "linear",
-  mipmapFilter: "linear",
+  filter: 'linear',
+  mipmapFilter: 'linear',
   maxAnisotropy: 16,
 });
 
@@ -190,14 +213,14 @@ device.destroy();
 ```
 
 ```ts
-import { bind, createBindGroupLayout } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import { bind, createBindGroupLayout } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 const computeLayout = createBindGroupLayout(device, {
   entries: [
-    bind.storage(0, "compute", { hasDynamicOffset: true }),
-    bind.storageTexture(1, "compute", { access: "write-only", format: "rgba8unorm", viewDimension: "2d" }),
+    bind.storage(0, 'compute', { hasDynamicOffset: true }),
+    bind.storageTexture(1, 'compute', { access: 'write-only', format: 'rgba8unorm', viewDimension: '2d' }),
   ],
 });
 

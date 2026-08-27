@@ -7,7 +7,7 @@ Data shapes returned or consumed by the WGSL helpers. Use `ResolvedShader` for `
 ## Import
 
 ```ts
-import type { ResolvedShader, ShaderSource, SourceMap, WGSLAst, WGSLSource } from "@vgpu/wgsl";
+import type { ResolvedShader, ShaderSource, SourceMap, WGSLAst, WGSLSource } from '@vgpu/wgsl';
 ```
 
 ## Signature
@@ -38,7 +38,7 @@ interface WGSLAst {
 }
 
 interface ResolvedShader {
-  readonly kind: "wgsl";
+  readonly kind: 'wgsl';
   readonly wgsl: string;
   readonly source: WGSLSource;
   readonly ast: WGSLAst;
@@ -54,24 +54,24 @@ interface ResolvedShader {
 
 `ResolvedShader` fields:
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| kind | `"wgsl"` | ✔ | — | Discriminant for WGSL shader data returned by `compile()`. |
-| wgsl | string | ✔ | — | Original source string passed to `compile()`. |
-| source | `WGSLSource` | ✔ | — | Runtime source metadata. `compile()` sets `text` to the input, `path` to `"<runtime>"`, and `imports` to `[]`. |
-| ast | `WGSLAst` | ✔ | — | Lightweight passthrough AST metadata with one runtime module and no diagnostics. |
-| sourceMap | `SourceMap` | ✔ | — | Passthrough v1 source map with empty `mappings`. |
-| diagnostics | `readonly []` | ✔ | — | Always empty for `compile()` output. |
-| cacheKey | `Record<string, string>` | ✔ | — | Deterministic FNV-style key in the form `vgpu-wgsl-1:<hash>` under `default`. |
-| entryPoints | `readonly string[]` | ✔ | — | Names matched by `@(vertex|fragment|compute) fn <name>` in the source. |
-| stats | `{ lines: number; bytes: number; bindGroups: number }` | ✔ | — | Line count, UTF-8 byte length, and `bindGroups: 0`. |
+| Param       | Type                                                   | Required | Default | Notes                                                                                                          |
+| ----------- | ------------------------------------------------------ | -------- | ------- | -------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------- |
+| kind        | `"wgsl"`                                               | ✔        | —       | Discriminant for WGSL shader data returned by `compile()`.                                                     |
+| wgsl        | string                                                 | ✔        | —       | Original source string passed to `compile()`.                                                                  |
+| source      | `WGSLSource`                                           | ✔        | —       | Runtime source metadata. `compile()` sets `text` to the input, `path` to `"<runtime>"`, and `imports` to `[]`. |
+| ast         | `WGSLAst`                                              | ✔        | —       | Lightweight passthrough AST metadata with one runtime module and no diagnostics.                               |
+| sourceMap   | `SourceMap`                                            | ✔        | —       | Passthrough v1 source map with empty `mappings`.                                                               |
+| diagnostics | `readonly []`                                          | ✔        | —       | Always empty for `compile()` output.                                                                           |
+| cacheKey    | `Record<string, string>`                               | ✔        | —       | Deterministic FNV-style key in the form `vgpu-wgsl-1:<hash>` under `default`.                                  |
+| entryPoints | `readonly string[]`                                    | ✔        | —       | Names matched by `@(vertex                                                                                     | fragment | compute) fn <name>` in the source. |
+| stats       | `{ lines: number; bytes: number; bindGroups: number }` | ✔        | —       | Line count, UTF-8 byte length, and `bindGroups: 0`.                                                            |
 
 `ShaderSource` fields:
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| version | `1` | ✔ | — | Loader artifact version. |
-| wgsl | string | ✔ | — | Plain WGSL emitted by a loader or resolver. |
+| Param   | Type   | Required | Default | Notes                                       |
+| ------- | ------ | -------- | ------- | ------------------------------------------- |
+| version | `1`    | ✔        | —       | Loader artifact version.                    |
+| wgsl    | string | ✔        | —       | Plain WGSL emitted by a loader or resolver. |
 
 **Returns:** These are TypeScript interfaces, not callables. They return nothing.
 
@@ -80,7 +80,7 @@ interface ResolvedShader {
 ## Examples
 
 ```ts
-import { compile, type ResolvedShader, type ShaderSource } from "@vgpu/wgsl";
+import { compile, type ResolvedShader, type ShaderSource } from '@vgpu/wgsl';
 
 const resolved: ResolvedShader = compile(`
 @fragment
@@ -94,7 +94,7 @@ console.log(source.version, resolved.entryPoints[0]);
 ```
 
 ```ts
-import type { ShaderSource } from "@vgpu/wgsl";
+import type { ShaderSource } from '@vgpu/wgsl';
 
 function acceptsLoaderOutput(shader: ShaderSource): string {
   return shader.wgsl;
@@ -102,7 +102,7 @@ function acceptsLoaderOutput(shader: ShaderSource): string {
 
 acceptsLoaderOutput({
   version: 1,
-  wgsl: "@compute @workgroup_size(1) fn main() {}",
+  wgsl: '@compute @workgroup_size(1) fn main() {}',
 });
 ```
 

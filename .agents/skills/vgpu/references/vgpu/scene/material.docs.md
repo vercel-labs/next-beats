@@ -7,21 +7,21 @@ Creates a flat-color material descriptor; renders without lights.
 ## Import
 
 ```ts
-import { unlitMaterial } from "vgpu/scene";
+import { unlitMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function unlitMaterial(options?: import("vgpu/scene").ColorMaterialOptions): import("vgpu/scene").UnlitMaterial;
+declare function unlitMaterial(options?: import('vgpu/scene').ColorMaterialOptions): import('vgpu/scene').UnlitMaterial;
 ```
 
 ## Examples
 
 ```ts
-import { srgb, unlitMaterial } from "vgpu/scene";
+import { srgb, unlitMaterial } from 'vgpu/scene';
 
-const material = unlitMaterial({ color: srgb("#3b82f6") });
+const material = unlitMaterial({ color: srgb('#3b82f6') });
 material.set({ opacity: 0.5 });
 ```
 
@@ -39,19 +39,21 @@ Creates an N·L diffuse material descriptor lit by scene lights (uses `@vgpu/wgs
 ## Import
 
 ```ts
-import { lambertMaterial } from "vgpu/scene";
+import { lambertMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function lambertMaterial(options?: import("vgpu/scene").ColorMaterialOptions): import("vgpu/scene").LambertMaterial;
+declare function lambertMaterial(
+  options?: import('vgpu/scene').ColorMaterialOptions,
+): import('vgpu/scene').LambertMaterial;
 ```
 
 ## Examples
 
 ```ts
-import { directionalLight, lambertMaterial, mesh, scene, sphere } from "vgpu/scene";
+import { directionalLight, lambertMaterial, mesh, scene, sphere } from 'vgpu/scene';
 
 const root = scene({
   children: [
@@ -76,19 +78,19 @@ Creates a debug material that shades world-space normals; needs no lights or par
 ## Import
 
 ```ts
-import { normalMaterial } from "vgpu/scene";
+import { normalMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function normalMaterial(): import("vgpu/scene").NormalMaterial;
+declare function normalMaterial(): import('vgpu/scene').NormalMaterial;
 ```
 
 ## Examples
 
 ```ts
-import { mesh, normalMaterial, torus } from "vgpu/scene";
+import { mesh, normalMaterial, torus } from 'vgpu/scene';
 
 const donut = mesh(torus(), normalMaterial());
 void donut;
@@ -107,7 +109,7 @@ Creates a custom material from a WGSL fragment stage compiled against the scene 
 ## Import
 
 ```ts
-import { shaderMaterial } from "vgpu/scene";
+import { shaderMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -115,18 +117,18 @@ import { shaderMaterial } from "vgpu/scene";
 ```ts
 declare function shaderMaterial(
   source: string,
-  options?: import("vgpu/scene").ShaderMaterialOptions,
-): import("vgpu/scene").ShaderMaterial;
+  options?: import('vgpu/scene').ShaderMaterialOptions,
+): import('vgpu/scene').ShaderMaterial;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| source | `string` | ✔ | — | WGSL fragment stage. May import from `@vgpu/wgsl-std/*`. |
-| options.set | `Record<string, unknown>` | ✖ | `{}` | Initial binding values keyed by WGSL variable name, like `draw.set()`. |
-| options.blend | `MaterialBlend` | ✖ | — | `"alpha"`, `"additive"`, or `"premultiplied"`. |
-| options.label | `string` | ✖ | — | Used in error `where` strings. |
+| Param         | Type                      | Required | Default | Notes                                                                  |
+| ------------- | ------------------------- | -------- | ------- | ---------------------------------------------------------------------- |
+| source        | `string`                  | ✔        | —       | WGSL fragment stage. May import from `@vgpu/wgsl-std/*`.               |
+| options.set   | `Record<string, unknown>` | ✖        | `{}`    | Initial binding values keyed by WGSL variable name, like `draw.set()`. |
+| options.blend | `MaterialBlend`           | ✖        | —       | `"alpha"`, `"additive"`, or `"premultiplied"`.                         |
+| options.label | `string`                  | ✖        | —       | Used in error `where` strings.                                         |
 
 **Returns:** `ShaderMaterial` descriptor with `source`, `values`, and `set()`.
 **Throws:** None at construction; WGSL errors surface when the renderer compiles the material.
@@ -134,7 +136,7 @@ declare function shaderMaterial(
 ## Examples
 
 ```ts
-import { shaderMaterial } from "vgpu/scene";
+import { shaderMaterial } from 'vgpu/scene';
 
 const glow = shaderMaterial(GLOW_WGSL, { set: { params: { color: [0.2, 0.5, 1], intensity: 2 } } });
 glow.set({ params: { intensity: 4 } }); // merges per binding, like draw.set()
@@ -156,23 +158,23 @@ Abstract base of every material descriptor. Discriminate concrete materials by `
 ## Import
 
 ```ts
-import { SceneMaterial } from "vgpu/scene";
+import { SceneMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare abstract class SceneMaterial {
-  abstract readonly kind: import("vgpu/scene").SceneMaterialKind;
+  abstract readonly kind: import('vgpu/scene').SceneMaterialKind;
   label: string | undefined;
-  blend: import("vgpu/scene").MaterialBlend | undefined;
+  blend: import('vgpu/scene').MaterialBlend | undefined;
 }
 ```
 
 ## Examples
 
 ```ts
-import { UnlitMaterial, unlitMaterial, type SceneMaterial } from "vgpu/scene";
+import { UnlitMaterial, unlitMaterial, type SceneMaterial } from 'vgpu/scene';
 
 const material: SceneMaterial = unlitMaterial();
 if (material instanceof UnlitMaterial) void material.color;
@@ -191,15 +193,15 @@ Class returned by `unlitMaterial()`. `kind: "unlit"` with `color`, `opacity`, an
 ## Import
 
 ```ts
-import type { UnlitMaterial } from "vgpu/scene";
+import type { UnlitMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class UnlitMaterial {
-  readonly kind: "unlit";
-  set(values: import("vgpu/scene").ColorMaterialValues): this;
+  readonly kind: 'unlit';
+  set(values: import('vgpu/scene').ColorMaterialValues): this;
   readonly color: Float32Array;
   readonly opacity: number;
 }
@@ -208,7 +210,7 @@ declare class UnlitMaterial {
 ## Examples
 
 ```ts
-import { unlitMaterial } from "vgpu/scene";
+import { unlitMaterial } from 'vgpu/scene';
 
 unlitMaterial().set({ color: [1, 0, 0] });
 ```
@@ -227,15 +229,15 @@ Class returned by `lambertMaterial()`. `kind: "lambert"` with `color`, `opacity`
 ## Import
 
 ```ts
-import type { LambertMaterial } from "vgpu/scene";
+import type { LambertMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class LambertMaterial {
-  readonly kind: "lambert";
-  set(values: import("vgpu/scene").ColorMaterialValues): this;
+  readonly kind: 'lambert';
+  set(values: import('vgpu/scene').ColorMaterialValues): this;
   readonly color: Float32Array;
   readonly opacity: number;
 }
@@ -244,7 +246,7 @@ declare class LambertMaterial {
 ## Examples
 
 ```ts
-import { lambertMaterial } from "vgpu/scene";
+import { lambertMaterial } from 'vgpu/scene';
 
 lambertMaterial({ color: [0.4, 0.6, 1] }).set({ opacity: 0.8 });
 ```
@@ -262,21 +264,21 @@ Class returned by `normalMaterial()`. `kind: "normal"`, no parameters.
 ## Import
 
 ```ts
-import type { NormalMaterial } from "vgpu/scene";
+import type { NormalMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class NormalMaterial {
-  readonly kind: "normal";
+  readonly kind: 'normal';
 }
 ```
 
 ## Examples
 
 ```ts
-import { normalMaterial, type NormalMaterial } from "vgpu/scene";
+import { normalMaterial, type NormalMaterial } from 'vgpu/scene';
 
 const material: NormalMaterial = normalMaterial();
 void material;
@@ -295,14 +297,14 @@ Class returned by `shaderMaterial()`. Holds the WGSL `source` plus binding `valu
 ## Import
 
 ```ts
-import type { ShaderMaterial } from "vgpu/scene";
+import type { ShaderMaterial } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class ShaderMaterial {
-  readonly kind: "shader";
+  readonly kind: 'shader';
   readonly source: string;
   readonly values: Readonly<Record<string, unknown>>;
   set(values: Record<string, unknown>): this;
@@ -312,9 +314,9 @@ declare class ShaderMaterial {
 ## Examples
 
 ```ts
-import { shaderMaterial } from "vgpu/scene";
+import { shaderMaterial } from 'vgpu/scene';
 
-const material = shaderMaterial("@fragment fn fs_main() {}", { set: { params: { t: 0 } } });
+const material = shaderMaterial('@fragment fn fs_main() {}', { set: { params: { t: 0 } } });
 material.set({ params: { t: 1 } });
 ```
 
@@ -332,35 +334,35 @@ Options shared by `unlitMaterial()` and `lambertMaterial()`.
 ## Import
 
 ```ts
-import type { ColorMaterialOptions } from "vgpu/scene";
+import type { ColorMaterialOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface ColorMaterialOptions {
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly opacity?: number;
-  readonly blend?: import("vgpu/scene").MaterialBlend;
+  readonly blend?: import('vgpu/scene').MaterialBlend;
   readonly label?: string;
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| color | `Vec3Like` | ✖ | `[1, 1, 1]` | Linear RGB; pass `srgb("#…")` for hex input. |
-| opacity | `number` | ✖ | `1` | In `[0, 1]`. Values below 1 need a `blend` mode to show. |
-| blend | `MaterialBlend` | ✖ | — | Blend preset shared with `DrawOptions.blend`. |
-| label | `string` | ✖ | — | Used in error `where` strings. |
+| Field   | Type            | Required | Default     | Notes                                                    |
+| ------- | --------------- | -------- | ----------- | -------------------------------------------------------- |
+| color   | `Vec3Like`      | ✖        | `[1, 1, 1]` | Linear RGB; pass `srgb("#…")` for hex input.             |
+| opacity | `number`        | ✖        | `1`         | In `[0, 1]`. Values below 1 need a `blend` mode to show. |
+| blend   | `MaterialBlend` | ✖        | —           | Blend preset shared with `DrawOptions.blend`.            |
+| label   | `string`        | ✖        | —           | Used in error `where` strings.                           |
 
 ## Examples
 
 ```ts
-import { srgb, unlitMaterial } from "vgpu/scene";
+import { srgb, unlitMaterial } from 'vgpu/scene';
 
-unlitMaterial({ color: srgb("#ff8800"), opacity: 0.75, blend: "alpha" });
+unlitMaterial({ color: srgb('#ff8800'), opacity: 0.75, blend: 'alpha' });
 ```
 
 ## Notes
@@ -376,14 +378,14 @@ Values accepted by `set()` on color materials.
 ## Import
 
 ```ts
-import type { ColorMaterialValues } from "vgpu/scene";
+import type { ColorMaterialValues } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface ColorMaterialValues {
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly opacity?: number;
 }
 ```
@@ -391,7 +393,7 @@ interface ColorMaterialValues {
 ## Examples
 
 ```ts
-import { unlitMaterial } from "vgpu/scene";
+import { unlitMaterial } from 'vgpu/scene';
 
 unlitMaterial().set({ color: [0, 1, 0], opacity: 0.9 });
 ```
@@ -409,21 +411,21 @@ Blend preset accepted by materials; the same presets as `DrawOptions.blend`.
 ## Import
 
 ```ts
-import type { MaterialBlend } from "vgpu/scene";
+import type { MaterialBlend } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-type MaterialBlend = "alpha" | "additive" | "premultiplied";
+type MaterialBlend = 'alpha' | 'additive' | 'premultiplied';
 ```
 
 ## Examples
 
 ```ts
-import { unlitMaterial, type MaterialBlend } from "vgpu/scene";
+import { unlitMaterial, type MaterialBlend } from 'vgpu/scene';
 
-const blend: MaterialBlend = "additive";
+const blend: MaterialBlend = 'additive';
 unlitMaterial({ blend });
 ```
 
@@ -441,19 +443,19 @@ Discriminator for material descriptors.
 ## Import
 
 ```ts
-import type { SceneMaterialKind } from "vgpu/scene";
+import type { SceneMaterialKind } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-type SceneMaterialKind = "unlit" | "normal" | "lambert" | "shader";
+type SceneMaterialKind = 'unlit' | 'normal' | 'lambert' | 'shader';
 ```
 
 ## Examples
 
 ```ts
-import { normalMaterial, type SceneMaterialKind } from "vgpu/scene";
+import { normalMaterial, type SceneMaterialKind } from 'vgpu/scene';
 
 const kind: SceneMaterialKind = normalMaterial().kind;
 void kind;
@@ -472,7 +474,7 @@ Options accepted by `shaderMaterial()`.
 ## Import
 
 ```ts
-import type { ShaderMaterialOptions } from "vgpu/scene";
+import type { ShaderMaterialOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -480,7 +482,7 @@ import type { ShaderMaterialOptions } from "vgpu/scene";
 ```ts
 interface ShaderMaterialOptions {
   readonly set?: Record<string, unknown>;
-  readonly blend?: import("vgpu/scene").MaterialBlend;
+  readonly blend?: import('vgpu/scene').MaterialBlend;
   readonly label?: string;
 }
 ```
@@ -488,9 +490,9 @@ interface ShaderMaterialOptions {
 ## Examples
 
 ```ts
-import { shaderMaterial } from "vgpu/scene";
+import { shaderMaterial } from 'vgpu/scene';
 
-shaderMaterial("@fragment fn fs_main() {}", { label: "glow", blend: "additive" });
+shaderMaterial('@fragment fn fs_main() {}', { label: 'glow', blend: 'additive' });
 ```
 
 ## Notes

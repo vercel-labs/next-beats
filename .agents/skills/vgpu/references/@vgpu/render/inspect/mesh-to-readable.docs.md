@@ -7,7 +7,7 @@ Promotes a render `Mesh` into a CPU-readable shape by ensuring its vertex buffer
 ## Import
 
 ```ts
-import { meshToReadable } from "@vgpu/render/inspect";
+import { meshToReadable } from '@vgpu/render/inspect';
 ```
 
 ## Signature
@@ -18,10 +18,10 @@ export function meshToReadable(mesh: Mesh, device: Device): Promise<Mesh>;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| mesh | Mesh | ✔ | — | Source mesh. Must come from `@vgpu/render` helpers or user code with a valid `vertexBuffer`. |
-| device | Device | ✔ | — | Device that owns the target vertex buffer and command encoder used for the copy. |
+| Param  | Type   | Required | Default | Notes                                                                                        |
+| ------ | ------ | -------- | ------- | -------------------------------------------------------------------------------------------- |
+| mesh   | Mesh   | ✔        | —       | Source mesh. Must come from `@vgpu/render` helpers or user code with a valid `vertexBuffer`. |
+| device | Device | ✔        | —       | Device that owns the target vertex buffer and command encoder used for the copy.             |
 
 **Returns:** `Promise<Mesh>` — resolves to the original mesh when it already has `copy_src` usage or to a frozen clone that shares all metadata but replaces `vertexBuffer` with a readable copy.
 
@@ -30,10 +30,10 @@ export function meshToReadable(mesh: Mesh, device: Device): Promise<Mesh>;
 ## Examples
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { meshToReadable } from "@vgpu/render/inspect";
-import { init, geometry } from "vgpu/mock";
-import { box } from "vgpu/scene";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { meshToReadable } from '@vgpu/render/inspect';
+import { init, geometry } from 'vgpu/mock';
+import { box } from 'vgpu/scene';
 
 async function main(): Promise<void> {
   const adapter = createMockAdapter();
@@ -42,10 +42,10 @@ async function main(): Promise<void> {
 
   const readable = await meshToReadable(geo as never, gpu.device);
   const vertices = await readable.vertexBuffer.read(readable.vertexBuffer.options.size);
-  console.log("Readable bytes", new Float32Array(vertices));
+  console.log('Readable bytes', new Float32Array(vertices));
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
 });
 ```

@@ -7,7 +7,7 @@ Creates an `InspectMaterial` that visualizes per-fragment normals as RGB. Use it
 ## Import
 
 ```ts
-import { normalDebugMaterial } from "@vgpu/render/inspect";
+import { normalDebugMaterial } from '@vgpu/render/inspect';
 ```
 
 ## Signature
@@ -18,31 +18,26 @@ export function normalDebugMaterial(spec: NormalDebugMaterialSpec): InspectMater
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| spec | NormalDebugMaterialSpec | ✔ | — | Configuration object used to allocate the material. |
-| spec.device | Device | ✔ | — | Device that owns the pipeline, bind group layout, and uniform buffer writes. |
-| spec.targetFormat | GPUTextureFormat | ✖ | "bgra8unorm-srgb" | Color attachment format; use "rgba8unorm-srgb" if BGRA is unavailable. |
+| Param             | Type                    | Required | Default           | Notes                                                                        |
+| ----------------- | ----------------------- | -------- | ----------------- | ---------------------------------------------------------------------------- |
+| spec              | NormalDebugMaterialSpec | ✔        | —                 | Configuration object used to allocate the material.                          |
+| spec.device       | Device                  | ✔        | —                 | Device that owns the pipeline, bind group layout, and uniform buffer writes. |
+| spec.targetFormat | GPUTextureFormat        | ✖        | "bgra8unorm-srgb" | Color attachment format; use "rgba8unorm-srgb" if BGRA is unavailable.       |
 
 **Returns:** `InspectMaterial` — exposes the configured `pipeline`, `bindGroupLayout`, 128-byte uniform size, and a writer that uploads view-projection and model matrices.
 
 ## Examples
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { InspectMaterial, normalDebugMaterial } from "@vgpu/render/inspect";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { InspectMaterial, normalDebugMaterial } from '@vgpu/render/inspect';
 
-const IDENTITY_MATRIX = new Float32Array([
-  1, 0, 0, 0,
-  0, 1, 0, 0,
-  0, 0, 1, 0,
-  0, 0, 0, 1,
-]);
+const IDENTITY_MATRIX = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 async function main(): Promise<void> {
   const device = await createMockAdapter().requestDevice();
-  const material: InspectMaterial = normalDebugMaterial({ device, targetFormat: "rgba8unorm-srgb" });
-  const uniforms = device.createBuffer({ size: material.uniformByteSize, usage: ["uniform", "copy_dst"] });
+  const material: InspectMaterial = normalDebugMaterial({ device, targetFormat: 'rgba8unorm-srgb' });
+  const uniforms = device.createBuffer({ size: material.uniformByteSize, usage: ['uniform', 'copy_dst'] });
 
   material.writeUniforms(uniforms.gpu, 0, {
     viewProjectionMatrix: IDENTITY_MATRIX,
@@ -50,7 +45,7 @@ async function main(): Promise<void> {
   });
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
 });
 ```

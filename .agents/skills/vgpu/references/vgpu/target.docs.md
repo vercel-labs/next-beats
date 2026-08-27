@@ -7,14 +7,14 @@ Offscreen render target abstraction used by passes, draws, bundles, and ping-pon
 ## Import
 
 ```ts
-import type { Target, TargetOptions, TargetTextureOptions, PingPongTargets, PingPongStorage } from "vgpu";
+import type { Target, TargetOptions, TargetTextureOptions, PingPongTargets, PingPongStorage } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { ClearColor } from "vgpu";
-import type { ResourceDestroyCallback, ResourceIdentity, Texture, UnsubscribeResourceDestroy } from "vgpu/core";
+import type { ClearColor } from 'vgpu';
+import type { ResourceDestroyCallback, ResourceIdentity, Texture, UnsubscribeResourceDestroy } from 'vgpu/core';
 
 interface TargetTextureOptions {
   readonly format?: GPUTextureFormat;
@@ -51,35 +51,43 @@ interface Target {
   }): GPURenderPassDescriptor;
 }
 
-interface PingPongTargets { readonly read: Target; readonly write: Target; swap(): void; }
-interface PingPongStorage { readonly read: import("vgpu").StorageBuffer; readonly write: import("vgpu").StorageBuffer; swap(): void; }
+interface PingPongTargets {
+  readonly read: Target;
+  readonly write: Target;
+  swap(): void;
+}
+interface PingPongStorage {
+  readonly read: import('vgpu').StorageBuffer;
+  readonly write: import('vgpu').StorageBuffer;
+  swap(): void;
+}
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| target.opts | `TargetOptions` | ✔ | — | Creates an offscreen target. `size` is mandatory. |
-| opts.size | `readonly [number, number]` | ✔ | — | Initial offscreen texture size in physical pixels. |
-| opts.format | `GPUTextureFormat` | ✖ | `"rgba8unorm"` | Used for single-color targets when `colors` is omitted. |
-| opts.colors | `readonly { format: GPUTextureFormat }[]` | ✖ | `[{ format: opts.format ?? "rgba8unorm" }]` | Multiple render targets (MRT): one attachment per entry, all written by one pass — the G-buffer layout for deferred shading. `target.color` is `colors[0]`. |
-| opts.depth | `boolean \| GPUTextureFormat` | ✖ | `undefined` | `true` means `"depth24plus"`; a string uses that depth format; omitted means no depth. Combined depth-stencil formats such as `"depth24plus-stencil8"` are supported; stencil-only `"stencil8"` is rejected. |
-| opts.msaa | `boolean \| 4` | ✖ | `false` / sample count `1` | Only `true` or `4` enables MSAA, creating color/depth attachments with sample count `4` and resolving to sampleable `.color(s)`. |
-| opts.clearColor | `ClearColor` | ✖ | `[0, 0, 0, 1]` | Default clear color of this target, used by passes that clear without naming one. Writable at runtime as `target.clearColor`; a pass `clear` color still wins for that pass. Four finite numbers, or a `GPUColor` object. |
-| opts.label | `string` | ✖ | `undefined` | Prefix for created texture labels. |
-| target.resize.size | `readonly [number, number]` | ✔ | — | Recreates offscreen textures unless size is unchanged. |
-| target.read | — | — | — | No parameters; reads `target.color` and returns its raw unpadded texel bytes (4 per texel for `rgba8unorm`, 8 for `rgba16float`, 16 for `rgba32float`). `bgra8unorm` / `bgra8unorm-srgb` are supported and swizzled to RGBA, matching canvas preferred formats on platforms such as macOS. |
-| target.readFloats | — | — | — | No parameters; reads `target.color` and decodes it to one f32 per component — the HDR readback for `rgba16float` / `rgba32float` targets. `unorm8` formats decode to `[0, 1]`. |
-| target.onDestroy.cb | `ResourceDestroyCallback<Target>` | ✔ | — | Subscribes to target destruction. |
-| target.renderPassDescriptor.clear | `ClearColor` | ✖ | `[0, 0, 0, 1]` | Clear color for all color attachments unless `preserve` is true. `Frame.pass` supplies `target.clearColor` for omitted/`true` clears and a per-pass color when provided. |
-| target.renderPassDescriptor.preserve | `boolean` | ✖ | `false` | Optional implementer hook used by `Frame.pass({ clear: false })`; when true, color and depth attachments should load existing contents and omit clear values. |
-| target.renderPassDescriptor.clearDepth | `number` | ✖ | `1` | Depth clear value used when the pass clears. `Frame.pass` supplies `FramePassOptions.clearDepth`; ignored while preserving and on targets without depth. |
-| target.renderPassDescriptor.clearStencil | `number` | ✖ | `0` | Stencil clear value used when the pass clears. `Frame.pass` supplies `FramePassOptions.clearStencil`; ignored while preserving and on targets whose depth format has no stencil aspect. |
-| target.renderPassDescriptor.depthReadOnly | `boolean` | ✖ | `false` | When true, the depth-stencil attachment is built with `depthReadOnly: true` and omits `depthLoadOp`/`depthStoreOp`, as WebGPU requires for read-only aspects; formats with a stencil aspect also set `stencilReadOnly: true` and omit the stencil ops. `Frame.pass` supplies `FramePassOptions.depthReadOnly`. |
-| pingPong.width | `number` | ✔ | — | Floored and clamped to at least `1`. |
-| pingPong.height | `number` | ✔ | — | Floored and clamped to at least `1`. |
-| pingPong.opts | `TargetTextureOptions` | ✖ | `{}` | Texture options for both targets. Size is intentionally not accepted; positional width/height win. |
-| pingPongStorage.bytes | `number` | ✔ | — | Creates two `"read-write"` storage buffers. |
+| Param                                     | Type                                      | Required | Default                                     | Notes                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------- | ----------------------------------------- | -------: | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| target.opts                               | `TargetOptions`                           |        ✔ | —                                           | Creates an offscreen target. `size` is mandatory.                                                                                                                                                                                                                                                              |
+| opts.size                                 | `readonly [number, number]`               |        ✔ | —                                           | Initial offscreen texture size in physical pixels.                                                                                                                                                                                                                                                             |
+| opts.format                               | `GPUTextureFormat`                        |        ✖ | `"rgba8unorm"`                              | Used for single-color targets when `colors` is omitted.                                                                                                                                                                                                                                                        |
+| opts.colors                               | `readonly { format: GPUTextureFormat }[]` |        ✖ | `[{ format: opts.format ?? "rgba8unorm" }]` | Multiple render targets (MRT): one attachment per entry, all written by one pass — the G-buffer layout for deferred shading. `target.color` is `colors[0]`.                                                                                                                                                    |
+| opts.depth                                | `boolean \| GPUTextureFormat`             |        ✖ | `undefined`                                 | `true` means `"depth24plus"`; a string uses that depth format; omitted means no depth. Combined depth-stencil formats such as `"depth24plus-stencil8"` are supported; stencil-only `"stencil8"` is rejected.                                                                                                   |
+| opts.msaa                                 | `boolean \| 4`                            |        ✖ | `false` / sample count `1`                  | Only `true` or `4` enables MSAA, creating color/depth attachments with sample count `4` and resolving to sampleable `.color(s)`.                                                                                                                                                                               |
+| opts.clearColor                           | `ClearColor`                              |        ✖ | `[0, 0, 0, 1]`                              | Default clear color of this target, used by passes that clear without naming one. Writable at runtime as `target.clearColor`; a pass `clear` color still wins for that pass. Four finite numbers, or a `GPUColor` object.                                                                                      |
+| opts.label                                | `string`                                  |        ✖ | `undefined`                                 | Prefix for created texture labels.                                                                                                                                                                                                                                                                             |
+| target.resize.size                        | `readonly [number, number]`               |        ✔ | —                                           | Recreates offscreen textures unless size is unchanged.                                                                                                                                                                                                                                                         |
+| target.read                               | —                                         |        — | —                                           | No parameters; reads `target.color` and returns its raw unpadded texel bytes (4 per texel for `rgba8unorm`, 8 for `rgba16float`, 16 for `rgba32float`). `bgra8unorm` / `bgra8unorm-srgb` are supported and swizzled to RGBA, matching canvas preferred formats on platforms such as macOS.                     |
+| target.readFloats                         | —                                         |        — | —                                           | No parameters; reads `target.color` and decodes it to one f32 per component — the HDR readback for `rgba16float` / `rgba32float` targets. `unorm8` formats decode to `[0, 1]`.                                                                                                                                 |
+| target.onDestroy.cb                       | `ResourceDestroyCallback<Target>`         |        ✔ | —                                           | Subscribes to target destruction.                                                                                                                                                                                                                                                                              |
+| target.renderPassDescriptor.clear         | `ClearColor`                              |        ✖ | `[0, 0, 0, 1]`                              | Clear color for all color attachments unless `preserve` is true. `Frame.pass` supplies `target.clearColor` for omitted/`true` clears and a per-pass color when provided.                                                                                                                                       |
+| target.renderPassDescriptor.preserve      | `boolean`                                 |        ✖ | `false`                                     | Optional implementer hook used by `Frame.pass({ clear: false })`; when true, color and depth attachments should load existing contents and omit clear values.                                                                                                                                                  |
+| target.renderPassDescriptor.clearDepth    | `number`                                  |        ✖ | `1`                                         | Depth clear value used when the pass clears. `Frame.pass` supplies `FramePassOptions.clearDepth`; ignored while preserving and on targets without depth.                                                                                                                                                       |
+| target.renderPassDescriptor.clearStencil  | `number`                                  |        ✖ | `0`                                         | Stencil clear value used when the pass clears. `Frame.pass` supplies `FramePassOptions.clearStencil`; ignored while preserving and on targets whose depth format has no stencil aspect.                                                                                                                        |
+| target.renderPassDescriptor.depthReadOnly | `boolean`                                 |        ✖ | `false`                                     | When true, the depth-stencil attachment is built with `depthReadOnly: true` and omits `depthLoadOp`/`depthStoreOp`, as WebGPU requires for read-only aspects; formats with a stencil aspect also set `stencilReadOnly: true` and omit the stencil ops. `Frame.pass` supplies `FramePassOptions.depthReadOnly`. |
+| pingPong.width                            | `number`                                  |        ✔ | —                                           | Floored and clamped to at least `1`.                                                                                                                                                                                                                                                                           |
+| pingPong.height                           | `number`                                  |        ✔ | —                                           | Floored and clamped to at least `1`.                                                                                                                                                                                                                                                                           |
+| pingPong.opts                             | `TargetTextureOptions`                    |        ✖ | `{}`                                        | Texture options for both targets. Size is intentionally not accepted; positional width/height win.                                                                                                                                                                                                             |
+| pingPongStorage.bytes                     | `number`                                  |        ✔ | —                                           | Creates two `"read-write"` storage buffers.                                                                                                                                                                                                                                                                    |
 
 **Returns:** `target(gpu)` returns `Target`; `resize()` returns `void`; `read()` returns `Promise<Uint8Array>`; `readFloats()` returns `Promise<Float32Array>`; `renderPassDescriptor(opts?)` returns a WebGPU render pass descriptor; `pingPong(gpu)` returns `PingPongTargets`; `pingPongStorage(gpu)` returns `PingPongStorage`.
 
@@ -88,27 +96,30 @@ interface PingPongStorage { readonly read: import("vgpu").StorageBuffer; readonl
 ## Examples
 
 ```ts
-import { init, effect, frame, target } from "vgpu/mock";
+import { init, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
-const scene = target(gpu, { size: [128, 128], format: "rgba16float", depth: true, msaa: true });
-const post = effect(gpu, `
+const scene = target(gpu, { size: [128, 128], format: 'rgba16float', depth: true, msaa: true });
+const post = effect(
+  gpu,
+  `
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f { return vec4f(uv, 0, 1); }
-`);
+`,
+);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: scene, clear: [0, 0, 0, 1] }, (pass) => pass.draw(post));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: scene, clear: [0, 0, 0, 1] }, pass => pass.draw(post));
 });
 ```
 
 ```ts
-import { init, draw, frame, target } from "vgpu/mock";
+import { init, draw, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 // G-buffer for deferred shading: albedo, normals, material parameters.
 const gbuffer = target(gpu, {
   size: [512, 512],
-  colors: [{ format: "rgba8unorm" }, { format: "rgba16float" }, { format: "rgba8unorm" }],
+  colors: [{ format: 'rgba8unorm' }, { format: 'rgba16float' }, { format: 'rgba8unorm' }],
   depth: true,
 });
 const fill = draw(gpu, {
@@ -124,7 +135,7 @@ const fill = draw(gpu, {
   `,
 });
 
-frame(gpu, (currentFrame) => {
+frame(gpu, currentFrame => {
   currentFrame.pass(gbuffer, fill); // one draw fills all three attachments
 });
 ```
@@ -132,17 +143,21 @@ frame(gpu, (currentFrame) => {
 One geometry pass fills every G-buffer attachment; a later lighting effect samples them as `gbuffer.colors[0]`–`[2]`. Per-attachment blend/write-mask overrides for MRT draws live on `DrawOptions.colors`.
 
 ```ts
-import { init, effect, surface, target } from "vgpu/mock";
+import { init, effect, surface, target } from 'vgpu/mock';
 
 const gpu = await init();
 const canvasSurface = surface(gpu, mockCanvas());
 const bloomSize = (w: number, h: number): [number, number] => [w / 2, h / 2];
 const bloom = target(gpu, { size: bloomSize(canvasSurface.size[0], canvasSurface.size[1]) });
-const bright = effect(gpu, `
+const bright = effect(
+  gpu,
+  `
   struct Params { resolution: vec2f }
   @group(0) @binding(0) var<uniform> params: Params;
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }
-`, { set: { params: { resolution: bloom.size } } });
+`,
+  { set: { params: { resolution: bloom.size } } },
+);
 
 canvasSurface.onResize(({ width, height }) => {
   bloom.resize(bloomSize(width, height));
@@ -155,34 +170,42 @@ function mockCanvas(): HTMLCanvasElement {
     height: 10,
     clientWidth: 10,
     clientHeight: 10,
-    getContext() { return { configure() {}, unconfigure() {}, getCurrentTexture() { return { createView: () => ({}) }; } }; },
+    getContext() {
+      return {
+        configure() {},
+        unconfigure() {},
+        getCurrentTexture() {
+          return { createView: () => ({}) };
+        },
+      };
+    },
   } as unknown as HTMLCanvasElement;
 }
 ```
 
 ```ts
-import { init, effect, frame, target } from "vgpu/mock";
+import { init, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 // HDR target: readFloats() decodes the half-float texels, read() would hand back raw bytes.
-const hdr = target(gpu, { size: [64, 64], format: "rgba16float" });
+const hdr = target(gpu, { size: [64, 64], format: 'rgba16float' });
 const bloom = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(4.0, 2.0, 1.0, 1.0); }`);
 
-frame(gpu, (currentFrame) => currentFrame.pass(hdr, bloom));
+frame(gpu, currentFrame => currentFrame.pass(hdr, bloom));
 
 const floats = await hdr.readFloats(); // Float32Array, 64 * 64 * 4 components
 console.log(floats[0]); // 4 — values above 1 survive the readback
 ```
 
 ```ts
-import { init, effect, frame, pingPong } from "vgpu/mock";
+import { init, effect, frame, pingPong } from 'vgpu/mock';
 
 const gpu = await init();
-const pair = pingPong(gpu, 32.9, 32.1, { format: "rgba8unorm" });
+const pair = pingPong(gpu, 32.9, 32.1, { format: 'rgba8unorm' });
 const blur = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: pair.write, clear: false }, (pass) => pass.draw(blur));
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: pair.write, clear: false }, pass => pass.draw(blur));
 });
 pair.swap();
 ```

@@ -7,22 +7,22 @@ Creates a root node for a scene tree. Any node can act as a root; `scene()` name
 ## Import
 
 ```ts
-import { scene } from "vgpu/scene";
+import { scene } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function scene(options?: import("vgpu/scene").NodeOptions): import("vgpu/scene").SceneNode;
+declare function scene(options?: import('vgpu/scene').NodeOptions): import('vgpu/scene').SceneNode;
 ```
 
 ## Examples
 
 ```ts
-import { box, group, mesh, scene, unlitMaterial } from "vgpu/scene";
+import { box, group, mesh, scene, unlitMaterial } from 'vgpu/scene';
 
 const root = scene();
-const spinner = group({ label: "spinner" });
+const spinner = group({ label: 'spinner' });
 root.add(spinner);
 spinner.add(mesh(box({ size: 1 }), unlitMaterial({ color: [0.2, 0.5, 1] })));
 ```
@@ -41,19 +41,19 @@ Creates a plain transform node used to group children.
 ## Import
 
 ```ts
-import { group } from "vgpu/scene";
+import { group } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function group(options?: import("vgpu/scene").NodeOptions): import("vgpu/scene").SceneNode;
+declare function group(options?: import('vgpu/scene').NodeOptions): import('vgpu/scene').SceneNode;
 ```
 
 ## Examples
 
 ```ts
-import { group } from "vgpu/scene";
+import { group } from 'vgpu/scene';
 
 const rig = group({ position: [0, 2, 0], rotation: [0, Math.PI / 4, 0] });
 rig.set({ rotation: [0, Math.PI / 2, 0] });
@@ -73,26 +73,26 @@ Creates a renderable node: a pure geometry descriptor paired with a material.
 ## Import
 
 ```ts
-import { mesh } from "vgpu/scene";
+import { mesh } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare function mesh(
-  geometry: import("vgpu/scene").SceneGeometry,
-  material?: import("vgpu/scene").SceneMaterial,
-  options?: import("vgpu/scene").NodeOptions,
-): import("vgpu/scene").MeshNode;
+  geometry: import('vgpu/scene').SceneGeometry,
+  material?: import('vgpu/scene').SceneMaterial,
+  options?: import('vgpu/scene').NodeOptions,
+): import('vgpu/scene').MeshNode;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| geometry | `SceneGeometry` | ✔ | — | Pure descriptor from `box()`, `sphere()`, `plane()`, … |
-| material | `SceneMaterial` | ✖ | `normalMaterial()` | Shading descriptor; swap by assigning `node.material`. |
-| options | `NodeOptions` | ✖ | `{}` | Initial transform, label, visibility, children. |
+| Param    | Type            | Required | Default            | Notes                                                  |
+| -------- | --------------- | -------- | ------------------ | ------------------------------------------------------ |
+| geometry | `SceneGeometry` | ✔        | —                  | Pure descriptor from `box()`, `sphere()`, `plane()`, … |
+| material | `SceneMaterial` | ✖        | `normalMaterial()` | Shading descriptor; swap by assigning `node.material`. |
+| options  | `NodeOptions`   | ✖        | `{}`               | Initial transform, label, visibility, children.        |
 
 **Returns:** `MeshNode` with `kind: "mesh"`.
 **Throws:** `VGPU-SCENE-VALUE-INVALID` for malformed transform options.
@@ -100,7 +100,7 @@ declare function mesh(
 ## Examples
 
 ```ts
-import { lambertMaterial, mesh, sphere } from "vgpu/scene";
+import { lambertMaterial, mesh, sphere } from 'vgpu/scene';
 
 const ball = mesh(sphere({ radius: 0.5 }), lambertMaterial({ color: [0.9, 0.4, 0.2] }), {
   position: [0, 0.5, 0],
@@ -122,22 +122,22 @@ Class returned by `mesh()`. Extends `SceneNode` with `geometry` and `material` f
 ## Import
 
 ```ts
-import type { MeshNode } from "vgpu/scene";
+import type { MeshNode } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class MeshNode {
-  geometry: import("vgpu/scene").SceneGeometry;
-  material: import("vgpu/scene").SceneMaterial;
+  geometry: import('vgpu/scene').SceneGeometry;
+  material: import('vgpu/scene').SceneMaterial;
 }
 ```
 
 ## Examples
 
 ```ts
-import { box, mesh, unlitMaterial } from "vgpu/scene";
+import { box, mesh, unlitMaterial } from 'vgpu/scene';
 
 const node = mesh(box());
 node.material = unlitMaterial({ color: [1, 0, 0] });
@@ -157,20 +157,20 @@ Base scene-tree node: a TRS transform with parent/children links. Mutation goes 
 ## Import
 
 ```ts
-import { SceneNode } from "vgpu/scene";
+import { SceneNode } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class SceneNode {
-  set(values: import("vgpu/scene").NodeTransformValues): this;
-  lookAt(target: import("vgpu/scene").Vec3Like, up?: import("vgpu/scene").Vec3Like): this;
+  set(values: import('vgpu/scene').NodeTransformValues): this;
+  lookAt(target: import('vgpu/scene').Vec3Like, up?: import('vgpu/scene').Vec3Like): this;
   add(...children: SceneNode[]): this;
   remove(...children: SceneNode[]): this;
   removeFromParent(): this;
   traverse(visit: (node: SceneNode) => void): void;
-  readonly kind: import("vgpu/scene").SceneNodeKind;
+  readonly kind: import('vgpu/scene').SceneNodeKind;
   readonly parent: SceneNode | null;
   readonly children: readonly SceneNode[];
   readonly position: Float32Array;
@@ -190,7 +190,7 @@ declare class SceneNode {
 ## Examples
 
 ```ts
-import { group } from "vgpu/scene";
+import { group } from 'vgpu/scene';
 
 const parent = group({ position: [1, 0, 0] });
 const child = group({ position: [0, 1, 0] });
@@ -217,29 +217,29 @@ Options accepted by node factories: all of `NodeTransformValues` plus initial `c
 ## Import
 
 ```ts
-import type { NodeOptions } from "vgpu/scene";
+import type { NodeOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface NodeOptions {
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly rotation?: import("vgpu/scene").Vec3Like;
-  readonly quaternion?: import("vgpu/scene").QuatLike;
-  readonly scale?: number | import("vgpu/scene").Vec3Like;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly rotation?: import('vgpu/scene').Vec3Like;
+  readonly quaternion?: import('vgpu/scene').QuatLike;
+  readonly scale?: number | import('vgpu/scene').Vec3Like;
   readonly visible?: boolean;
   readonly label?: string;
-  readonly children?: readonly import("vgpu/scene").SceneNode[];
+  readonly children?: readonly import('vgpu/scene').SceneNode[];
 }
 ```
 
 ## Examples
 
 ```ts
-import { group, mesh, box } from "vgpu/scene";
+import { group, mesh, box } from 'vgpu/scene';
 
-const rig = group({ label: "rig", children: [mesh(box())] });
+const rig = group({ label: 'rig', children: [mesh(box())] });
 void rig;
 ```
 
@@ -256,17 +256,17 @@ Transform and flag values accepted by `node.set()`.
 ## Import
 
 ```ts
-import type { NodeTransformValues } from "vgpu/scene";
+import type { NodeTransformValues } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface NodeTransformValues {
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly rotation?: import("vgpu/scene").Vec3Like;
-  readonly quaternion?: import("vgpu/scene").QuatLike;
-  readonly scale?: number | import("vgpu/scene").Vec3Like;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly rotation?: import('vgpu/scene').Vec3Like;
+  readonly quaternion?: import('vgpu/scene').QuatLike;
+  readonly scale?: number | import('vgpu/scene').Vec3Like;
   readonly visible?: boolean;
   readonly label?: string;
 }
@@ -274,19 +274,19 @@ interface NodeTransformValues {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| position | `Vec3Like` | ✖ | `[0, 0, 0]` | Local position. |
-| rotation | `Vec3Like` | ✖ | — | Intrinsic XYZ Euler angles in radians. Ignored when `quaternion` is given. |
-| quaternion | `QuatLike` | ✖ | identity | Local rotation (x, y, z, w). |
-| scale | `number \| Vec3Like` | ✖ | `1` | Uniform number or per-axis vector. |
-| visible | `boolean` | ✖ | `true` | Invisible nodes (and their subtrees) are skipped by the renderer. |
-| label | `string` | ✖ | — | Used in error `where` strings and debugging. |
+| Field      | Type                 | Required | Default     | Notes                                                                      |
+| ---------- | -------------------- | -------- | ----------- | -------------------------------------------------------------------------- |
+| position   | `Vec3Like`           | ✖        | `[0, 0, 0]` | Local position.                                                            |
+| rotation   | `Vec3Like`           | ✖        | —           | Intrinsic XYZ Euler angles in radians. Ignored when `quaternion` is given. |
+| quaternion | `QuatLike`           | ✖        | identity    | Local rotation (x, y, z, w).                                               |
+| scale      | `number \| Vec3Like` | ✖        | `1`         | Uniform number or per-axis vector.                                         |
+| visible    | `boolean`            | ✖        | `true`      | Invisible nodes (and their subtrees) are skipped by the renderer.          |
+| label      | `string`             | ✖        | —           | Used in error `where` strings and debugging.                               |
 
 ## Examples
 
 ```ts
-import { group } from "vgpu/scene";
+import { group } from 'vgpu/scene';
 
 group().set({ position: [0, 1, 0], rotation: [0, Math.PI, 0], scale: 2 });
 ```
@@ -304,7 +304,7 @@ Three-component vector input accepted by scene-tree setters: tuples, plain array
 ## Import
 
 ```ts
-import type { Vec3Like } from "vgpu/scene";
+import type { Vec3Like } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -316,7 +316,7 @@ type Vec3Like = readonly [number, number, number] | readonly number[] | Float32A
 ## Examples
 
 ```ts
-import type { Vec3Like } from "vgpu/scene";
+import type { Vec3Like } from 'vgpu/scene';
 
 const up: Vec3Like = [0, 1, 0];
 ```
@@ -335,7 +335,7 @@ Quaternion input (x, y, z, w) accepted by scene-tree setters.
 ## Import
 
 ```ts
-import type { QuatLike } from "vgpu/scene";
+import type { QuatLike } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -347,7 +347,7 @@ type QuatLike = readonly [number, number, number, number] | readonly number[] | 
 ## Examples
 
 ```ts
-import type { QuatLike } from "vgpu/scene";
+import type { QuatLike } from 'vgpu/scene';
 
 const identity: QuatLike = [0, 0, 0, 1];
 ```
@@ -365,31 +365,31 @@ Discriminator for scene-tree node types, used by renderers and traversal code.
 ## Import
 
 ```ts
-import type { SceneNodeKind } from "vgpu/scene";
+import type { SceneNodeKind } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 type SceneNodeKind =
-  | "scene"
-  | "group"
-  | "mesh"
-  | "perspective-camera"
-  | "orthographic-camera"
-  | "directional-light"
-  | "ambient-light";
+  | 'scene'
+  | 'group'
+  | 'mesh'
+  | 'perspective-camera'
+  | 'orthographic-camera'
+  | 'directional-light'
+  | 'ambient-light';
 ```
 
 ## Examples
 
 ```ts
-import { scene, mesh, box, type SceneNode } from "vgpu/scene";
+import { scene, mesh, box, type SceneNode } from 'vgpu/scene';
 
 const root = scene({ children: [mesh(box())] });
 const meshes: SceneNode[] = [];
-root.traverse((node) => {
-  if (node.kind === "mesh") meshes.push(node);
+root.traverse(node => {
+  if (node.kind === 'mesh') meshes.push(node);
 });
 ```
 

@@ -11,8 +11,8 @@ resolving an import graph.
 ## Import
 
 ```ts
-import { reflectSource } from "@vgpu/wgsl/reflect-source";
-import type { EntryPointInfo, Reflection } from "@vgpu/wgsl/reflect-source";
+import { reflectSource } from '@vgpu/wgsl/reflect-source';
+import type { EntryPointInfo, Reflection } from '@vgpu/wgsl/reflect-source';
 ```
 
 ## Signature
@@ -33,7 +33,7 @@ interface Reflection {
 interface EntryPointInfo {
   readonly name: string;
   readonly mangledName: string;
-  readonly stage: "vertex" | "fragment" | "compute";
+  readonly stage: 'vertex' | 'fragment' | 'compute';
   readonly workgroupSize?: readonly [number, number, number];
   readonly inputs?: readonly EntryPointInputInfo[];
   readonly bindings?: readonly BindingRef[];
@@ -55,10 +55,10 @@ prefer `Reflection`.
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| wgsl | string | ✔ | — | A single WGSL module as text. Must not contain top-level `import` — `reflectSource()` reflects one raw string, not an import graph. |
-| path | string | ✖ | `"<runtime>"` | Label attached to diagnostics/positions for this string. Purely cosmetic when you have no real file path. |
+| Param | Type   | Required | Default       | Notes                                                                                                                               |
+| ----- | ------ | -------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| wgsl  | string | ✔        | —             | A single WGSL module as text. Must not contain top-level `import` — `reflectSource()` reflects one raw string, not an import graph. |
+| path  | string | ✖        | `"<runtime>"` | Label attached to diagnostics/positions for this string. Purely cosmetic when you have no real file path.                           |
 
 **Returns:** `Reflection` — the same plain-data shape `resolveShader()` exposes as `ResolvedShader.reflection`: `bindings` (every `@group/@binding` declaration), `entryPoints` (every `@vertex`/`@fragment`/`@compute` function), `overrides`, `featuresRequired`, `aliases`, `structs`, and `hostShareableLayouts` (CPU-memory layout for uniform/storage types).
 
@@ -68,7 +68,7 @@ prefer `Reflection`.
 ## Examples
 
 ```ts
-import { reflectSource } from "@vgpu/wgsl/reflect-source";
+import { reflectSource } from '@vgpu/wgsl/reflect-source';
 
 const reflection = reflectSource(`
 @group(0) @binding(0) var<uniform> scale: f32;
@@ -84,7 +84,7 @@ console.log(reflection.bindings[0]?.group, reflection.bindings[0]?.binding); // 
 ```
 
 ```ts
-import { reflectSource, type EntryPointInfo } from "@vgpu/wgsl/reflect-source";
+import { reflectSource, type EntryPointInfo } from '@vgpu/wgsl/reflect-source';
 
 const reflection = reflectSource(`
 @compute @workgroup_size(64)
@@ -99,22 +99,22 @@ const json = JSON.stringify(entry);
 const copy = { ...entry };
 const keys = Object.keys(entry);
 
-console.log(json.includes("\"stage\":\"compute\""), copy.stage, keys);
+console.log(json.includes('"stage":"compute"'), copy.stage, keys);
 ```
 
 ```ts
-import { reflectSource } from "@vgpu/wgsl/reflect-source";
+import { reflectSource } from '@vgpu/wgsl/reflect-source';
 
 // Serialization survives a structured clone / worker postMessage boundary too — no `toJSON`
 // hook runs, so the clone has exactly the same enumerable own keys as the original.
-const reflection = reflectSource("@fragment\nfn fs_main() -> @location(0) vec4f { return vec4f(1.0); }");
+const reflection = reflectSource('@fragment\nfn fs_main() -> @location(0) vec4f { return vec4f(1.0); }');
 const cloned = structuredClone(reflection.entryPoints[0]);
 console.log(Object.keys(cloned!).length === Object.keys(reflection.entryPoints[0]!).length);
 ```
 
 ## Notes
 
-- **Serialization contract (issue [#252](https://github.com/vercel-labs/vgpu/issues/252)):** every field of `EntryPointInfo` — and of `Reflection` as a whole — is an ordinary enumerable, own, writable property. `JSON.stringify`, `{ ...entry }`, `Object.keys`/`Object.entries`/`Object.assign`, `structuredClone`, and worker `postMessage` all see the complete shape. There is no `toJSON` hook and no hidden/non-enumerable metadata. `workgroupSize`, `inputs`, `bindings`, and `samplingPairs` are simply *absent* (not present as an `undefined`-valued key) when they do not apply, so the key set stays identical across a serialization boundary — an own key valued `undefined` would survive `structuredClone` but get dropped by `JSON.stringify`, which would otherwise make the two disagree.
+- **Serialization contract (issue [#252](https://github.com/vercel-labs/vgpu/issues/252)):** every field of `EntryPointInfo` — and of `Reflection` as a whole — is an ordinary enumerable, own, writable property. `JSON.stringify`, `{ ...entry }`, `Object.keys`/`Object.entries`/`Object.assign`, `structuredClone`, and worker `postMessage` all see the complete shape. There is no `toJSON` hook and no hidden/non-enumerable metadata. `workgroupSize`, `inputs`, `bindings`, and `samplingPairs` are simply _absent_ (not present as an `undefined`-valued key) when they do not apply, so the key set stays identical across a serialization boundary — an own key valued `undefined` would survive `structuredClone` but get dropped by `JSON.stringify`, which would otherwise make the two disagree.
 - `Reflection` and `EntryPointInfo` are the **frozen/stable** reflection shapes: this is the same interface `ResolvedShader.reflection` exposes from `resolveShader()` (`@vgpu/wgsl/runtime`), not a different or looser one. Do not confuse this with `ResolvedShader.entryPoints` from the top-level `@vgpu/wgsl` `compile()` (`npx vgpu docs cat /@vgpu/wgsl/resolved-shader.docs.md`) — that is an unrelated, older, and much simpler `readonly string[]` of matched entry-point names with no bindings/stage/inputs. `reflectSource()`/`resolveShader()`'s `EntryPointInfo[]` is the one to reach for whenever you need stage, workgroup size, vertex inputs, or bound resources.
 - `reflectSource()` only accepts a single raw WGSL string with no imports. If your WGSL imports other modules, call `resolveShader()` (`@vgpu/wgsl/runtime`) instead and read `.reflection` off the result — it walks the same scanner/parser/`ReflectionFacade` path and returns the identical `Reflection` shape.
 - `bindings`/`samplingPairs` on an `EntryPointInfo` are scoped to that entry point and its transitive callees (a conservative "used by the whole module" fallback applies when static analysis cannot prove otherwise); `Reflection.bindings` at the top level lists every declared `@group/@binding` in the module regardless of which entry points use it.

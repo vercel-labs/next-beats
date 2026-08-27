@@ -7,20 +7,20 @@ Type alias for scene cameras returned by `perspectiveCamera()` and `orthographic
 ## Import
 
 ```ts
-import type { Camera } from "vgpu/scene";
+import type { Camera } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-type Camera = import("vgpu/scene").SceneCamera;
+type Camera = import('vgpu/scene').SceneCamera;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| Camera | `SceneCamera` | ✔ | — | Alias that keeps helper and consumer types in sync. |
+| Param  | Type          | Required | Default | Notes                                               |
+| ------ | ------------- | -------- | ------- | --------------------------------------------------- |
+| Camera | `SceneCamera` | ✔        | —       | Alias that keeps helper and consumer types in sync. |
 
 **Returns:** Not a callable; this alias ensures `perspectiveCamera()` and `orthographicCamera()` share the same contract.
 
@@ -29,8 +29,8 @@ type Camera = import("vgpu/scene").SceneCamera;
 ## Examples
 
 ```ts
-import type { Camera } from "vgpu/scene";
-import { perspectiveCamera } from "vgpu/scene";
+import type { Camera } from 'vgpu/scene';
+import { perspectiveCamera } from 'vgpu/scene';
 
 const camera: Camera = perspectiveCamera({
   fov: 60,
@@ -54,7 +54,7 @@ Common contract of stateful camera nodes: column-major matrices plus the camera 
 ## Import
 
 ```ts
-import type { SceneCamera } from "vgpu/scene";
+import type { SceneCamera } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -72,14 +72,14 @@ interface SceneCamera {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| viewProjection | `Float32Array` | ✔ | — | Column-major projection × view matrix. Bind this to your WGSL uniforms. |
-| viewProjectionMatrix | `Float32Array` | ✔ | — | Alias of `viewProjection`, kept for naming continuity. |
-| position | `Float32Array` | ✔ | — | Local position (world position for unparented cameras). Mutate via `set()`. |
-| view | `Float32Array` | ✔ | — | Inverse of the camera node's world matrix. |
-| projection | `Float32Array` | ✔ | — | Projection matrix derived from the camera's parameters. |
-| worldPosition | `Float32Array` | ✔ | — | World position used for specular highlights or parallax. |
+| Field                | Type           | Required | Default | Notes                                                                       |
+| -------------------- | -------------- | -------- | ------- | --------------------------------------------------------------------------- |
+| viewProjection       | `Float32Array` | ✔        | —       | Column-major projection × view matrix. Bind this to your WGSL uniforms.     |
+| viewProjectionMatrix | `Float32Array` | ✔        | —       | Alias of `viewProjection`, kept for naming continuity.                      |
+| position             | `Float32Array` | ✔        | —       | Local position (world position for unparented cameras). Mutate via `set()`. |
+| view                 | `Float32Array` | ✔        | —       | Inverse of the camera node's world matrix.                                  |
+| projection           | `Float32Array` | ✔        | —       | Projection matrix derived from the camera's parameters.                     |
+| worldPosition        | `Float32Array` | ✔        | —       | World position used for specular highlights or parallax.                    |
 
 **Returns:** Not a callable — the interface describes what camera helpers return.
 
@@ -88,7 +88,7 @@ interface SceneCamera {
 ## Examples
 
 ```ts
-import { perspectiveCamera } from "vgpu/scene";
+import { perspectiveCamera } from 'vgpu/scene';
 
 const camera = perspectiveCamera({
   fov: 50,
@@ -115,7 +115,7 @@ Input-friendly vector type accepted by camera helpers. Accepts tuple literals or
 ## Import
 
 ```ts
-import type { CameraVec3 } from "vgpu/scene";
+import type { CameraVec3 } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -126,10 +126,10 @@ type CameraVec3 = readonly [number, number, number] | Float32Array;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| tuple form | `readonly [number, number, number]` | ✔ | — | Pass literal XYZ coordinates without allocations. |
-| typed array form | `Float32Array` | ✔ | — | Use when positions already live in typed arrays (e.g. math libraries). |
+| Param            | Type                                | Required | Default | Notes                                                                  |
+| ---------------- | ----------------------------------- | -------- | ------- | ---------------------------------------------------------------------- |
+| tuple form       | `readonly [number, number, number]` | ✔        | —       | Pass literal XYZ coordinates without allocations.                      |
+| typed array form | `Float32Array`                      | ✔        | —       | Use when positions already live in typed arrays (e.g. math libraries). |
 
 **Returns:** Not a callable — this is the accepted input type for camera helpers.
 
@@ -138,7 +138,7 @@ type CameraVec3 = readonly [number, number, number] | Float32Array;
 ## Examples
 
 ```ts
-import type { CameraVec3 } from "vgpu/scene";
+import type { CameraVec3 } from 'vgpu/scene';
 
 const orbitPos: CameraVec3 = new Float32Array([0, 3, 5]);
 ```
@@ -157,7 +157,7 @@ Type-only re-export of the `Vec3` alias from `wgpu-matrix`. Used internally by l
 ## Import
 
 ```ts
-import type { Vec3 } from "vgpu/scene";
+import type { Vec3 } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -168,9 +168,9 @@ type Vec3 = Float32Array;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| Vec3 | `Float32Array` | ✔ | — | Column vector used by low-level helpers; provided for users wiring math utilities. |
+| Param | Type           | Required | Default | Notes                                                                              |
+| ----- | -------------- | -------- | ------- | ---------------------------------------------------------------------------------- |
+| Vec3  | `Float32Array` | ✔        | —       | Column vector used by low-level helpers; provided for users wiring math utilities. |
 
 **Returns:** Not a callable.
 
@@ -179,7 +179,7 @@ type Vec3 = Float32Array;
 ## Examples
 
 ```ts
-import type { Vec3 } from "vgpu/scene";
+import type { Vec3 } from 'vgpu/scene';
 
 const up: Vec3 = new Float32Array([0, 1, 0]);
 ```
@@ -198,7 +198,7 @@ Type-only re-export of the column-major 4×4 matrix type from `wgpu-matrix`. Hel
 ## Import
 
 ```ts
-import type { Mat4 } from "vgpu/scene";
+import type { Mat4 } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -209,9 +209,9 @@ type Mat4 = Float32Array;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| Mat4 | `Float32Array` | ✔ | — | Column-major 4×4 matrix used across scene helpers. |
+| Param | Type           | Required | Default | Notes                                              |
+| ----- | -------------- | -------- | ------- | -------------------------------------------------- |
+| Mat4  | `Float32Array` | ✔        | —       | Column-major 4×4 matrix used across scene helpers. |
 
 **Returns:** Not a callable.
 
@@ -220,14 +220,9 @@ type Mat4 = Float32Array;
 ## Examples
 
 ```ts
-import type { Mat4 } from "vgpu/scene";
+import type { Mat4 } from 'vgpu/scene';
 
-const identity: Mat4 = new Float32Array([
-  1, 0, 0, 0,
-  0, 1, 0, 0,
-  0, 0, 1, 0,
-  0, 0, 0, 1,
-]);
+const identity: Mat4 = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 ```
 
 ## Notes

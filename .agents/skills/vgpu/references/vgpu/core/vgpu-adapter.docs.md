@@ -7,13 +7,13 @@
 ## Import
 
 ```ts
-import type { VGPUAdapter } from "vgpu/core";
+import type { VGPUAdapter } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device, RequiredDeviceLimits } from "vgpu/core";
+import type { Device, RequiredDeviceLimits } from 'vgpu/core';
 
 interface CreateDeviceOptions {
   readonly powerPreference?: GPUPowerPreference;
@@ -31,13 +31,13 @@ interface VGPUAdapter {
 
 ### `requestDevice(opts?)` / `CreateDeviceOptions`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `CreateDeviceOptions` | ✖ | `undefined` | Device request options. Concrete adapters may accept additional adapter-specific keys, but this is the core portable subset. |
-| opts.powerPreference | `GPUPowerPreference` | ✖ | `undefined` | Passed to adapter selection by browser/node implementations. The mock adapter ignores it. |
-| opts.requiredFeatures | `readonly GPUFeatureName[]` | ✖ | `undefined` | Forwarded to native `adapter.requestDevice({ requiredFeatures })` by browser/node implementations after a `validateRequiredFeatures` check against the adapter's supported features (unsupported names throw `VGPU-FEATURE-UNSUPPORTED`). The mock adapter honors it against its declared `createMockAdapter({ features })` set and enables exactly the requested features on the device. |
-| opts.requiredLimits | `RequiredDeviceLimits` | ✖ | `undefined` | Forwarded unchanged to native `adapter.requestDevice({ requiredLimits })`; custom/mock adapters receive the same option. |
-| opts.label | `string` | ✖ | `undefined` | Node adapter assigns it to `GPUDevice.label`; browser core request path currently does not assign it in `vgpu-api`, and the mock adapter ignores it. |
+| Param                 | Type                        | Required | Default     | Notes                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------- | --------------------------- | -------: | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| opts                  | `CreateDeviceOptions`       |        ✖ | `undefined` | Device request options. Concrete adapters may accept additional adapter-specific keys, but this is the core portable subset.                                                                                                                                                                                                                                                              |
+| opts.powerPreference  | `GPUPowerPreference`        |        ✖ | `undefined` | Passed to adapter selection by browser/node implementations. The mock adapter ignores it.                                                                                                                                                                                                                                                                                                 |
+| opts.requiredFeatures | `readonly GPUFeatureName[]` |        ✖ | `undefined` | Forwarded to native `adapter.requestDevice({ requiredFeatures })` by browser/node implementations after a `validateRequiredFeatures` check against the adapter's supported features (unsupported names throw `VGPU-FEATURE-UNSUPPORTED`). The mock adapter honors it against its declared `createMockAdapter({ features })` set and enables exactly the requested features on the device. |
+| opts.requiredLimits   | `RequiredDeviceLimits`      |        ✖ | `undefined` | Forwarded unchanged to native `adapter.requestDevice({ requiredLimits })`; custom/mock adapters receive the same option.                                                                                                                                                                                                                                                                  |
+| opts.label            | `string`                    |        ✖ | `undefined` | Node adapter assigns it to `GPUDevice.label`; browser core request path currently does not assign it in `vgpu-api`, and the mock adapter ignores it.                                                                                                                                                                                                                                      |
 
 **Returns:** `requestDevice(opts?)` returns `Promise<Device>` wrapping the raw `GPUDevice` created by the concrete adapter.
 
@@ -51,11 +51,11 @@ interface VGPUAdapter {
 ## Examples
 
 ```ts
-import type { Device, VGPUAdapter } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import type { Device, VGPUAdapter } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 async function withDevice(adapter: VGPUAdapter): Promise<Device> {
-  return adapter.requestDevice({ label: "example-device" });
+  return adapter.requestDevice({ label: 'example-device' });
 }
 
 const device = await withDevice(createMockAdapter());
@@ -64,17 +64,17 @@ device.destroy();
 ```
 
 ```ts
-import type { VGPUAdapter } from "vgpu/core";
-import { createMockAdapter } from "vgpu/mock";
+import type { VGPUAdapter } from 'vgpu/core';
+import { createMockAdapter } from 'vgpu/mock';
 
 const adapter: VGPUAdapter = createMockAdapter();
 const device = await adapter.requestDevice({
-  powerPreference: "high-performance",
+  powerPreference: 'high-performance',
   requiredFeatures: [],
   requiredLimits: {},
 });
 
-const buffer = device.createBuffer({ size: 4, usage: ["copy_dst", "copy_src"] });
+const buffer = device.createBuffer({ size: 4, usage: ['copy_dst', 'copy_src'] });
 buffer.write(new Uint32Array([42]));
 console.log(new Uint32Array(await buffer.read(4))[0]);
 

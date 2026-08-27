@@ -7,14 +7,14 @@ Low-level render bundle helper around `GPUDevice.createRenderBundleEncoder`. Pre
 ## Import
 
 ```ts
-import { createRenderBundle, RenderBundleRecorder } from "vgpu/core";
-import type { RenderBundleOptions } from "vgpu/core";
+import { createRenderBundle, RenderBundleRecorder } from 'vgpu/core';
+import type { RenderBundleOptions } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Buffer } from "vgpu/core";
+import type { Buffer } from 'vgpu/core';
 
 declare interface RenderPassDrawOptions {
   readonly vertexCount: number;
@@ -50,29 +50,29 @@ declare function createRenderBundle(device: { readonly gpu: GPUDevice }, opts: R
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `{ readonly gpu: GPUDevice }` | ✔ | — | Core `Device` or any wrapper exposing a native `GPUDevice` as `.gpu`. |
-| opts | `RenderBundleOptions` | ✔ | — | Native render bundle encoder options plus callback. |
-| opts.label | `string` | ✖ | `undefined` | Passed to `createRenderBundleEncoder` and `finish`. |
-| opts.colorFormats | `readonly (GPUTextureFormat \| null)[]` | ✔ | — | Must match the render pass where the bundle will execute. |
-| opts.depthStencilFormat | `GPUTextureFormat` | ✖ | `undefined` | Required when the replay pass has depth/stencil. |
-| opts.sampleCount | `number` | ✖ | WebGPU encoder default (`1`) | Must match replay pass sample count. main API (`vgpu`) passes `target.sampleCount`. |
-| opts.depthReadOnly | `boolean` | ✖ | `undefined` | Forwarded to WebGPU encoder descriptor. |
-| opts.stencilReadOnly | `boolean` | ✖ | `undefined` | Forwarded to WebGPU encoder descriptor. |
-| opts.record | `(bundle: RenderBundleRecorder) => void` | ✔ | — | Called synchronously before `encoder.finish()`. |
-| recorder.setPipeline.pipeline | `GPURenderPipeline` | ✔ | — | Native pipeline compatible with bundle formats. |
-| recorder.setBindGroup.index | `number` | ✔ | — | Bind group slot. |
-| recorder.setBindGroup.group | `GPUBindGroup \| null` | ✔ | — | Native bind group or `null`. |
-| recorder.setBindGroup.dynamicOffsets | `readonly GPUBufferDynamicOffset[] \| Uint32Array` | ✖ | `undefined` | Forwarded to `setBindGroup`. |
-| recorder.setVertexBuffer.slot | `number` | ✔ | — | Vertex buffer slot. |
-| recorder.setVertexBuffer.buffer | `Buffer \| GPUBuffer \| null` | ✔ | — | Core `Buffer` is unwrapped to `.gpu`; native buffer and `null` pass through. |
-| recorder.setVertexBuffer.offset | `number` | ✖ | `0` | Byte offset. |
-| recorder.setVertexBuffer.size | `GPUSize64` | ✖ | `undefined` | Byte size. |
-| recorder.draw.options.vertexCount | `number` | ✔ | — | Object overload vertex count. |
-| recorder.draw.options.instanceCount | `number` | ✖ | `1` | Object overload instance count. |
-| recorder.draw.options.firstVertex | `number` | ✖ | `0` | Object overload first vertex. |
-| recorder.draw.options.firstInstance | `number` | ✖ | `0` | Object overload first instance. |
+| Param                                | Type                                               | Required | Default                      | Notes                                                                               |
+| ------------------------------------ | -------------------------------------------------- | -------: | ---------------------------- | ----------------------------------------------------------------------------------- |
+| device                               | `{ readonly gpu: GPUDevice }`                      |        ✔ | —                            | Core `Device` or any wrapper exposing a native `GPUDevice` as `.gpu`.               |
+| opts                                 | `RenderBundleOptions`                              |        ✔ | —                            | Native render bundle encoder options plus callback.                                 |
+| opts.label                           | `string`                                           |        ✖ | `undefined`                  | Passed to `createRenderBundleEncoder` and `finish`.                                 |
+| opts.colorFormats                    | `readonly (GPUTextureFormat \| null)[]`            |        ✔ | —                            | Must match the render pass where the bundle will execute.                           |
+| opts.depthStencilFormat              | `GPUTextureFormat`                                 |        ✖ | `undefined`                  | Required when the replay pass has depth/stencil.                                    |
+| opts.sampleCount                     | `number`                                           |        ✖ | WebGPU encoder default (`1`) | Must match replay pass sample count. main API (`vgpu`) passes `target.sampleCount`. |
+| opts.depthReadOnly                   | `boolean`                                          |        ✖ | `undefined`                  | Forwarded to WebGPU encoder descriptor.                                             |
+| opts.stencilReadOnly                 | `boolean`                                          |        ✖ | `undefined`                  | Forwarded to WebGPU encoder descriptor.                                             |
+| opts.record                          | `(bundle: RenderBundleRecorder) => void`           |        ✔ | —                            | Called synchronously before `encoder.finish()`.                                     |
+| recorder.setPipeline.pipeline        | `GPURenderPipeline`                                |        ✔ | —                            | Native pipeline compatible with bundle formats.                                     |
+| recorder.setBindGroup.index          | `number`                                           |        ✔ | —                            | Bind group slot.                                                                    |
+| recorder.setBindGroup.group          | `GPUBindGroup \| null`                             |        ✔ | —                            | Native bind group or `null`.                                                        |
+| recorder.setBindGroup.dynamicOffsets | `readonly GPUBufferDynamicOffset[] \| Uint32Array` |        ✖ | `undefined`                  | Forwarded to `setBindGroup`.                                                        |
+| recorder.setVertexBuffer.slot        | `number`                                           |        ✔ | —                            | Vertex buffer slot.                                                                 |
+| recorder.setVertexBuffer.buffer      | `Buffer \| GPUBuffer \| null`                      |        ✔ | —                            | Core `Buffer` is unwrapped to `.gpu`; native buffer and `null` pass through.        |
+| recorder.setVertexBuffer.offset      | `number`                                           |        ✖ | `0`                          | Byte offset.                                                                        |
+| recorder.setVertexBuffer.size        | `GPUSize64`                                        |        ✖ | `undefined`                  | Byte size.                                                                          |
+| recorder.draw.options.vertexCount    | `number`                                           |        ✔ | —                            | Object overload vertex count.                                                       |
+| recorder.draw.options.instanceCount  | `number`                                           |        ✖ | `1`                          | Object overload instance count.                                                     |
+| recorder.draw.options.firstVertex    | `number`                                           |        ✖ | `0`                          | Object overload first vertex.                                                       |
+| recorder.draw.options.firstInstance  | `number`                                           |        ✖ | `0`                          | Object overload first instance.                                                     |
 
 **Returns:** `createRenderBundle()` returns `GPURenderBundle`; recorder methods return `void`.
 
@@ -81,13 +81,13 @@ declare function createRenderBundle(device: { readonly gpu: GPUDevice }, opts: R
 ## Examples
 
 ```ts
-import { init } from "vgpu/mock";
-import { createRenderBundle } from "vgpu/core";
+import { init } from 'vgpu/mock';
+import { createRenderBundle } from 'vgpu/core';
 
 const gpu = await init();
 const bundle = createRenderBundle(gpu.device, {
-  label: "empty",
-  colorFormats: ["rgba8unorm"],
+  label: 'empty',
+  colorFormats: ['rgba8unorm'],
   sampleCount: 1,
   record(recorder) {
     void recorder;
@@ -97,13 +97,13 @@ void bundle;
 ```
 
 ```ts
-import { init, target } from "vgpu/mock";
-import { createRenderBundle } from "vgpu/core";
+import { init, target } from 'vgpu/mock';
+import { createRenderBundle } from 'vgpu/core';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [16, 16] });
 const bundle = createRenderBundle(gpu.device, {
-  colorFormats: colorTarget.colors.map((color) => color.format),
+  colorFormats: colorTarget.colors.map(color => color.format),
   depthStencilFormat: colorTarget.depth?.format,
   sampleCount: colorTarget.sampleCount,
   record(recorder) {

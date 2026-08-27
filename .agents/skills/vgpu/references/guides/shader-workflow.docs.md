@@ -52,26 +52,29 @@ npx vgpu doctor --pretty
 Do not open a browser to see whether a shader draws. Render one frame headless, read the pixels, and write a PNG you can open:
 
 ```ts
-import { writeFileSync } from "node:fs";
-import { PNG } from "pngjs";
-import { init, effect, target } from "vgpu/node";
+import { writeFileSync } from 'node:fs';
+import { PNG } from 'pngjs';
+import { init, effect, target } from 'vgpu/node';
 
 const width = 320;
 const height = 180;
 const gpu = await init();
 const colorTarget = target(gpu, { size: [width, height] });
 
-effect(gpu, `
+effect(
+  gpu,
+  `
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv, 0.5, 1.0);
   }
-`).draw(colorTarget);
+`,
+).draw(colorTarget);
 
-const pixels = await colorTarget.read();          // RGBA bytes, row-major, no padding
+const pixels = await colorTarget.read(); // RGBA bytes, row-major, no padding
 const png = new PNG({ width, height });
 png.data.set(pixels);
-writeFileSync("frame.png", PNG.sync.write(png));
-gpu.dispose();                                // stops Dawn's polling so the process exits
+writeFileSync('frame.png', PNG.sync.write(png));
+gpu.dispose(); // stops Dawn's polling so the process exits
 ```
 
 Keep the target small (a few hundred pixels wide) so the loop stays fast on a CPU renderer. Assert on `pixels` when you know the expected value; open the PNG when you need to judge composition. See [Getting started](getting-started.docs.md) for the same pattern without PNG encoding.

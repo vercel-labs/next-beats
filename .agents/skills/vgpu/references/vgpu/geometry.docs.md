@@ -7,15 +7,15 @@ Creates an immutable vertex/index layout plus mutable GPU buffers for `draw(gpu)
 ## Import
 
 ```ts
-import type { Geometry, GeometryOptions, GeometryBufferOptions, GeometrySliceOptions } from "vgpu";
-import { box } from "vgpu/scene";
+import type { Geometry, GeometryOptions, GeometryBufferOptions, GeometrySliceOptions } from 'vgpu';
+import { box } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface Gpu {
-  geometry(geometry: import("vgpu/scene").SceneGeometry): Geometry;
+  geometry(geometry: import('vgpu/scene').SceneGeometry): Geometry;
   geometry(options: GeometryOptions): Geometry;
 }
 
@@ -110,129 +110,135 @@ interface DrawCallOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| geometry | `SceneGeometry` | ✔ | — | v1 primitive sugar path. Emits pinned locations: `position` → `@location(0)`, `normal` → `@location(1)`, `uv` → `@location(2)`. |
-| options.buffers | `readonly GeometryBufferOptions[]` | ✔ | — | Vertex buffer streams. Maximum 8. |
-| buffer.attributes | `GeometryAttributes` | ✔ | — | Record form only. Key is the WGSL vertex input name unless `location` is specified. Maximum 16 attributes total. |
-| attribute format | `GPUVertexFormat` | ✔ | — | Shorthand value: `{ position: "float32x3" }`. |
-| attribute.offset | `number` | ✖ | tight-packed order | Byte offset within the stream. Integer-like attribute keys are rejected to avoid JavaScript key reordering. |
-| attribute.location | `number` | ✖ | shader name match | Explicit shader location. When present, the record key is only a label. |
-| buffer.data | `GeometryData` | ✖ | — | Creates an owned `["vertex", "copy_dst"]` buffer and uploads the initial data. Mutually exclusive with `buffer`. |
-| buffer.buffer | `GPUBuffer` | ✖ | — | Caller-owned escape hatch. Mutually exclusive with `data`; not destroyed by `geometry.destroy()`. |
-| buffer.stride | `number` | ✖ | `roundUp4(sum(format sizes))` | Explicit stride for padded/interleaved data. Must be valid for WebGPU vertex buffers. |
-| buffer.stepMode | `"vertex" \| "instance"` | ✖ | `"vertex"` | Instance streams derive `geometry.instanceCount` from the first instance buffer with data. |
-| options.vertexCount | `number` | ✖ | derived | Derived from the first vertex-step buffer with data. |
-| options.instanceCount | `number` | ✖ | derived | Draw default after `DrawCallOptions.instances` and `DrawOptions.instances`. |
-| options.indices | `Uint16Array \| Uint32Array \| readonly number[]` | ✖ | — | Creates an owned `["index", "copy_dst"]` index buffer. `Uint16Array` infers `"uint16"`; otherwise `"uint32"`. |
-| options.indexBuffer | `GPUBuffer` | ✖ | — | Caller-owned index buffer escape hatch. Pair with `indexFormat` and `indexCount`. |
-| options.topology | `GPUPrimitiveTopology` | ✖ | `"triangle-list"` | Pipeline-affecting geometry topology. Strip topologies derive `stripIndexFormat` from `indexFormat`. |
-| geometry.slice.opts | `GeometrySliceOptions` | ✖ | full range | Frozen range view sharing buffers and layout identity with the parent geometry. |
-| geometry.write.data | `GeometryData` | ✔ | — | Writes to buffer 0 using `queue.writeBuffer`. No resize. |
-| geometry.writeIndices.data | `Uint16Array \| Uint32Array` | ✔ | — | Writes to an index buffer owned from `options.indices`. Write caller-owned `indexBuffer` objects directly. No resize. |
+| Field                      | Type                                              | Required | Default                       | Notes                                                                                                                           |
+| -------------------------- | ------------------------------------------------- | -------: | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| geometry                   | `SceneGeometry`                                   |        ✔ | —                             | v1 primitive sugar path. Emits pinned locations: `position` → `@location(0)`, `normal` → `@location(1)`, `uv` → `@location(2)`. |
+| options.buffers            | `readonly GeometryBufferOptions[]`                |        ✔ | —                             | Vertex buffer streams. Maximum 8.                                                                                               |
+| buffer.attributes          | `GeometryAttributes`                              |        ✔ | —                             | Record form only. Key is the WGSL vertex input name unless `location` is specified. Maximum 16 attributes total.                |
+| attribute format           | `GPUVertexFormat`                                 |        ✔ | —                             | Shorthand value: `{ position: "float32x3" }`.                                                                                   |
+| attribute.offset           | `number`                                          |        ✖ | tight-packed order            | Byte offset within the stream. Integer-like attribute keys are rejected to avoid JavaScript key reordering.                     |
+| attribute.location         | `number`                                          |        ✖ | shader name match             | Explicit shader location. When present, the record key is only a label.                                                         |
+| buffer.data                | `GeometryData`                                    |        ✖ | —                             | Creates an owned `["vertex", "copy_dst"]` buffer and uploads the initial data. Mutually exclusive with `buffer`.                |
+| buffer.buffer              | `GPUBuffer`                                       |        ✖ | —                             | Caller-owned escape hatch. Mutually exclusive with `data`; not destroyed by `geometry.destroy()`.                               |
+| buffer.stride              | `number`                                          |        ✖ | `roundUp4(sum(format sizes))` | Explicit stride for padded/interleaved data. Must be valid for WebGPU vertex buffers.                                           |
+| buffer.stepMode            | `"vertex" \| "instance"`                          |        ✖ | `"vertex"`                    | Instance streams derive `geometry.instanceCount` from the first instance buffer with data.                                      |
+| options.vertexCount        | `number`                                          |        ✖ | derived                       | Derived from the first vertex-step buffer with data.                                                                            |
+| options.instanceCount      | `number`                                          |        ✖ | derived                       | Draw default after `DrawCallOptions.instances` and `DrawOptions.instances`.                                                     |
+| options.indices            | `Uint16Array \| Uint32Array \| readonly number[]` |        ✖ | —                             | Creates an owned `["index", "copy_dst"]` index buffer. `Uint16Array` infers `"uint16"`; otherwise `"uint32"`.                   |
+| options.indexBuffer        | `GPUBuffer`                                       |        ✖ | —                             | Caller-owned index buffer escape hatch. Pair with `indexFormat` and `indexCount`.                                               |
+| options.topology           | `GPUPrimitiveTopology`                            |        ✖ | `"triangle-list"`             | Pipeline-affecting geometry topology. Strip topologies derive `stripIndexFormat` from `indexFormat`.                            |
+| geometry.slice.opts        | `GeometrySliceOptions`                            |        ✖ | full range                    | Frozen range view sharing buffers and layout identity with the parent geometry.                                                 |
+| geometry.write.data        | `GeometryData`                                    |        ✔ | —                             | Writes to buffer 0 using `queue.writeBuffer`. No resize.                                                                        |
+| geometry.writeIndices.data | `Uint16Array \| Uint32Array`                      |        ✔ | —                             | Writes to an index buffer owned from `options.indices`. Write caller-owned `indexBuffer` objects directly. No resize.           |
 
 **Returns:** `geometry(gpu)` returns `Geometry`; `geometry.slice()` returns `GeometrySlice`; `write()`, `writeIndices()`, and `destroy()` return `void`.
 
 ## Error codes
 
-| Code | When | Fix |
-|---|---|---|
-| `VGPU-MESH-LAYOUT-INVALID` | Invalid stride/offset/format, both `data` and `buffer`, or integer-like attribute key. | Use record keys that are names, align offsets/strides, and choose one data source. |
-| `VGPU-MESH-LIMIT-EXCEEDED` | More than 8 buffers or 16 attributes. | Split draws or reduce streams/attributes. |
-| `VGPU-MESH-LOCATION-CONFLICT` | Duplicate explicit `location` values. | Give each explicit shader location once. |
-| `VGPU-MESH-DATA-MISALIGNED` | Data byte length is not divisible by stride, or index bytes do not match format. | Repack data or pass an explicit `stride`. |
-| `VGPU-MESH-RANGE-INVALID` | Slice or draw-time range is negative, non-integer, outside parent counts, or uses index ranges on non-indexed geometries. | Clamp ranges and use indexed fields only with indexed geometries. |
-| `VGPU-MESH-WRITE-RANGE` | `write()` or `writeIndices()` would overflow the fixed buffer. | Create a larger geometry; writes do not resize buffers. |
-| `VGPU-MESH-ATTRIBUTE-UNMATCHED` | Named geometry attribute has no vertex-stage shader input. | Rename the attribute or specify `location`. |
-| `VGPU-MESH-INPUT-MISSING` | Shader declares an uncovered `@location` input. | Add the geometry attribute or remove the shader input. |
-| `VGPU-MESH-FORMAT-MISMATCH` | Vertex format base type does not match the WGSL input base type. | Use a compatible `GPUVertexFormat`; width differences are allowed by WebGPU. |
+| Code                            | When                                                                                                                      | Fix                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `VGPU-MESH-LAYOUT-INVALID`      | Invalid stride/offset/format, both `data` and `buffer`, or integer-like attribute key.                                    | Use record keys that are names, align offsets/strides, and choose one data source. |
+| `VGPU-MESH-LIMIT-EXCEEDED`      | More than 8 buffers or 16 attributes.                                                                                     | Split draws or reduce streams/attributes.                                          |
+| `VGPU-MESH-LOCATION-CONFLICT`   | Duplicate explicit `location` values.                                                                                     | Give each explicit shader location once.                                           |
+| `VGPU-MESH-DATA-MISALIGNED`     | Data byte length is not divisible by stride, or index bytes do not match format.                                          | Repack data or pass an explicit `stride`.                                          |
+| `VGPU-MESH-RANGE-INVALID`       | Slice or draw-time range is negative, non-integer, outside parent counts, or uses index ranges on non-indexed geometries. | Clamp ranges and use indexed fields only with indexed geometries.                  |
+| `VGPU-MESH-WRITE-RANGE`         | `write()` or `writeIndices()` would overflow the fixed buffer.                                                            | Create a larger geometry; writes do not resize buffers.                            |
+| `VGPU-MESH-ATTRIBUTE-UNMATCHED` | Named geometry attribute has no vertex-stage shader input.                                                                | Rename the attribute or specify `location`.                                        |
+| `VGPU-MESH-INPUT-MISSING`       | Shader declares an uncovered `@location` input.                                                                           | Add the geometry attribute or remove the shader input.                             |
+| `VGPU-MESH-FORMAT-MISMATCH`     | Vertex format base type does not match the WGSL input base type.                                                          | Use a compatible `GPUVertexFormat`; width differences are allowed by WebGPU.       |
 
 ## Examples
 
 ```ts
-import { init, geometry } from "vgpu/mock";
+import { init, geometry } from 'vgpu/mock';
 
 const gpu = await init();
-const positions = new Float32Array([
-  -1, -1, 0,
-   1, -1, 0,
-   0,  1, 0,
-]);
+const positions = new Float32Array([-1, -1, 0, 1, -1, 0, 0, 1, 0]);
 
 const triangle = geometry(gpu, {
-  buffers: [{
-    data: positions,
-    attributes: { position: "float32x3" },
-  }],
-});
-```
-
-```ts
-import { init, geometry } from "vgpu/mock";
-
-const gpu = await init();
-const ledVertices = new Float32Array(6 * 6);
-const ledGeometry = geometry(gpu, {
-  label: "triangle-led-front-led-emitters",
-  buffers: [{
-    data: ledVertices,
-    stride: 24,
-    attributes: {
-      position: "float32x2",
-      local: "float32x2",
-      led_index: "float32",
-    },
-  }],
-});
-```
-
-```ts
-import { init, geometry } from "vgpu/mock";
-
-const gpu = await init();
-const quadCorners = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
-const instanceData = new Float32Array(4 * 10);
-const particles = geometry(gpu, {
-  topology: "triangle-strip",
   buffers: [
-    { data: quadCorners, attributes: { corner: "float32x2" } },
-    { stepMode: "instance", data: instanceData, attributes: {
-      i_pos: "float32x3",
-      i_color: { format: "unorm8x4", location: 5 },
-    } },
+    {
+      data: positions,
+      attributes: { position: 'float32x3' },
+    },
   ],
 });
 ```
 
 ```ts
-import { init, draw, geometry } from "vgpu/mock";
+import { init, geometry } from 'vgpu/mock';
+
+const gpu = await init();
+const ledVertices = new Float32Array(6 * 6);
+const ledGeometry = geometry(gpu, {
+  label: 'triangle-led-front-led-emitters',
+  buffers: [
+    {
+      data: ledVertices,
+      stride: 24,
+      attributes: {
+        position: 'float32x2',
+        local: 'float32x2',
+        led_index: 'float32',
+      },
+    },
+  ],
+});
+```
+
+```ts
+import { init, geometry } from 'vgpu/mock';
+
+const gpu = await init();
+const quadCorners = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+const instanceData = new Float32Array(4 * 10);
+const particles = geometry(gpu, {
+  topology: 'triangle-strip',
+  buffers: [
+    { data: quadCorners, attributes: { corner: 'float32x2' } },
+    {
+      stepMode: 'instance',
+      data: instanceData,
+      attributes: {
+        i_pos: 'float32x3',
+        i_color: { format: 'unorm8x4', location: 5 },
+      },
+    },
+  ],
+});
+```
+
+```ts
+import { init, draw, geometry } from 'vgpu/mock';
 
 const gpu = await init();
 const vertexData = new Float32Array(3 * 4500);
 const allIndices = new Uint32Array(4500);
 const gltfGeometry = geometry(gpu, {
-  buffers: [{ data: vertexData, attributes: { position: "float32x3" } }],
+  buffers: [{ data: vertexData, attributes: { position: 'float32x3' } }],
   indices: allIndices,
 });
 const hull = gltfGeometry.slice({ firstIndex: 0, indexCount: 3600 });
-const glass = gltfGeometry.slice({ firstIndex: 3600, indexCount: 900, label: "glass" });
-const pbrWgsl = "@vertex fn vs_main(@location(0) position: vec3f) -> @builtin(position) vec4f { return vec4f(position, 1); }";
+const glass = gltfGeometry.slice({ firstIndex: 3600, indexCount: 900, label: 'glass' });
+const pbrWgsl =
+  '@vertex fn vs_main(@location(0) position: vec3f) -> @builtin(position) vec4f { return vec4f(position, 1); }';
 
 draw(gpu, { shader: pbrWgsl, geometry: hull });
-draw(gpu, { shader: pbrWgsl, geometry: glass, blend: "alpha" });
+draw(gpu, { shader: pbrWgsl, geometry: glass, blend: 'alpha' });
 ```
 
 ```ts
-import { init, draw, geometry, target } from "vgpu/mock";
+import { init, draw, geometry, target } from 'vgpu/mock';
 
 const gpu = await init();
 const glyphQuads = new Float32Array(4 * 4);
 const quadIndices = new Uint16Array([0, 1, 2, 2, 1, 3]);
 const text = geometry(gpu, {
-  buffers: [{ data: glyphQuads, attributes: { pos: "float32x2", uv: "float32x2" } }],
+  buffers: [{ data: glyphQuads, attributes: { pos: 'float32x2', uv: 'float32x2' } }],
   indices: quadIndices,
 });
-const sdfTextWgsl = "@vertex fn vs_main(@location(0) pos: vec2f, @location(1) uv: vec2f) -> @builtin(position) vec4f { return vec4f(pos, 0, 1); }";
+const sdfTextWgsl =
+  '@vertex fn vs_main(@location(0) pos: vec2f, @location(1) uv: vec2f) -> @builtin(position) vec4f { return vec4f(pos, 0, 1); }';
 const textDraw = draw(gpu, { shader: sdfTextWgsl, geometry: text });
 const colorTarget = target(gpu, { size: [640, 480] });
 
@@ -242,8 +248,8 @@ textDraw.draw({ target: colorTarget, indices: 6 });
 ```
 
 ```ts
-import { init, geometry } from "vgpu/mock";
-import { box } from "vgpu/scene";
+import { init, geometry } from 'vgpu/mock';
+import { box } from 'vgpu/scene';
 
 const gpu = await init();
 const cube = geometry(gpu, box({ size: 2 }));

@@ -24,15 +24,15 @@ export fn hash3(seed: vec3f) -> vec3f;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| value | `u32` | ✔ | — | Input integer for `hashU32`, implemented with Wellons lowbias32 constants. |
-| value | `vec2u` | ✔ | — | Two-dimensional unsigned seed for `pcg2d`; returns two decorrelated unsigned outputs. |
-| value | `vec3u` | ✔ | — | Three-dimensional unsigned seed for `pcg3d`; returns three decorrelated unsigned outputs. |
-| hash | `u32` | ✔ | — | Hash bits passed to `unitFloat`. The low 8 bits are discarded, then the top 24 bits map to `[0.0, 1.0)`. |
-| seed | `f32` | ✔ | — | Float seed for `hash1`; bitcast to `u32` before hashing. `-0.0` and `0.0` hash differently. |
-| seed | `vec2f` | ✔ | — | Float vector seed for `hash2`; bitcast to `vec2u`, hashed with `pcg2d`, converted with `unitFloat`. |
-| seed | `vec3f` | ✔ | — | Float vector seed for `hash3`; bitcast to `vec3u`, hashed with `pcg3d`, converted with `unitFloat`. |
+| Param | Type    | Required | Default | Notes                                                                                                    |
+| ----- | ------- | -------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| value | `u32`   | ✔        | —       | Input integer for `hashU32`, implemented with Wellons lowbias32 constants.                               |
+| value | `vec2u` | ✔        | —       | Two-dimensional unsigned seed for `pcg2d`; returns two decorrelated unsigned outputs.                    |
+| value | `vec3u` | ✔        | —       | Three-dimensional unsigned seed for `pcg3d`; returns three decorrelated unsigned outputs.                |
+| hash  | `u32`   | ✔        | —       | Hash bits passed to `unitFloat`. The low 8 bits are discarded, then the top 24 bits map to `[0.0, 1.0)`. |
+| seed  | `f32`   | ✔        | —       | Float seed for `hash1`; bitcast to `u32` before hashing. `-0.0` and `0.0` hash differently.              |
+| seed  | `vec2f` | ✔        | —       | Float vector seed for `hash2`; bitcast to `vec2u`, hashed with `pcg2d`, converted with `unitFloat`.      |
+| seed  | `vec3f` | ✔        | —       | Float vector seed for `hash3`; bitcast to `vec3u`, hashed with `pcg3d`, converted with `unitFloat`.      |
 
 **Returns:** `hashU32` returns `u32`; `pcg2d`/`pcg3d` return unsigned vectors; `unitFloat` and `hash1` return `f32` in `[0.0, 1.0)`; `hash2`/`hash3` return float vectors with each component in `[0.0, 1.0)`.
 
@@ -49,7 +49,7 @@ fn cellRandom(cell: vec3i) -> f32 {
 }
 `;
 
-console.log(hashWgsl.includes("cellRandom"));
+console.log(hashWgsl.includes('cellRandom'));
 ```
 
 ```ts

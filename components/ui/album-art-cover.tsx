@@ -1,8 +1,9 @@
 'use client';
 
 import { startTransition, useEffect, useRef, useState } from 'react';
-import { effect, frame, frameLoop, init, surface } from 'vgpu';
-import { COVER_LOOP_SECONDS, motifForTitle } from '@/lib/cover-motif';
+import { draw, frame, frameLoop, init, surface } from 'vgpu';
+import { artworkVariant, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
+import type { ArtworkKind } from '@/lib/cover-motif';
 import { cn } from '@/lib/utils';
 import coverShader from './album-art.wgsl';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
@@ -11,11 +12,10 @@ let gpuPromise: Promise<Gpu> | undefined;
 const animatedCovers = new Set<(currentFrame: Frame, time: number) => void>();
 let animationLoop: FrameLoopHandle | undefined;
 
-// One shared loop for every cover on screen, so a page full of covers still costs one
-// frame submission per tick rather than one per cover.
+// All visible large covers share one 15 fps ticker. Each cover remains a separate surface,
+// but there is no React state update and no requestAnimationFrame loop per card.
 function registerAnimatedCover(gpu: Gpu, render: (currentFrame: Frame, time: number) => void) {
   animatedCovers.add(render);
-
   animationLoop ??= frameLoop(
     gpu,
     currentFrame => {
@@ -42,75 +42,64 @@ function getGpu() {
   return gpuPromise;
 }
 
-function seedVector(value: string): [number, number, number, number] {
-  let a = 0x9e3779b9;
-  let b = 0x243f6a88;
-  let c = 0xb7e15162;
-  let d = 0xdeadbeef;
-
-  for (let index = 0; index < value.length; index += 1) {
-    const code = value.charCodeAt(index);
-    a = Math.imul(a ^ code, 2654435761);
-    b = Math.imul(b ^ code, 1597334677);
-    c = Math.imul(c ^ code, 2246822519);
-    d = Math.imul(d ^ code, 3266489917);
-  }
-
-  return [a, b, c, d].map(number => (number >>> 0) / 4294967295) as [number, number, number, number];
-}
-
-export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
-
-const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
-
 type Props = {
   seed: string;
   label: string;
   kind: ArtworkKind;
+  small?: boolean;
 };
 
-export function AlbumArtCover({ seed, label, kind }: Props) {
+const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
+
+export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (small) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     let disposed = false;
     let output: Surface | undefined;
-    let visibilityObserver: IntersectionObserver | undefined;
+    let observer: IntersectionObserver | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
+    const seedValues = seedVector(seed);
+    const variant = artworkVariant(label, kind, seedValues[3]);
 
     void getGpu()
       .then(gpu => {
         if (disposed) return;
-
-        const seedValues = seedVector(seed);
-        const motif = motifForTitle(label, seedValues[3]);
-
-        // Strokes are given in CSS pixels and shapes stay circular, so the shader needs
-        // the element's height and aspect ratio. Both come from the surface's resize
-        // event rather than from the canvas, so drawing never forces a layout.
-        let unit = 2 / 48;
         let aspect = 1;
+        let unit = 2 / 48;
 
         output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
-        const cover = effect(gpu, coverShader, {
+        const cover = draw(gpu, {
+          entry: { fragment: 'fs_main' },
           label: `album-cover-${seed}`,
-          set: { cover: { params: [0, kindIndex[kind], motif, unit], seed: seedValues, shape: [aspect, 0, 0, 0] } },
+          set: {
+            cover: {
+              params: [0, kindIndex[kind], variant, unit],
+              seed: seedValues,
+              shape: [aspect, 1, 0, 0],
+            },
+          },
+          shader: coverShader,
         });
 
         let visible = true;
         let revealed = false;
-        const draw = (currentFrame: Frame, time: number) => {
+        const render = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
-
-          // The shader takes a normalised loop position, not seconds.
-          cover.set({ cover: { params: [time / COVER_LOOP_SECONDS, kindIndex[kind], motif, unit] } });
+          cover.set({
+            cover: {
+              params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, unit],
+              seed: seedValues,
+              shape: [aspect, 1, 0, 0],
+            },
+          });
           currentFrame.pass(output, cover);
-
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
@@ -119,47 +108,41 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
           }
         };
 
-        const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const drawStill = () => {
-          if (!disposed) void frame(gpu, currentFrame => draw(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
-        };
-
-        // Fires once immediately with the current size, then on every resize.
         unsubscribeResize = output.onResize(({ dpr, height, width }) => {
           aspect = height > 0 ? width / height : 1;
           unit = 2 / (height / dpr || 48);
-          cover.set({ cover: { params: [0, kindIndex[kind], motif, unit], shape: [aspect, 0, 0, 0] } });
-          if (still) drawStill();
         });
-
-        visibilityObserver = new IntersectionObserver(entries => {
+        observer = new IntersectionObserver(entries => {
           visible = entries[0]?.isIntersecting ?? true;
         });
-        visibilityObserver.observe(canvas);
-
-        if (!still) unregisterAnimation = registerAnimatedCover(gpu, draw);
+        observer.observe(canvas);
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          void frame(gpu, currentFrame => render(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
+        } else {
+          unregisterAnimation = registerAnimatedCover(gpu, render);
+        }
       })
       .catch(() => {
-        // The CSS gradient stays visible on its own; nothing else is needed.
+        // The type-colour CSS gradient remains visible when WebGPU is unavailable.
       });
 
     return () => {
       disposed = true;
+      observer?.disconnect();
       unregisterAnimation?.();
       unsubscribeResize?.();
-      visibilityObserver?.disconnect();
       output?.dispose();
     };
-  }, [kind, label, seed]);
+  }, [kind, label, seed, small]);
+
+  if (small) return null;
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden
-      // Transparent until the first frame lands, so the CSS gradient below is the
-      // fallback for free -- including when WebGPU is unavailable.
       className={cn(
-        'pointer-events-none absolute inset-0 z-10 block h-full w-full transition-opacity duration-300 ease-out',
+        'pointer-events-none absolute inset-0 z-20 block h-full w-full',
         ready ? 'opacity-100' : 'opacity-0',
       )}
     />

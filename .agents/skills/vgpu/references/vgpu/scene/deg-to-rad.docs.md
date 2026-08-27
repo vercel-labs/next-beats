@@ -7,7 +7,7 @@ Converts degrees to radians for custom scene math. Use it when a shader uniform,
 ## Import
 
 ```ts
-import { degToRad } from "vgpu/scene";
+import { degToRad } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -18,9 +18,9 @@ declare function degToRad(deg: number): number;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| deg | `number` | ✔ | — | Angle in degrees. Positive, negative, fractional, `Infinity`, and `NaN` are passed through JavaScript number arithmetic. |
+| Param | Type     | Required | Default | Notes                                                                                                                    |
+| ----- | -------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| deg   | `number` | ✔        | —       | Angle in degrees. Positive, negative, fractional, `Infinity`, and `NaN` are passed through JavaScript number arithmetic. |
 
 **Returns:** `number` — `deg * Math.PI / 180`, suitable for `Math.sin`, `Math.cos`, matrix helpers, or shader uniforms that expect radians.
 **Throws:** None.
@@ -28,7 +28,7 @@ declare function degToRad(deg: number): number;
 ## Examples
 
 ```ts
-import { degToRad } from "vgpu/scene";
+import { degToRad } from 'vgpu/scene';
 
 const quarterTurn = degToRad(90);
 const rotation = { sinAngle: Math.sin(quarterTurn), cosAngle: Math.cos(quarterTurn) };
@@ -36,7 +36,7 @@ void rotation;
 ```
 
 ```ts
-import { degToRad } from "vgpu/scene";
+import { degToRad } from 'vgpu/scene';
 
 const clockwise = degToRad(-45);
 console.log(clockwise < 0);

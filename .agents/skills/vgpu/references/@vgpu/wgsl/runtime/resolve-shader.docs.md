@@ -7,14 +7,14 @@ Loads a WGSL entry module, resolves vgpu WGSL imports, enforces pure imported mo
 ## Import
 
 ```ts
-import { resolveShader } from "@vgpu/wgsl/runtime";
-import type { ResolveOptions, ResolvedShader } from "@vgpu/wgsl/runtime";
+import { resolveShader } from '@vgpu/wgsl/runtime';
+import type { ResolveOptions, ResolvedShader } from '@vgpu/wgsl/runtime';
 ```
 
 ## Signature
 
 ```ts
-import type { ResolvedShader } from "@vgpu/wgsl/runtime";
+import type { ResolvedShader } from '@vgpu/wgsl/runtime';
 
 interface ResolveOptions {
   readonly entry: string;
@@ -22,8 +22,8 @@ interface ResolveOptions {
   readonly packageMap?: Record<string, string>;
   readonly modules?: Record<string, string>;
   readonly onDependency?: (path: string) => void;
-  readonly validate?: "off" | "auto" | "require" | boolean;
-  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: "none" | "safe" };
+  readonly validate?: 'off' | 'auto' | 'require' | boolean;
+  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: 'none' | 'safe' };
 }
 
 declare function resolveShader(opts: ResolveOptions): Promise<ResolvedShader>;
@@ -31,19 +31,19 @@ declare function resolveShader(opts: ResolveOptions): Promise<ResolvedShader>;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| opts.entry | string | ✔ | — | Entry WGSL module path. With `modules`, it is canonicalized against the virtual module map; without `modules`, it is resolved on disk and may omit `.wgsl` when a matching file or `index.wgsl` exists. The entry may declare `@group/@binding` resources. |
-| opts.rootDir | string | ✖ | `dirname(entry)` for cache-key grouping; no `@/` alias unless provided | Base directory for `@/foo.wgsl` imports. Also used as the default root passed to cache key generation when present. |
-| opts.packageMap | `Record<string, string>` | ✖ | `{}` | Prefix map for package-style WGSL imports. If a specifier starts with a key, the target prefix is joined with the remainder. |
-| opts.modules | `Record<string, string>` | ✖ | filesystem reads | In-memory WGSL filesystem. Keys are normalized with `/`; relative imports use virtual paths and package imports require `packageMap`. |
-| opts.onDependency | `(path: string) => void` | ✖ | no callback | Called once for each imported module as soon as its path resolves, before that module is read or parsed. Already-loaded modules and the entry are omitted. Discovered dependencies are still reported when a later resolution step throws, allowing build tools to watch the files that can repair a failed graph. |
-| opts.validate | `"off" | "auto" | "require" | boolean` | ✖ | `"auto"`, or `VGPU_VALIDATE` when set | Device-backed validation of emitted WGSL (`createShaderModule` plus a compilation-info round trip) through a lazily imported `@vgpu/adapter-node`. `"auto"` attempts validation and throws `VGPU-WGSL-NAGA-UNKNOWN` for invalid WGSL, but when no device/adapter is available it warns once to stderr and continues, recording the skip on `ResolvedShader.validation`. `"require"` (or `true`) throws `VGPU-WGSL-VALIDATE-NO-DEVICE`/`VGPU-WGSL-VALIDATE-ADAPTER-MISSING` instead of skipping. `"off"` (or `false`) never attempts validation and never imports device code. An explicit value here always wins over `VGPU_VALIDATE` (`"off"|"auto"|"require"`; anything else throws `VGPU-WGSL-VALIDATE-ENV-INVALID`). Independent of this option, `minify` with `identifiers: "safe"` always self-checks that renaming left no dangling reference (`VGPU-WGSL-MINIFY-DANGLING-IDENT`), with no GPU involved. |
-| opts.minify | `boolean | MinifyOptions` | ✖ | `false` | `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`; `false` or omitted preserves whitespace/comments after resolver emission and DCE. |
+| Param             | Type                     | Required       | Default                                                                | Notes                                                                                                                                                                                                                                                                                                              |
+| ----------------- | ------------------------ | -------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| opts.entry        | string                   | ✔              | —                                                                      | Entry WGSL module path. With `modules`, it is canonicalized against the virtual module map; without `modules`, it is resolved on disk and may omit `.wgsl` when a matching file or `index.wgsl` exists. The entry may declare `@group/@binding` resources.                                                         |
+| opts.rootDir      | string                   | ✖              | `dirname(entry)` for cache-key grouping; no `@/` alias unless provided | Base directory for `@/foo.wgsl` imports. Also used as the default root passed to cache key generation when present.                                                                                                                                                                                                |
+| opts.packageMap   | `Record<string, string>` | ✖              | `{}`                                                                   | Prefix map for package-style WGSL imports. If a specifier starts with a key, the target prefix is joined with the remainder.                                                                                                                                                                                       |
+| opts.modules      | `Record<string, string>` | ✖              | filesystem reads                                                       | In-memory WGSL filesystem. Keys are normalized with `/`; relative imports use virtual paths and package imports require `packageMap`.                                                                                                                                                                              |
+| opts.onDependency | `(path: string) => void` | ✖              | no callback                                                            | Called once for each imported module as soon as its path resolves, before that module is read or parsed. Already-loaded modules and the entry are omitted. Discovered dependencies are still reported when a later resolution step throws, allowing build tools to watch the files that can repair a failed graph. |
+| opts.validate     | `"off"                   | "auto"         | "require"                                                              | boolean`                                                                                                                                                                                                                                                                                                           | ✖                                                                                                                                                                                                                | `"auto"`, or `VGPU_VALIDATE` when set | Device-backed validation of emitted WGSL (`createShaderModule` plus a compilation-info round trip) through a lazily imported `@vgpu/adapter-node`. `"auto"` attempts validation and throws `VGPU-WGSL-NAGA-UNKNOWN` for invalid WGSL, but when no device/adapter is available it warns once to stderr and continues, recording the skip on `ResolvedShader.validation`. `"require"` (or `true`) throws `VGPU-WGSL-VALIDATE-NO-DEVICE`/`VGPU-WGSL-VALIDATE-ADAPTER-MISSING` instead of skipping. `"off"` (or `false`) never attempts validation and never imports device code. An explicit value here always wins over `VGPU_VALIDATE` (`"off" | "auto" | "require"`; anything else throws `VGPU-WGSL-VALIDATE-ENV-INVALID`). Independent of this option, `minify`with`identifiers: "safe"` always self-checks that renaming left no dangling reference (`VGPU-WGSL-MINIFY-DANGLING-IDENT`), with no GPU involved. |
+| opts.minify       | `boolean                 | MinifyOptions` | ✖                                                                      | `false`                                                                                                                                                                                                                                                                                                            | `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`; `false` or omitted preserves whitespace/comments after resolver emission and DCE. |
 
 Validation always covers the WGSL you get back. When `minify` rewrites the emitted text, validation runs twice: first on the unminified emission, because that text is what gives diagnostics accurate line/column mapping back to your modules, and then on the final minified string. So a successful resolve with `validation.ok === true` means the exact `wgsl` returned was accepted by the device — a minifier bug cannot slip corrupt output past a passing validation. Both passes share the same leased device, and the second one is skipped when minification changed nothing (the returned text was already validated).
 
-Validation acquires one WebGPU device per process through `@vgpu/adapter-node` and reuses it across calls, then destroys it shortly after the last validation finishes — a live device holds handles on the Node event loop, so without that release a script that validated a shader would never exit on its own. A later `resolveShader` transparently acquires a new device; a *failed* acquisition is remembered and **not retried for the lifetime of the process**, so after installing a device (for example `npx vgpu install-software-renderer`) restart the process rather than expecting the next call to pick it up.
+Validation acquires one WebGPU device per process through `@vgpu/adapter-node` and reuses it across calls, then destroys it shortly after the last validation finishes — a live device holds handles on the Node event loop, so without that release a script that validated a shader would never exit on its own. A later `resolveShader` transparently acquires a new device; a _failed_ acquisition is remembered and **not retried for the lifetime of the process**, so after installing a device (for example `npx vgpu install-software-renderer`) restart the process rather than expecting the next call to pick it up.
 
 **Returns:** `Promise<ResolvedShader>` — resolved WGSL plus dependency paths, cache keys, lightweight AST modules, source map, diagnostics, reflection for entry points/resources, and `validation: { mode, attempted, ok, skipped? }` reporting what the device-backed check actually did (`skipped` carries the `code`, `message`, and `fix` when `"auto"` could not get a device).
 
@@ -91,18 +91,18 @@ Package specifiers resolve in two steps: first by walking `node_modules` up from
 ## Examples
 
 ```ts
-import { resolveShader } from "@vgpu/wgsl/runtime";
+import { resolveShader } from '@vgpu/wgsl/runtime';
 
 const resolved = await resolveShader({
-  entry: "/entry.wgsl",
+  entry: '/entry.wgsl',
   validate: false,
   modules: {
-    "/math.wgsl": `
+    '/math.wgsl': `
 export fn tint(value: vec3f) -> vec3f {
   return value * vec3f(1.0, 0.5, 0.25);
 }
 `,
-    "/entry.wgsl": `
+    '/entry.wgsl': `
 import { tint } from "./math.wgsl";
 
 @fragment
@@ -113,22 +113,22 @@ fn fs_main() -> @location(0) vec4f {
   },
 });
 
-console.log(resolved.wgsl.includes("fs_main"));
+console.log(resolved.wgsl.includes('fs_main'));
 ```
 
 ```ts
-import { resolveShader } from "@vgpu/wgsl/runtime";
+import { resolveShader } from '@vgpu/wgsl/runtime';
 
 const resolved = await resolveShader({
-  entry: "/entry.wgsl",
+  entry: '/entry.wgsl',
   validate: false,
   minify: { whitespace: true },
   modules: {
-    "/types.wgsl": `
+    '/types.wgsl': `
 export struct NoiseConfig { seed: u32 }
 export fn noise(cfg: NoiseConfig) -> f32 { return f32(cfg.seed); }
 `,
-    "/entry.wgsl": `
+    '/entry.wgsl': `
 import { NoiseConfig, noise } from "./types.wgsl";
 
 @group(0) @binding(0) var<uniform> cfg: NoiseConfig;

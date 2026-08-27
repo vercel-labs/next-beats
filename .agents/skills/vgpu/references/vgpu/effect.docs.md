@@ -7,25 +7,32 @@ Fullscreen-fragment render unit created by `effect(gpu)`. Use it for post-proces
 ## Import
 
 ```ts
-import type { Effect, EffectOptions } from "vgpu";
+import type { Effect, EffectOptions } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { DrawCallOptions, Target, TargetSignature } from "vgpu";
+import type { DrawCallOptions, Target, TargetSignature } from 'vgpu';
 
 type SetBag = Record<string, unknown>;
 
-type BlendPreset = "alpha" | "additive" | "premultiplied";
-interface BlendComponentOptions { readonly src: GPUBlendFactor; readonly dst: GPUBlendFactor; readonly op?: GPUBlendOperation; }
-interface BlendOptions { readonly color: BlendComponentOptions; readonly alpha?: BlendComponentOptions; }
+type BlendPreset = 'alpha' | 'additive' | 'premultiplied';
+interface BlendComponentOptions {
+  readonly src: GPUBlendFactor;
+  readonly dst: GPUBlendFactor;
+  readonly op?: GPUBlendOperation;
+}
+interface BlendOptions {
+  readonly color: BlendComponentOptions;
+  readonly alpha?: BlendComponentOptions;
+}
 
 interface EffectOptions {
   readonly set?: SetBag;
   readonly label?: string;
   readonly blend?: BlendPreset | BlendOptions;
-  readonly writeMask?: readonly ("r" | "g" | "b" | "a")[];
+  readonly writeMask?: readonly ('r' | 'g' | 'b' | 'a')[];
 }
 
 interface Effect {
@@ -39,17 +46,17 @@ interface Effect {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| effect.source | `string \| ShaderSource` | ✔ | — | WGSL string or `ShaderSource`. If no `@vertex` entry exists, vgpu injects a fullscreen triangle vertex stage and provides `@location(0) uv`. |
-| effect.opts | `EffectOptions` | ✖ | `{}` | Initial options. Passing a `mesh` property is rejected; effects have no vertex buffers. |
-| opts.set | `Record<string, unknown>` | ✖ | `undefined` | Same as one initial `.set(opts.set)` call: establishes first-set binding ownership and validates reflected bindings. |
-| opts.label | `string` | ✖ | `"effect"` | Used in shader reflection labels, GPU object labels, and `VGPU-*` error `where` fields. |
-| opts.blend | `"alpha" \| "additive" \| "premultiplied" \| BlendOptions` | ✖ | `undefined` | Constructor-only blend state passed through to the fullscreen draw. Presets and defaults match `DrawOptions.blend`; omitted explicit `alpha` copies `color`, and `op` defaults to `"add"`. |
-| opts.writeMask | `readonly ("r" \| "g" \| "b" \| "a")[]` | ✖ | all channels | Constructor-only color channel mask. Omit for RGBA; `[]` writes no channels; `["r","g","b"]` skips alpha. |
-| effect.set.values | `Record<string, unknown>` | ✔ | — | Binding values by WGSL variable name. JS values are lib-owned; resources are user-owned. |
-| effect.draw.target | `Target \| DrawCallOptions` | ✖ | `{}` | One-shot render pass. Pass a bare target for the common case, or an options bag when setting per-call draw options. |
-| opts.target | `Target` | ✖ | — | Required at runtime when an options bag is used. Use a `Surface` or an offscreen `Target`. |
+| Param              | Type                                                       | Required | Default      | Notes                                                                                                                                                                                      |
+| ------------------ | ---------------------------------------------------------- | -------: | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| effect.source      | `string \| ShaderSource`                                   |        ✔ | —            | WGSL string or `ShaderSource`. If no `@vertex` entry exists, vgpu injects a fullscreen triangle vertex stage and provides `@location(0) uv`.                                               |
+| effect.opts        | `EffectOptions`                                            |        ✖ | `{}`         | Initial options. Passing a `mesh` property is rejected; effects have no vertex buffers.                                                                                                    |
+| opts.set           | `Record<string, unknown>`                                  |        ✖ | `undefined`  | Same as one initial `.set(opts.set)` call: establishes first-set binding ownership and validates reflected bindings.                                                                       |
+| opts.label         | `string`                                                   |        ✖ | `"effect"`   | Used in shader reflection labels, GPU object labels, and `VGPU-*` error `where` fields.                                                                                                    |
+| opts.blend         | `"alpha" \| "additive" \| "premultiplied" \| BlendOptions` |        ✖ | `undefined`  | Constructor-only blend state passed through to the fullscreen draw. Presets and defaults match `DrawOptions.blend`; omitted explicit `alpha` copies `color`, and `op` defaults to `"add"`. |
+| opts.writeMask     | `readonly ("r" \| "g" \| "b" \| "a")[]`                    |        ✖ | all channels | Constructor-only color channel mask. Omit for RGBA; `[]` writes no channels; `["r","g","b"]` skips alpha.                                                                                  |
+| effect.set.values  | `Record<string, unknown>`                                  |        ✔ | —            | Binding values by WGSL variable name. JS values are lib-owned; resources are user-owned.                                                                                                   |
+| effect.draw.target | `Target \| DrawCallOptions`                                |        ✖ | `{}`         | One-shot render pass. Pass a bare target for the common case, or an options bag when setting per-call draw options.                                                                        |
+| opts.target        | `Target`                                                   |        ✖ | —            | Required at runtime when an options bag is used. Use a `Surface` or an offscreen `Target`.                                                                                                 |
 
 The `uv` varying that `effect(gpu)` injects is top-origin: `(0, 0)` is the
 top-left corner and `v` grows downward — the same convention as WebGPU texture
@@ -66,33 +73,40 @@ everything else flip-free.
 ## Examples
 
 ```ts
-import { init, clock, effect, frame, target } from "vgpu/mock";
+import { init, clock, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [64, 64] });
-const shader = effect(gpu, `
+const shader = effect(
+  gpu,
+  `
   struct Params { time: f32, speed: f32 }
   @group(0) @binding(0) var<uniform> params: Params;
 
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv, sin(params.time * params.speed) * 0.5 + 0.5, 1);
   }
-`, { label: "wave", set: { params: { time: 0, speed: 2 } } });
+`,
+  { label: 'wave', set: { params: { time: 0, speed: 2 } } },
+);
 
 shader.set({ params: { time: clock(gpu).time, speed: 2 } });
-frame(gpu, (currentFrame) => currentFrame.pass(colorTarget, shader));
+frame(gpu, currentFrame => currentFrame.pass(colorTarget, shader));
 ```
 
 ```ts
-import { init, effect, target } from "vgpu/mock";
+import { init, effect, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [32, 32] });
-const copy = effect(gpu, `
+const copy = effect(
+  gpu,
+  `
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv.x, uv.y, 0.0, 1.0);
   }
-`);
+`,
+);
 copy.draw(colorTarget);
 ```
 

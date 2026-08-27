@@ -7,7 +7,7 @@ GPU pass timer created by `timer(gpu)`; requires the `"timestamp-query"` device 
 ## Import
 
 ```ts
-import type { Timer, TimerSpan } from "vgpu";
+import type { Timer, TimerSpan } from 'vgpu';
 ```
 
 ## Signature
@@ -26,11 +26,11 @@ interface Timer {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| timer() | — | — | — | No parameters. |
-| timer.span.name | `string` | ✔ | — | Non-empty result key. Spans are memoized per name, so `timer.span("shadows")` is allocation-free in hot loops. |
-| timer.onResults.cb | `(spans: Readonly<Record<string, number>>) => void` | ✔ | — | Receives one frozen `name → milliseconds` record per timed frame. |
+| Param              | Type                                                | Required | Default | Notes                                                                                                          |
+| ------------------ | --------------------------------------------------- | -------: | ------- | -------------------------------------------------------------------------------------------------------------- |
+| timer()            | —                                                   |        — | —       | No parameters.                                                                                                 |
+| timer.span.name    | `string`                                            |        ✔ | —       | Non-empty result key. Spans are memoized per name, so `timer.span("shadows")` is allocation-free in hot loops. |
+| timer.onResults.cb | `(spans: Readonly<Record<string, number>>) => void` |        ✔ | —       | Receives one frozen `name → milliseconds` record per timed frame.                                              |
 
 **Returns:** `timer(gpu)` returns `Timer`; `span()` returns a `TimerSpan` to pass as `FramePassOptions.timer`; `onResults()` returns an unsubscribe function; `dispose()` returns `void`.
 
@@ -46,33 +46,36 @@ interface Timer {
 ## Examples
 
 ```ts
-import { init, createMockAdapter, effect, frameLoop, target, timer } from "vgpu/mock";
+import { init, createMockAdapter, effect, frameLoop, target, timer } from 'vgpu/mock';
 
-const gpu = await init({ adapter: createMockAdapter({ features: ["timestamp-query"] }), requiredFeatures: ["timestamp-query"] });
+const gpu = await init({
+  adapter: createMockAdapter({ features: ['timestamp-query'] }),
+  requiredFeatures: ['timestamp-query'],
+});
 const shadowMap = target(gpu, { size: [512, 512], depth: true });
 const scene = target(gpu, { size: [256, 256], depth: true });
 const casters = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0); }`);
 const world = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
 const gpuTimer = timer(gpu);
-gpuTimer.onResults((spans) => {
+gpuTimer.onResults(spans => {
   console.log(`shadows ${spans.shadows}ms, main ${spans.main}ms`);
 });
 
-const loop = frameLoop(gpu, (f) => {
-  f.pass({ target: shadowMap, timer: gpuTimer.span("shadows") }, (p) => p.draw(casters));
-  f.pass({ target: scene, timer: gpuTimer.span("main") }, (p) => p.draw(world));
+const loop = frameLoop(gpu, f => {
+  f.pass({ target: shadowMap, timer: gpuTimer.span('shadows') }, p => p.draw(casters));
+  f.pass({ target: scene, timer: gpuTimer.span('main') }, p => p.draw(world));
 });
 loop.stop();
 ```
 
 ```ts
-import { init, timer } from "vgpu";
+import { init, timer } from 'vgpu';
 
 // Optional timing: only request the feature when the adapter has it.
-const gpu = await init({ requiredFeatures: ["timestamp-query"] });
-const gpuTimer = gpu.device.features.has("timestamp-query") ? timer(gpu) : undefined;
-gpuTimer?.onResults((spans) => console.table(spans));
+const gpu = await init({ requiredFeatures: ['timestamp-query'] });
+const gpuTimer = gpu.device.features.has('timestamp-query') ? timer(gpu) : undefined;
+gpuTimer?.onResults(spans => console.table(spans));
 ```
 
 ## Notes

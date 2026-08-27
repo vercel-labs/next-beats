@@ -9,25 +9,44 @@ const motifs = [
   { index: 6, test: /merge|conflict|stack|trace|overflow|deadlock|pointer|commit|cache|approv|reset|branch|diff/ }, // tunnel
   { index: 5, test: /async|await|chemistr|component|thread|race|condition|atom|orbit|cycle|promise|indie/ }, // cluster
   { index: 4, test: /energ|electro|push|force|ship|deploy|boot|monday|vibe|beat|drop|bass|fast/ }, // strata
-  { index: 0, test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/ }, // swell
+  {
+    index: 0,
+    test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/,
+  }, // swell
 ] as const;
 
-export const MOTIF_COUNT = 8;
+export const TRACK_MOTIF_COUNT = 8;
+export const PLAYLIST_VARIANT_COUNT = 4;
 
-/** Frames and cadence of the baked loop. 48 frames at 250ms is a 12s cycle. */
-export const COVER_FRAMES = 48;
-export const COVER_FRAME_MS = 250;
-export const COVER_LOOP_SECONDS = (COVER_FRAMES * COVER_FRAME_MS) / 1000;
+export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
+
+/** Every movement is constructed to return to its origin over this live loop. */
+export const COVER_LOOP_SECONDS = 12;
 
 // Named for the form each one takes, which is what the shader's height fields build.
 const motifNames = ['swell', 'limb', 'satin', 'panels', 'strata', 'cluster', 'tunnel', 'dunes'] as const;
 
-// `kind` matches the shader: square covers print the motif bare, banners set it beside
-// the label. Sizes are the largest the artwork is displayed at, times a little headroom.
+const genreMotifs: Record<string, number> = {
+  electronic: 0,
+  synthwave: 1,
+  'hip-hop': 2,
+  indie: 3,
+  pop: 4,
+  'lo-fi': 5,
+};
+
+// `kind` matches the shader: 0 is a square cover, 3 a genre banner. `detail` below 1
+// enlarges the field's features, which is how the thumbnail stays legible at 40px instead
+// of being a downscale of the large composition.
 export const COVER_SHAPES = [
-  { height: 384, kind: 0, name: 'square', width: 384 },
-  { height: 224, kind: 3, name: 'banner', width: 768 },
+  { detail: 1, height: 320, kind: 0, name: 'square', width: 320 },
+  { detail: 0.55, height: 80, kind: 0, name: 'thumb', width: 80 },
+  { detail: 1, height: 192, kind: 3, name: 'banner', width: 640 },
+  { detail: 0.72, height: 96, kind: 3, name: 'banner-thumb', width: 320 },
 ] as const;
+
+/** Covers at or below this CSS height use the thumbnail composition. */
+export const THUMB_MAX_PX = 72;
 
 export type CoverShape = (typeof COVER_SHAPES)[number]['name'];
 
@@ -35,9 +54,46 @@ export function coverAssetName(motif: number, shape: CoverShape) {
   return `${motifNames[motif] ?? motifNames[0]}-${shape}`;
 }
 
-/** Public URL of the baked overlay for a title. */
-export function coverAssetUrl(title: string, fallback: number, shape: CoverShape) {
-  return `/covers/${coverAssetName(motifForTitle(title, fallback), shape)}.webp`;
+export function seedVector(value: string): [number, number, number, number] {
+  let a = 0x9e3779b9;
+  let b = 0x243f6a88;
+  let c = 0xb7e15162;
+  let d = 0xdeadbeef;
+
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    a = Math.imul(a ^ code, 2654435761);
+    b = Math.imul(b ^ code, 1597334677);
+    c = Math.imul(c ^ code, 2246822519);
+    d = Math.imul(d ^ code, 3266489917);
+  }
+
+  return [a, b, c, d].map(number => (number >>> 0) / 4294967295) as [number, number, number, number];
+}
+
+export function artworkVariant(label: string, kind: ArtworkKind, fallback: number) {
+  if (kind === 'genre') return genreMotifs[label.toLowerCase()] ?? Math.floor(fallback * 6);
+  if (kind === 'playlist') return Math.min(PLAYLIST_VARIANT_COUNT - 1, Math.floor(fallback * PLAYLIST_VARIANT_COUNT));
+  return motifForTitle(label, fallback);
+}
+
+function assetKey(value: string) {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/^-|-$/g, '') || 'cover'
+  );
+}
+
+export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape, still = false) {
+  const suffix = still ? '.static.webp' : '.webp';
+  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}${suffix}`;
+  if (kind === 'playlist') {
+    const variant = artworkVariant(label, kind, seedVector(seed)[3]);
+    return `/covers/playlists/${variant}-${shape}${suffix}`;
+  }
+  return `/covers/tracks/${assetKey(seed)}-${shape}${suffix}`;
 }
 
 export function motifForTitle(title: string, fallback: number) {
@@ -45,5 +101,5 @@ export function motifForTitle(title: string, fallback: number) {
   for (const motif of motifs) {
     if (motif.test.test(value)) return motif.index;
   }
-  return Math.min(MOTIF_COUNT - 1, Math.floor(fallback * MOTIF_COUNT));
+  return Math.min(TRACK_MOTIF_COUNT - 1, Math.floor(fallback * TRACK_MOTIF_COUNT));
 }

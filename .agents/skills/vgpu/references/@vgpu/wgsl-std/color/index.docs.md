@@ -28,14 +28,14 @@ export fn luminanceThreshold(value: vec3f, threshold: f32, softKnee: f32) -> vec
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| value | `f32` | ✔ | — | Scalar color channel for `srgbToLinear` or `linearToSrgb`. Expected range is usually `[0.0, 1.0]`; helpers do not clamp scalar transfer inputs. |
-| value | `vec3f` | ✔ | — | RGB/linear-HDR color for `luminance`, `applyExposure`, `tonemap*`, `luminanceThreshold`, `srgbToLinear3`, and `linearToSrgb3`. |
-| value | `vec4f` | ✔ | — | RGBA color for `srgbToLinear4` and `linearToSrgb4`; RGB is converted and alpha is preserved unchanged. |
-| exposure | `f32` | ✔ | — | Exposure in stops/EV for `applyExposure`; `1.0` doubles, `0.0` leaves unchanged, `-2.0` multiplies by `0.25`. |
-| threshold | `f32` | ✔ | — | Linear luminance threshold for `luminanceThreshold`. |
-| softKnee | `f32` | ✔ | — | Width of bright-pass transition. Internally clamped with `max(softKnee, 0.000001)`, so `0.0` behaves as an extremely hard edge without invalid `smoothstep` edges. |
+| Param     | Type    | Required | Default | Notes                                                                                                                                                              |
+| --------- | ------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| value     | `f32`   | ✔        | —       | Scalar color channel for `srgbToLinear` or `linearToSrgb`. Expected range is usually `[0.0, 1.0]`; helpers do not clamp scalar transfer inputs.                    |
+| value     | `vec3f` | ✔        | —       | RGB/linear-HDR color for `luminance`, `applyExposure`, `tonemap*`, `luminanceThreshold`, `srgbToLinear3`, and `linearToSrgb3`.                                     |
+| value     | `vec4f` | ✔        | —       | RGBA color for `srgbToLinear4` and `linearToSrgb4`; RGB is converted and alpha is preserved unchanged.                                                             |
+| exposure  | `f32`   | ✔        | —       | Exposure in stops/EV for `applyExposure`; `1.0` doubles, `0.0` leaves unchanged, `-2.0` multiplies by `0.25`.                                                      |
+| threshold | `f32`   | ✔        | —       | Linear luminance threshold for `luminanceThreshold`.                                                                                                               |
+| softKnee  | `f32`   | ✔        | —       | Width of bright-pass transition. Internally clamped with `max(softKnee, 0.000001)`, so `0.0` behaves as an extremely hard edge without invalid `smoothstep` edges. |
 
 **Returns:** WGSL functions return `f32`, `vec3f`, or `vec4f` as declared. Transfer helpers return converted color, `luminance` returns Rec.709/sRGB relative luminance, exposure/tonemap/threshold helpers return linear color values.
 
@@ -54,7 +54,7 @@ fn grade(baseColorSrgb: vec3f, exposureStops: f32) -> vec3f {
 }
 `;
 
-console.log(shaderWgsl.includes("tonemapAces"));
+console.log(shaderWgsl.includes('tonemapAces'));
 ```
 
 ```ts

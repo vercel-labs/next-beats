@@ -7,22 +7,24 @@ Creates a directional (sun-style) light node. Direction is explicit, not transfo
 ## Import
 
 ```ts
-import { directionalLight } from "vgpu/scene";
+import { directionalLight } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function directionalLight(options?: import("vgpu/scene").DirectionalLightOptions): import("vgpu/scene").DirectionalLight;
+declare function directionalLight(
+  options?: import('vgpu/scene').DirectionalLightOptions,
+): import('vgpu/scene').DirectionalLight;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options.direction | `Vec3Like` | ✖ | `[0, -1, 0]` | World-space direction the light travels toward. |
-| options.color | `Vec3Like` | ✖ | `[1, 1, 1]` | Linear RGB. |
-| options.intensity | `number` | ✖ | `1` | Must be `>= 0`. |
+| Param             | Type       | Required | Default      | Notes                                           |
+| ----------------- | ---------- | -------- | ------------ | ----------------------------------------------- |
+| options.direction | `Vec3Like` | ✖        | `[0, -1, 0]` | World-space direction the light travels toward. |
+| options.color     | `Vec3Like` | ✖        | `[1, 1, 1]`  | Linear RGB.                                     |
+| options.intensity | `number`   | ✖        | `1`          | Must be `>= 0`.                                 |
 
 **Returns:** `DirectionalLight` node with `kind: "directional-light"`.
 **Throws:** `VGPU-SCENE-VALUE-INVALID` for malformed vectors or negative intensity.
@@ -30,7 +32,7 @@ declare function directionalLight(options?: import("vgpu/scene").DirectionalLigh
 ## Examples
 
 ```ts
-import { directionalLight, scene } from "vgpu/scene";
+import { directionalLight, scene } from 'vgpu/scene';
 
 const sun = directionalLight({ direction: [-1, -2, -1], intensity: 1.2 });
 scene().add(sun);
@@ -51,14 +53,14 @@ Class returned by `directionalLight()`. Extends `SceneNode`.
 ## Import
 
 ```ts
-import type { DirectionalLight } from "vgpu/scene";
+import type { DirectionalLight } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class DirectionalLight {
-  set(values: import("vgpu/scene").DirectionalLightValues): this;
+  set(values: import('vgpu/scene').DirectionalLightValues): this;
   readonly direction: Float32Array;
   readonly color: Float32Array;
   readonly intensity: number;
@@ -68,7 +70,7 @@ declare class DirectionalLight {
 ## Examples
 
 ```ts
-import { directionalLight } from "vgpu/scene";
+import { directionalLight } from 'vgpu/scene';
 
 directionalLight().set({ direction: [1, -1, 0], color: [1, 0.9, 0.8] });
 ```
@@ -87,27 +89,27 @@ Options accepted by `directionalLight()`: light parameters plus `NodeOptions`.
 ## Import
 
 ```ts
-import type { DirectionalLightOptions } from "vgpu/scene";
+import type { DirectionalLightOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface DirectionalLightOptions {
-  readonly direction?: import("vgpu/scene").Vec3Like;
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly direction?: import('vgpu/scene').Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly intensity?: number;
   readonly label?: string;
-  readonly children?: readonly import("vgpu/scene").SceneNode[];
+  readonly children?: readonly import('vgpu/scene').SceneNode[];
 }
 ```
 
 ## Examples
 
 ```ts
-import { directionalLight } from "vgpu/scene";
+import { directionalLight } from 'vgpu/scene';
 
-directionalLight({ direction: [0, -1, -1], intensity: 2, label: "key" });
+directionalLight({ direction: [0, -1, -1], intensity: 2, label: 'key' });
 ```
 
 ## Notes
@@ -123,15 +125,15 @@ Values accepted by `DirectionalLight.set()`.
 ## Import
 
 ```ts
-import type { DirectionalLightValues } from "vgpu/scene";
+import type { DirectionalLightValues } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface DirectionalLightValues {
-  readonly direction?: import("vgpu/scene").Vec3Like;
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly direction?: import('vgpu/scene').Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly intensity?: number;
 }
 ```
@@ -139,7 +141,7 @@ interface DirectionalLightValues {
 ## Examples
 
 ```ts
-import { directionalLight } from "vgpu/scene";
+import { directionalLight } from 'vgpu/scene';
 
 directionalLight().set({ intensity: 0.5 });
 ```
@@ -157,19 +159,19 @@ Creates an ambient fill light node applied uniformly to lit materials.
 ## Import
 
 ```ts
-import { ambientLight } from "vgpu/scene";
+import { ambientLight } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function ambientLight(options?: import("vgpu/scene").AmbientLightOptions): import("vgpu/scene").AmbientLight;
+declare function ambientLight(options?: import('vgpu/scene').AmbientLightOptions): import('vgpu/scene').AmbientLight;
 ```
 
 ## Examples
 
 ```ts
-import { ambientLight, scene } from "vgpu/scene";
+import { ambientLight, scene } from 'vgpu/scene';
 
 scene().add(ambientLight({ color: [0.4, 0.45, 0.6], intensity: 0.3 }));
 ```
@@ -188,14 +190,14 @@ Class returned by `ambientLight()`. Extends `SceneNode`.
 ## Import
 
 ```ts
-import type { AmbientLight } from "vgpu/scene";
+import type { AmbientLight } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class AmbientLight {
-  set(values: import("vgpu/scene").AmbientLightValues): this;
+  set(values: import('vgpu/scene').AmbientLightValues): this;
   readonly color: Float32Array;
   readonly intensity: number;
 }
@@ -204,7 +206,7 @@ declare class AmbientLight {
 ## Examples
 
 ```ts
-import { ambientLight } from "vgpu/scene";
+import { ambientLight } from 'vgpu/scene';
 
 ambientLight().set({ intensity: 0.2 });
 ```
@@ -222,14 +224,14 @@ Options accepted by `ambientLight()`.
 ## Import
 
 ```ts
-import type { AmbientLightOptions } from "vgpu/scene";
+import type { AmbientLightOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface AmbientLightOptions {
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly intensity?: number;
   readonly label?: string;
 }
@@ -238,7 +240,7 @@ interface AmbientLightOptions {
 ## Examples
 
 ```ts
-import { ambientLight } from "vgpu/scene";
+import { ambientLight } from 'vgpu/scene';
 
 ambientLight({ intensity: 0.25 });
 ```
@@ -256,14 +258,14 @@ Values accepted by `AmbientLight.set()`.
 ## Import
 
 ```ts
-import type { AmbientLightValues } from "vgpu/scene";
+import type { AmbientLightValues } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface AmbientLightValues {
-  readonly color?: import("vgpu/scene").Vec3Like;
+  readonly color?: import('vgpu/scene').Vec3Like;
   readonly intensity?: number;
 }
 ```
@@ -271,7 +273,7 @@ interface AmbientLightValues {
 ## Examples
 
 ```ts
-import { ambientLight } from "vgpu/scene";
+import { ambientLight } from 'vgpu/scene';
 
 ambientLight().set({ color: [1, 1, 1] });
 ```

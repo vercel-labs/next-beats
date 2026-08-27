@@ -26,7 +26,7 @@ export function AlbumArt({ coverColor, coverSeed, label, kind = 'track', size = 
         className,
       )}
     >
-      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} />}
+      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} small={size !== 'lg'} />}
     </div>
   );
 }

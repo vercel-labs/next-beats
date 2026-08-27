@@ -7,7 +7,7 @@ Builds a column-major model matrix that rotates and translates around the Y axis
 ## Import
 
 ```ts
-import { orbit } from "vgpu/scene";
+import { orbit } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -26,13 +26,13 @@ declare function orbit(time: number, options?: OrbitOptions): Mat4;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| time | `number` | ✔ | — | Explicit time value in seconds or any deterministic unit you choose. The helper computes `angle = time * speed`. |
-| options | `OrbitOptions` | ✖ | `{}` | Optional transform controls. Omit it for a unit-radius orbit at Y=0 with speed 1. |
-| options.radius | `number` | ✖ | `1` | XZ orbit radius. Negative values are allowed by JavaScript math and mirror the translation through the origin. |
-| options.height | `number` | ✖ | `0` | Constant Y translation stored in matrix element 13. |
-| options.speed | `number` | ✖ | `1` | Angular multiplier. `0` freezes rotation; negative values orbit in the opposite direction. |
+| Param          | Type           | Required | Default | Notes                                                                                                            |
+| -------------- | -------------- | -------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
+| time           | `number`       | ✔        | —       | Explicit time value in seconds or any deterministic unit you choose. The helper computes `angle = time * speed`. |
+| options        | `OrbitOptions` | ✖        | `{}`    | Optional transform controls. Omit it for a unit-radius orbit at Y=0 with speed 1.                                |
+| options.radius | `number`       | ✖        | `1`     | XZ orbit radius. Negative values are allowed by JavaScript math and mirror the translation through the origin.   |
+| options.height | `number`       | ✖        | `0`     | Constant Y translation stored in matrix element 13.                                                              |
+| options.speed  | `number`       | ✖        | `1`     | Angular multiplier. `0` freezes rotation; negative values orbit in the opposite direction.                       |
 
 **Returns:** `Mat4` (`Float32Array`) — 16 column-major matrix values. The upper-left 3×3 rotates around Y; the translation is `[cos(angle) * radius, height, sin(angle) * radius]`.
 **Throws:** None.
@@ -40,14 +40,14 @@ declare function orbit(time: number, options?: OrbitOptions): Mat4;
 ## Examples
 
 ```ts
-import { orbit } from "vgpu/scene";
+import { orbit } from 'vgpu/scene';
 
 const model = orbit(1.5, { radius: 2, height: 0.5, speed: 0.4 });
 console.log(model.length); // 16
 ```
 
 ```ts
-import { orbit, type Mat4 } from "vgpu/scene";
+import { orbit, type Mat4 } from 'vgpu/scene';
 
 const paused: Mat4 = orbit(10, { speed: 0 });
 void paused;

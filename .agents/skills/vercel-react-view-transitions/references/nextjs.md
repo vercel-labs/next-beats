@@ -45,7 +45,9 @@ A bare `<ViewTransition>` in layout works only if pages have **no** VTs of their
 No wrapper component needed, works in Server Components:
 
 ```tsx
-<Link href="/products/1" transitionTypes={['transition-to-detail']}>View Product</Link>
+<Link href="/products/1" transitionTypes={['transition-to-detail']}>
+  View Product
+</Link>
 ```
 
 Replaces the manual pattern of `onNavigate` + `startTransition` + `addTransitionType` + `router.push()`. Reserve manual `startTransition` for non-link interactions (buttons, forms).
@@ -101,13 +103,21 @@ Directional slides + Suspense reveals coexist because they fire at different mom
 
 ```tsx
 <ViewTransition
-  enter={{ "nav-forward": "slide-from-right", default: "none" }}
-  exit={{ "nav-forward": "slide-to-left", default: "none" }}
+  enter={{ 'nav-forward': 'slide-from-right', default: 'none' }}
+  exit={{ 'nav-forward': 'slide-to-left', default: 'none' }}
   default="none"
 >
   <div>
-    <Suspense fallback={<ViewTransition exit="slide-down"><Skeleton /></ViewTransition>}>
-      <ViewTransition enter="slide-up" default="none"><Content /></ViewTransition>
+    <Suspense
+      fallback={
+        <ViewTransition exit="slide-down">
+          <Skeleton />
+        </ViewTransition>
+      }
+    >
+      <ViewTransition enter="slide-up" default="none">
+        <Content />
+      </ViewTransition>
     </Suspense>
   </div>
 </ViewTransition>
@@ -135,18 +145,20 @@ Same rules as explicit `<Suspense>`: use simple string props (not type maps) sin
 
 ```tsx
 // List page
-{products.map((product) => (
-  <Link key={product.id} href={`/products/${product.id}`} transitionTypes={['nav-forward']}>
-    <ViewTransition name={`product-${product.id}`}>
-      <Image src={product.image} alt={product.name} width={400} height={300} />
-    </ViewTransition>
-  </Link>
-))}
+{
+  products.map(product => (
+    <Link key={product.id} href={`/products/${product.id}`} transitionTypes={['nav-forward']}>
+      <ViewTransition name={`product-${product.id}`}>
+        <Image src={product.image} alt={product.name} width={400} height={300} />
+      </ViewTransition>
+    </Link>
+  ));
+}
 
 // Detail page — same name
 <ViewTransition name={`product-${product.id}`}>
   <Image src={product.image} alt={product.name} width={800} height={600} />
-</ViewTransition>
+</ViewTransition>;
 ```
 
 ---

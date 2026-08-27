@@ -7,14 +7,14 @@ Low-level user-owned uniform buffer with a stable bind group at binding `0`. Pre
 ## Import
 
 ```ts
-import { Uniform } from "vgpu/core";
-import type { UniformOptions } from "vgpu/core";
+import { Uniform } from 'vgpu/core';
+import type { UniformOptions } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "vgpu/core";
+import type { Device } from 'vgpu/core';
 
 declare interface UniformOptions {
   readonly size: number;
@@ -26,7 +26,7 @@ declare interface UniformOptions {
 declare class Uniform {
   readonly device: Device;
   readonly size: number;
-  readonly buffer: import("vgpu/core").Buffer;
+  readonly buffer: import('vgpu/core').Buffer;
   readonly bindGroupLayout: GPUBindGroupLayout;
   readonly bindGroup: GPUBindGroup;
   constructor(device: Device, opts: UniformOptions);
@@ -39,16 +39,16 @@ declare class Uniform {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Core device, usually `gpu.device` from the main API (`vgpu`) `init()`. |
-| opts | `UniformOptions` | ✔ | — | Buffer/layout options. |
-| opts.size | `number` | ✔ | — | Byte size. Used for `device.createBuffer({ usage: ["uniform", "copy_dst"] })` and `minBindingSize`. |
-| opts.label | `string` | ✖ | `undefined` | Forwarded to buffer label; layout label becomes `${label}.bgl`; bind group label becomes `${label}.bg`. |
-| opts.visibility | `GPUShaderStageFlags` | ✖ | `GPUShaderStage.VERTEX \| GPUShaderStage.FRAGMENT` with numeric fallback `1 \| 2` | Ignored when `opts.bindGroupLayout` is supplied. |
-| opts.bindGroupLayout | `GPUBindGroupLayout` | ✖ | A new binding-0 uniform layout | Reuse a pipeline/draw-owned layout. Binding `0` must be a compatible uniform buffer. |
-| uniform.write.data | `BufferSource` | ✔ | — | Bytes uploaded with `queue.writeBuffer`. |
-| uniform.write.offset | `number` | ✖ | `0` | Destination byte offset in the buffer. |
+| Param                | Type                  | Required | Default                                                                           | Notes                                                                                                   |
+| -------------------- | --------------------- | -------: | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| device               | `Device`              |        ✔ | —                                                                                 | Core device, usually `gpu.device` from the main API (`vgpu`) `init()`.                                  |
+| opts                 | `UniformOptions`      |        ✔ | —                                                                                 | Buffer/layout options.                                                                                  |
+| opts.size            | `number`              |        ✔ | —                                                                                 | Byte size. Used for `device.createBuffer({ usage: ["uniform", "copy_dst"] })` and `minBindingSize`.     |
+| opts.label           | `string`              |        ✖ | `undefined`                                                                       | Forwarded to buffer label; layout label becomes `${label}.bgl`; bind group label becomes `${label}.bg`. |
+| opts.visibility      | `GPUShaderStageFlags` |        ✖ | `GPUShaderStage.VERTEX \| GPUShaderStage.FRAGMENT` with numeric fallback `1 \| 2` | Ignored when `opts.bindGroupLayout` is supplied.                                                        |
+| opts.bindGroupLayout | `GPUBindGroupLayout`  |        ✖ | A new binding-0 uniform layout                                                    | Reuse a pipeline/draw-owned layout. Binding `0` must be a compatible uniform buffer.                    |
+| uniform.write.data   | `BufferSource`        |        ✔ | —                                                                                 | Bytes uploaded with `queue.writeBuffer`.                                                                |
+| uniform.write.offset | `number`              |        ✖ | `0`                                                                               | Destination byte offset in the buffer.                                                                  |
 
 **Returns:** Constructor returns `Uniform`; `gpu` returns the underlying `GPUBuffer`; `write()`, `destroy()`, and `dispose()` return `void`.
 
@@ -57,14 +57,15 @@ declare class Uniform {
 ## Examples
 
 ```ts
-import { init, draw } from "vgpu/mock";
-import { Uniform } from "vgpu/core";
+import { init, draw } from 'vgpu/mock';
+import { Uniform } from 'vgpu/core';
 
 const gpu = await init();
-const camera = new Uniform(gpu.device, { size: 64, label: "camera" });
+const camera = new Uniform(gpu.device, { size: 64, label: 'camera' });
 camera.write(new Float32Array(16));
 
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   struct Camera { viewProjection: mat4x4f }
   @group(0) @binding(0) var<uniform> camera: Camera;
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
@@ -72,21 +73,24 @@ const drawable = draw(gpu, { shader: `
     return camera.viewProjection * vec4f(p[vi], 0, 1);
   }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }
-` });
+`,
+});
 drawable.set({ camera });
 ```
 
 ```ts
-import { init, draw } from "vgpu/mock";
-import { Uniform } from "vgpu/core";
+import { init, draw } from 'vgpu/mock';
+import { Uniform } from 'vgpu/core';
 
 const gpu = await init();
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   struct Params { value: f32 }
   @group(0) @binding(0) var<uniform> params: Params;
   @vertex fn vs_main() -> @builtin(position) vec4f { return vec4f(0, 0, 0, 1); }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(params.value); }
-` });
+`,
+});
 const params = new Uniform(gpu.device, { size: 16, bindGroupLayout: drawable.layout(0) });
 params.write(new Float32Array([1, 0, 0, 0]));
 drawable.set({ params });

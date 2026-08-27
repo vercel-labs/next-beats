@@ -38,26 +38,26 @@ export fn voronoi3d(position: vec3f) -> VoronoiSample3;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| position | `vec2f` | ✔ | — | 2D sample position for `voronoi2d`. The function searches the `3 x 3` cells around `floor(position)`. |
-| position | `vec3f` | ✔ | — | 3D sample position for `voronoi3d`. The function searches the `3 x 3 x 3` cells around `floor(position)`. |
+| Param    | Type    | Required | Default | Notes                                                                                                     |
+| -------- | ------- | -------- | ------- | --------------------------------------------------------------------------------------------------------- |
+| position | `vec2f` | ✔        | —       | 2D sample position for `voronoi2d`. The function searches the `3 x 3` cells around `floor(position)`.     |
+| position | `vec3f` | ✔        | —       | 3D sample position for `voronoi3d`. The function searches the `3 x 3 x 3` cells around `floor(position)`. |
 
 `VoronoiSample2` fields:
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| f1 | `f32` | ✔ | — | Euclidean distance to the nearest jittered feature point. |
-| f2 | `f32` | ✔ | — | Euclidean distance to the second-nearest jittered feature point. `f1 <= f2`. |
-| cell | `vec2i` | ✔ | — | Integer lattice cell containing the nearest feature point. Use it for stable per-cell randomization or IDs. |
+| Param | Type    | Required | Default | Notes                                                                                                       |
+| ----- | ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| f1    | `f32`   | ✔        | —       | Euclidean distance to the nearest jittered feature point.                                                   |
+| f2    | `f32`   | ✔        | —       | Euclidean distance to the second-nearest jittered feature point. `f1 <= f2`.                                |
+| cell  | `vec2i` | ✔        | —       | Integer lattice cell containing the nearest feature point. Use it for stable per-cell randomization or IDs. |
 
 `VoronoiSample3` fields:
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| f1 | `f32` | ✔ | — | Euclidean distance to the nearest jittered feature point. |
-| f2 | `f32` | ✔ | — | Euclidean distance to the second-nearest jittered feature point. `f1 <= f2`. |
-| cell | `vec3i` | ✔ | — | Integer lattice cell containing the nearest feature point. Use it for stable per-cell randomization or IDs. |
+| Param | Type    | Required | Default | Notes                                                                                                       |
+| ----- | ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| f1    | `f32`   | ✔        | —       | Euclidean distance to the nearest jittered feature point.                                                   |
+| f2    | `f32`   | ✔        | —       | Euclidean distance to the second-nearest jittered feature point. `f1 <= f2`.                                |
+| cell  | `vec3i` | ✔        | —       | Integer lattice cell containing the nearest feature point. Use it for stable per-cell randomization or IDs. |
 
 **Returns:** `voronoi2d` returns `VoronoiSample2`; `voronoi3d` returns `VoronoiSample3`. The returned sample contains nearest distance `f1`, second-nearest distance `f2`, and the winning feature cell.
 
@@ -75,7 +75,7 @@ fn edgeMask(position: vec2f) -> f32 {
 }
 `;
 
-console.log(voronoiWgsl.includes("edgeMask"));
+console.log(voronoiWgsl.includes('edgeMask'));
 ```
 
 ```ts
@@ -122,7 +122,7 @@ fn clouds(uv: vec2f, time: f32) -> f32 {
 }
 `;
 
-console.log(cloudWgsl.includes("cloudFbm"));
+console.log(cloudWgsl.includes('cloudFbm'));
 ```
 
 ## Notes

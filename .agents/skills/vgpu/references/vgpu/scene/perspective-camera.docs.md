@@ -7,7 +7,7 @@ Creates a stateful perspective camera node. FOV is in degrees for the public sce
 ## Import
 
 ```ts
-import { perspectiveCamera, type PerspectiveCameraOptions } from "vgpu/scene";
+import { perspectiveCamera, type PerspectiveCameraOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -18,26 +18,26 @@ interface PerspectiveCameraOptions {
   readonly aspect?: number;
   readonly near?: number;
   readonly far?: number;
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly target?: import("vgpu/scene").CameraVec3;
-  readonly up?: import("vgpu/scene").CameraVec3;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly target?: import('vgpu/scene').CameraVec3;
+  readonly up?: import('vgpu/scene').CameraVec3;
   readonly label?: string;
 }
 
-declare function perspectiveCamera(options: PerspectiveCameraOptions): import("vgpu/scene").PerspectiveCamera;
+declare function perspectiveCamera(options: PerspectiveCameraOptions): import('vgpu/scene').PerspectiveCamera;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options.fov | number | ✔ | — | Vertical field of view in degrees. Must be in `(0, 180)`. |
-| options.aspect | number | ✖ | `1` | Width / height. Update on resize with `camera.set({ aspect })`. |
-| options.near | number | ✖ | `0.1` | Near clip plane distance. Must be positive. |
-| options.far | number | ✖ | `100` | Far clip plane distance. Must be greater than `near`. |
-| options.position | Vec3Like | ✖ | `[0, 0, 0]` | Initial local position. |
-| options.target | CameraVec3 | ✖ | — | When given, the camera is oriented with `lookAt(target, up)`. |
-| options.up | CameraVec3 | ✖ | `[0, 1, 0]` | Up vector used only with `target`. |
+| Param            | Type       | Required | Default     | Notes                                                           |
+| ---------------- | ---------- | -------- | ----------- | --------------------------------------------------------------- |
+| options.fov      | number     | ✔        | —           | Vertical field of view in degrees. Must be in `(0, 180)`.       |
+| options.aspect   | number     | ✖        | `1`         | Width / height. Update on resize with `camera.set({ aspect })`. |
+| options.near     | number     | ✖        | `0.1`       | Near clip plane distance. Must be positive.                     |
+| options.far      | number     | ✖        | `100`       | Far clip plane distance. Must be greater than `near`.           |
+| options.position | Vec3Like   | ✖        | `[0, 0, 0]` | Initial local position.                                         |
+| options.target   | CameraVec3 | ✖        | —           | When given, the camera is oriented with `lookAt(target, up)`.   |
+| options.up       | CameraVec3 | ✖        | `[0, 1, 0]` | Up vector used only with `target`.                              |
 
 **Returns:** `PerspectiveCamera` — a scene node (`kind: "perspective-camera"`) with `viewProjection`, `view`, `projection`, `position`, and `worldPosition`.
 **Throws:** `VGPU-SCENE-VALUE-INVALID` for out-of-range `fov`, non-positive `near`, or `far <= near`.
@@ -45,7 +45,7 @@ declare function perspectiveCamera(options: PerspectiveCameraOptions): import("v
 ## Examples
 
 ```ts
-import { perspectiveCamera } from "vgpu/scene";
+import { perspectiveCamera } from 'vgpu/scene';
 
 const cam = perspectiveCamera({ fov: 45, position: [2, 2, 3], target: [0, 0, 0] });
 
@@ -70,15 +70,15 @@ Class returned by `perspectiveCamera()`. Extends `SceneNode`, implements `SceneC
 ## Import
 
 ```ts
-import type { PerspectiveCamera } from "vgpu/scene";
+import type { PerspectiveCamera } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class PerspectiveCamera {
-  set(values: import("vgpu/scene").PerspectiveCameraValues): this;
-  lookAt(target: import("vgpu/scene").Vec3Like, up?: import("vgpu/scene").Vec3Like): this;
+  set(values: import('vgpu/scene').PerspectiveCameraValues): this;
+  lookAt(target: import('vgpu/scene').Vec3Like, up?: import('vgpu/scene').Vec3Like): this;
   readonly fov: number;
   readonly aspect: number;
   readonly near: number;
@@ -96,7 +96,7 @@ declare class PerspectiveCamera {
 ## Examples
 
 ```ts
-import { perspectiveCamera, type PerspectiveCamera } from "vgpu/scene";
+import { perspectiveCamera, type PerspectiveCamera } from 'vgpu/scene';
 
 const cam: PerspectiveCamera = perspectiveCamera({ fov: 45 });
 cam.set({ aspect: 16 / 9 });
@@ -116,7 +116,7 @@ Values accepted by `PerspectiveCamera.set()`: projection parameters plus node tr
 ## Import
 
 ```ts
-import type { PerspectiveCameraValues } from "vgpu/scene";
+import type { PerspectiveCameraValues } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -127,10 +127,10 @@ interface PerspectiveCameraValues {
   readonly aspect?: number;
   readonly near?: number;
   readonly far?: number;
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly rotation?: import("vgpu/scene").Vec3Like;
-  readonly quaternion?: import("vgpu/scene").QuatLike;
-  readonly scale?: number | import("vgpu/scene").Vec3Like;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly rotation?: import('vgpu/scene').Vec3Like;
+  readonly quaternion?: import('vgpu/scene').QuatLike;
+  readonly scale?: number | import('vgpu/scene').Vec3Like;
   readonly visible?: boolean;
   readonly label?: string;
 }
@@ -139,7 +139,7 @@ interface PerspectiveCameraValues {
 ## Examples
 
 ```ts
-import { perspectiveCamera } from "vgpu/scene";
+import { perspectiveCamera } from 'vgpu/scene';
 
 perspectiveCamera({ fov: 45 }).set({ aspect: 2, position: [0, 1, 4] });
 ```

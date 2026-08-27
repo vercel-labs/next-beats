@@ -7,7 +7,7 @@ Compute pipeline created by `compute(gpu)`. It uses the same WGSL reflection and
 ## Import
 
 ```ts
-import type { Compute, ComputeOptions, DispatchOptions, StorageAccess, StorageBuffer, StorageOptions } from "vgpu";
+import type { Compute, ComputeOptions, DispatchOptions, StorageAccess, StorageBuffer, StorageOptions } from 'vgpu';
 ```
 
 ## Signature
@@ -30,7 +30,7 @@ interface Compute {
   dispatch(opts: DispatchOptions): void;
 }
 
-type StorageAccess = "read" | "read-write";
+type StorageAccess = 'read' | 'read-write';
 
 interface StorageOptions {
   readonly access?: StorageAccess;
@@ -47,23 +47,23 @@ interface StorageBuffer {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| compute.source | `string \| ShaderSource` | ✔ | — | WGSL string or `ShaderSource`. Must include at least one `@compute` entry point. |
-| compute.opts | `ComputeOptions` | ✖ | `{}` | Initial compute options. |
-| opts.label | `string` | ✖ | `"compute"` | Used in shader reflection, GPU labels, and error `where` fields. |
-| opts.set | `Record<string, unknown>` | ✖ | `undefined` | Initial `.set()` call. |
-| opts.constants | `Readonly<Record<string, number \| boolean>>` | ✖ | WGSL defaults | Constructor-only values for WGSL `override` constants, applied to the compute stage. Use them to tune workgroup size per device or workload at pipeline creation: `@workgroup_size(WG)` with `override WG: u32`. Keying (`@id(N)` → decimal string of `N`) and number/boolean conversion match `DrawOptions.constants`. |
-| opts.entry | `string` | ✖ | first `@compute` entry point | Constructor-only entry point selection when one WGSL module packs several `@compute` kernels sharing structs and bindings (e.g. emit/simulate/compact). The name must exist in the shader with the `@compute` stage. Binding visibility, bind group layouts, and the storage-aliasing preflight follow the selected entry. |
-| compute.set.values | `Record<string, unknown>` | ✔ | — | Binding values by WGSL variable name. JS values are packed; buffers/resources are bound by identity. |
-| compute.dispatch.x | `number` | ✔ | — | Workgroup count X passed to `dispatchWorkgroups`. |
-| compute.dispatch.y | `number` | ✖ | `1` | Workgroup count Y. |
-| compute.dispatch.z | `number` | ✖ | `1` | Workgroup count Z. |
-| compute.dispatch.opts.indirect | `StorageBuffer \| { buffer, offset? }` | ✔ in the overload | — | GPU-driven dispatch via `dispatchWorkgroupsIndirect`: the GPU reads `[x, y, z]` workgroup counts (3 tightly packed u32, 12 bytes) from the buffer at the byte `offset` (default `0`). Use it when an earlier pass decides how much work exists — variable particle populations, stream compaction. Requires a buffer created with `storage(gpu, bytes, { indirect: true })`; `offset` must be a multiple of 4 and `offset + 12 <= size`. Cannot be combined with explicit counts. |
-| storage.bytes | `number` | ✔ | — | Byte size for a main API (`vgpu`) storage buffer. |
-| storage.access | `StorageAccess \| StorageOptions` | ✖ | `"read-write"` | Access string, or a `StorageOptions` bag with `access` and `indirect`. Stored on the resource facade and used by binding normalization. |
-| storage.access.indirect | `boolean` | ✖ | `false` | Appends the `"indirect"` buffer usage so the buffer can supply GPU-read draw/dispatch arguments. |
-| storage.write.data | `BufferSource` | ✔ | — | `ArrayBuffer` or `ArrayBufferView`; writes at offset `0` in the public main API (`vgpu`) type. |
+| Param                          | Type                                          |          Required | Default                      | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------ | --------------------------------------------- | ----------------: | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| compute.source                 | `string \| ShaderSource`                      |                 ✔ | —                            | WGSL string or `ShaderSource`. Must include at least one `@compute` entry point.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| compute.opts                   | `ComputeOptions`                              |                 ✖ | `{}`                         | Initial compute options.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| opts.label                     | `string`                                      |                 ✖ | `"compute"`                  | Used in shader reflection, GPU labels, and error `where` fields.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| opts.set                       | `Record<string, unknown>`                     |                 ✖ | `undefined`                  | Initial `.set()` call.                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| opts.constants                 | `Readonly<Record<string, number \| boolean>>` |                 ✖ | WGSL defaults                | Constructor-only values for WGSL `override` constants, applied to the compute stage. Use them to tune workgroup size per device or workload at pipeline creation: `@workgroup_size(WG)` with `override WG: u32`. Keying (`@id(N)` → decimal string of `N`) and number/boolean conversion match `DrawOptions.constants`.                                                                                                                                                           |
+| opts.entry                     | `string`                                      |                 ✖ | first `@compute` entry point | Constructor-only entry point selection when one WGSL module packs several `@compute` kernels sharing structs and bindings (e.g. emit/simulate/compact). The name must exist in the shader with the `@compute` stage. Binding visibility, bind group layouts, and the storage-aliasing preflight follow the selected entry.                                                                                                                                                        |
+| compute.set.values             | `Record<string, unknown>`                     |                 ✔ | —                            | Binding values by WGSL variable name. JS values are packed; buffers/resources are bound by identity.                                                                                                                                                                                                                                                                                                                                                                              |
+| compute.dispatch.x             | `number`                                      |                 ✔ | —                            | Workgroup count X passed to `dispatchWorkgroups`.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| compute.dispatch.y             | `number`                                      |                 ✖ | `1`                          | Workgroup count Y.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| compute.dispatch.z             | `number`                                      |                 ✖ | `1`                          | Workgroup count Z.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| compute.dispatch.opts.indirect | `StorageBuffer \| { buffer, offset? }`        | ✔ in the overload | —                            | GPU-driven dispatch via `dispatchWorkgroupsIndirect`: the GPU reads `[x, y, z]` workgroup counts (3 tightly packed u32, 12 bytes) from the buffer at the byte `offset` (default `0`). Use it when an earlier pass decides how much work exists — variable particle populations, stream compaction. Requires a buffer created with `storage(gpu, bytes, { indirect: true })`; `offset` must be a multiple of 4 and `offset + 12 <= size`. Cannot be combined with explicit counts. |
+| storage.bytes                  | `number`                                      |                 ✔ | —                            | Byte size for a main API (`vgpu`) storage buffer.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| storage.access                 | `StorageAccess \| StorageOptions`             |                 ✖ | `"read-write"`               | Access string, or a `StorageOptions` bag with `access` and `indirect`. Stored on the resource facade and used by binding normalization.                                                                                                                                                                                                                                                                                                                                           |
+| storage.access.indirect        | `boolean`                                     |                 ✖ | `false`                      | Appends the `"indirect"` buffer usage so the buffer can supply GPU-read draw/dispatch arguments.                                                                                                                                                                                                                                                                                                                                                                                  |
+| storage.write.data             | `BufferSource`                                |                 ✔ | —                            | `ArrayBuffer` or `ArrayBufferView`; writes at offset `0` in the public main API (`vgpu`) type.                                                                                                                                                                                                                                                                                                                                                                                    |
 
 **Returns:** `compute(gpu)` returns `Compute`; `set()` returns the same `Compute`; `dispatch()` returns `void` after submitting; `storage(gpu)` returns a main API (`vgpu`) `StorageBuffer`; `StorageBuffer.read()` resolves an `ArrayBuffer` copy.
 
@@ -72,37 +72,44 @@ interface StorageBuffer {
 ## Examples
 
 ```ts
-import { init, compute, storage } from "vgpu/mock";
+import { init, compute, storage } from 'vgpu/mock';
 
 const gpu = await init();
 const bytes = 4 * 16;
-const src = storage(gpu, bytes, "read");
-const dst = storage(gpu, bytes, "read-write");
+const src = storage(gpu, bytes, 'read');
+const dst = storage(gpu, bytes, 'read-write');
 src.write(new Float32Array(16));
 
-const sim = compute(gpu, `
+const sim = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read> src: array<vec4f>;
   @group(0) @binding(1) var<storage, read_write> dst: array<vec4f>;
   @compute @workgroup_size(1)
   fn cs_main(@builtin(global_invocation_id) id: vec3u) {
     dst[id.x] = src[id.x] + vec4f(1.0, 0.0, 0.0, 0.0);
   }
-`, { label: "sim", set: { src, dst } });
+`,
+  { label: 'sim', set: { src, dst } },
+);
 
 sim.dispatch(4);
 ```
 
 ```ts
-import { init, compute, pingPongStorage } from "vgpu/mock";
+import { init, compute, pingPongStorage } from 'vgpu/mock';
 
 const gpu = await init();
 const particles = pingPongStorage(gpu, 1024);
-const step = compute(gpu, `
+const step = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read> src: array<u32>;
   @group(0) @binding(1) var<storage, read_write> dst: array<u32>;
   @compute @workgroup_size(64)
   fn cs_main(@builtin(global_invocation_id) id: vec3u) { dst[id.x] = src[id.x]; }
-`);
+`,
+);
 
 step.set({ src: particles.read, dst: particles.write });
 step.dispatch(Math.ceil(256 / 64));
@@ -110,17 +117,21 @@ particles.swap();
 ```
 
 ```ts
-import { init, compute, storage } from "vgpu/mock";
+import { init, compute, storage } from 'vgpu/mock';
 
 const gpu = await init();
 const wg = 64; // tune per device or workload without editing WGSL
 const data = storage(gpu, 4 * 256);
-const scale = compute(gpu, `
+const scale = compute(
+  gpu,
+  `
   override WG: u32 = 64;
   @group(0) @binding(0) var<storage, read_write> data: array<f32>;
   @compute @workgroup_size(WG)
   fn cs_main(@builtin(global_invocation_id) id: vec3u) { data[id.x] = data[id.x] * 2.0; }
-`, { constants: { WG: wg }, set: { data } });
+`,
+  { constants: { WG: wg }, set: { data } },
+);
 
 scale.dispatch(Math.ceil(256 / wg));
 ```
@@ -128,28 +139,36 @@ scale.dispatch(Math.ceil(256 / wg));
 One JS constant drives both the pipeline's workgroup size and the dispatch math, so retuning `wg` cannot desynchronize them.
 
 ```ts
-import { init, compute, storage } from "vgpu/mock";
+import { init, compute, storage } from 'vgpu/mock';
 
 const gpu = await init();
-const alive = storage(gpu, 4, "read");             // live-particle count, e.g. from emission/compaction
+const alive = storage(gpu, 4, 'read'); // live-particle count, e.g. from emission/compaction
 const args = storage(gpu, 12, { indirect: true }); // [x, y, z] workgroup counts
 const particles = storage(gpu, 4 * 1024);
 
-const prepare = compute(gpu, `
+const prepare = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read> alive: u32;
   @group(0) @binding(1) var<storage, read_write> args: array<u32, 3>;
   @compute @workgroup_size(1) fn cs_main() {
     args[0] = (alive + 63u) / 64u; args[1] = 1u; args[2] = 1u; // one workgroup per 64 live particles
   }
-`, { set: { alive, args } });
+`,
+  { set: { alive, args } },
+);
 
-const step = compute(gpu, `
+const step = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read_write> particles: array<f32>;
   @compute @workgroup_size(64)
   fn cs_main(@builtin(global_invocation_id) id: vec3u) { particles[id.x] = particles[id.x] + 0.016; }
-`, { set: { particles } });
+`,
+  { set: { particles } },
+);
 
-prepare.dispatch(1);               // GPU computes how much work exists
+prepare.dispatch(1); // GPU computes how much work exists
 step.dispatch({ indirect: args }); // GPU reads the counts; JS never sees them
 ```
 

@@ -7,30 +7,30 @@ Creates shared drag-orbit + wheel-zoom controls that drive a camera (or any node
 ## Import
 
 ```ts
-import { orbitControls, type OrbitControlsOptions } from "vgpu/scene";
+import { orbitControls, type OrbitControlsOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare function orbitControls(
-  node: import("vgpu/scene").SceneNode,
-  options?: import("vgpu/scene").OrbitControlsOptions,
-): import("vgpu/scene").OrbitControls;
+  node: import('vgpu/scene').SceneNode,
+  options?: import('vgpu/scene').OrbitControlsOptions,
+): import('vgpu/scene').OrbitControls;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| node | `SceneNode` | ✔ | — | Usually a camera; any node with `set()`/`lookAt()` works. |
-| options.element | `OrbitControlsElement` | ✖ | — | Pointer/wheel source (usually the canvas). Omit for programmatic-only control. |
-| options.target | `Vec3Like` | ✖ | `[0, 0, 0]` | World-space orbit/look-at point. |
-| options.damping | `number` | ✖ | `0.1` | Easing time constant in seconds (~63% convergence). `0` applies input immediately. |
-| options.rotateSpeed | `number` | ✖ | `0.005` | Drag sensitivity in radians per pixel. |
-| options.zoomSpeed | `number` | ✖ | `1` | Wheel zoom sensitivity multiplier. |
-| options.distance | `{ min?, max? }` | ✖ | — | Zoom clamp range. |
-| options.pitch | `{ min?, max? }` | ✖ | ±(π/2 − 0.01) | Pitch limits in radians; defaults keep the camera off the poles. |
+| Param               | Type                   | Required | Default       | Notes                                                                              |
+| ------------------- | ---------------------- | -------- | ------------- | ---------------------------------------------------------------------------------- |
+| node                | `SceneNode`            | ✔        | —             | Usually a camera; any node with `set()`/`lookAt()` works.                          |
+| options.element     | `OrbitControlsElement` | ✖        | —             | Pointer/wheel source (usually the canvas). Omit for programmatic-only control.     |
+| options.target      | `Vec3Like`             | ✖        | `[0, 0, 0]`   | World-space orbit/look-at point.                                                   |
+| options.damping     | `number`               | ✖        | `0.1`         | Easing time constant in seconds (~63% convergence). `0` applies input immediately. |
+| options.rotateSpeed | `number`               | ✖        | `0.005`       | Drag sensitivity in radians per pixel.                                             |
+| options.zoomSpeed   | `number`               | ✖        | `1`           | Wheel zoom sensitivity multiplier.                                                 |
+| options.distance    | `{ min?, max? }`       | ✖        | —             | Zoom clamp range.                                                                  |
+| options.pitch       | `{ min?, max? }`       | ✖        | ±(π/2 − 0.01) | Pitch limits in radians; defaults keep the camera off the poles.                   |
 
 **Returns:** `OrbitControls` with `update()`, `set()`, `dispose()`, and `yaw`/`pitch`/`distance`/`target` state.
 **Throws:** `VGPU-SCENE-VALUE-INVALID` for malformed `target` vectors.
@@ -38,8 +38,8 @@ declare function orbitControls(
 ## Examples
 
 ```ts
-import { clock, init, frameLoop } from "vgpu";
-import { orbitControls, perspectiveCamera } from "vgpu/scene";
+import { clock, init, frameLoop } from 'vgpu';
+import { orbitControls, perspectiveCamera } from 'vgpu/scene';
 
 declare const canvas: HTMLCanvasElement;
 
@@ -68,7 +68,7 @@ Class returned by `orbitControls()`.
 ## Import
 
 ```ts
-import type { OrbitControls } from "vgpu/scene";
+import type { OrbitControls } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -76,7 +76,7 @@ import type { OrbitControls } from "vgpu/scene";
 ```ts
 declare class OrbitControls {
   update(deltaTime?: number): boolean;
-  set(values: import("vgpu/scene").OrbitControlsValues): this;
+  set(values: import('vgpu/scene').OrbitControlsValues): this;
   dispose(): void;
   readonly yaw: number;
   readonly pitch: number;
@@ -88,7 +88,7 @@ declare class OrbitControls {
 ## Examples
 
 ```ts
-import { orbitControls, perspectiveCamera } from "vgpu/scene";
+import { orbitControls, perspectiveCamera } from 'vgpu/scene';
 
 const camera = perspectiveCamera({ fov: 45, position: [0, 0, 5], target: [0, 0, 0] });
 const controls = orbitControls(camera, { damping: 0 });
@@ -112,7 +112,7 @@ Structural event-target contract so controls work with an `HTMLCanvasElement` wi
 ## Import
 
 ```ts
-import type { OrbitControlsElement } from "vgpu/scene";
+import type { OrbitControlsElement } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -132,7 +132,7 @@ interface OrbitControlsElement {
 ## Examples
 
 ```ts
-import type { OrbitControlsElement } from "vgpu/scene";
+import type { OrbitControlsElement } from 'vgpu/scene';
 
 declare const canvas: HTMLCanvasElement;
 const element: OrbitControlsElement = canvas;
@@ -153,15 +153,15 @@ Options accepted by `orbitControls()`.
 ## Import
 
 ```ts
-import type { OrbitControlsOptions } from "vgpu/scene";
+import type { OrbitControlsOptions } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 interface OrbitControlsOptions {
-  readonly element?: import("vgpu/scene").OrbitControlsElement;
-  readonly target?: import("vgpu/scene").Vec3Like;
+  readonly element?: import('vgpu/scene').OrbitControlsElement;
+  readonly target?: import('vgpu/scene').Vec3Like;
   readonly damping?: number;
   readonly rotateSpeed?: number;
   readonly zoomSpeed?: number;
@@ -174,7 +174,7 @@ interface OrbitControlsOptions {
 ## Examples
 
 ```ts
-import { orbitControls, perspectiveCamera } from "vgpu/scene";
+import { orbitControls, perspectiveCamera } from 'vgpu/scene';
 
 orbitControls(perspectiveCamera({ fov: 45, position: [0, 0, 5] }), {
   target: [0, 0.5, 0],
@@ -196,7 +196,7 @@ Values accepted by `OrbitControls.set()`; applied immediately to both state and 
 ## Import
 
 ```ts
-import type { OrbitControlsValues } from "vgpu/scene";
+import type { OrbitControlsValues } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -206,14 +206,14 @@ interface OrbitControlsValues {
   readonly yaw?: number;
   readonly pitch?: number;
   readonly distance?: number;
-  readonly target?: import("vgpu/scene").Vec3Like;
+  readonly target?: import('vgpu/scene').Vec3Like;
 }
 ```
 
 ## Examples
 
 ```ts
-import { orbitControls, perspectiveCamera } from "vgpu/scene";
+import { orbitControls, perspectiveCamera } from 'vgpu/scene';
 
 const controls = orbitControls(perspectiveCamera({ fov: 45, position: [0, 0, 5] }));
 controls.set({ pitch: 0.4, distance: 6 });

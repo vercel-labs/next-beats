@@ -7,21 +7,21 @@ Creates a pure cube descriptor for `geometry(gpu)`. Descriptors are device-agnos
 ## Import
 
 ```ts
-import { box } from "vgpu/scene";
+import { box } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function box(options?: import("vgpu/scene").BoxOptions): import("vgpu/scene").SceneGeometryOfKind<"box">;
+declare function box(options?: import('vgpu/scene').BoxOptions): import('vgpu/scene').SceneGeometryOfKind<'box'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `BoxOptions` | ✖ | `{}` | Configuration bag for the cube descriptor. |
-| options.size | `number` | ✖ | `1` | Edge length used by the geometry factory. Any positive value works. |
+| Param        | Type         | Required | Default | Notes                                                               |
+| ------------ | ------------ | -------- | ------- | ------------------------------------------------------------------- |
+| options      | `BoxOptions` | ✖        | `{}`    | Configuration bag for the cube descriptor.                          |
+| options.size | `number`     | ✖        | `1`     | Edge length used by the geometry factory. Any positive value works. |
 
 **Returns:** `SceneGeometryOfKind<"box">` — frozen descriptor with `kind: "box"` and the props you provided; omitted fields stay omitted until upload-time defaults are applied.
 
@@ -30,7 +30,7 @@ declare function box(options?: import("vgpu/scene").BoxOptions): import("vgpu/sc
 ## Examples
 
 ```ts
-import { box } from "vgpu/scene";
+import { box } from 'vgpu/scene';
 
 const tallCube = box({ size: 3 });
 console.log(tallCube.kind); // "box"
@@ -50,7 +50,7 @@ Shape configuration shared by `box()` descriptors.
 ## Import
 
 ```ts
-import type { BoxOptions } from "vgpu/scene";
+import type { BoxOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -63,9 +63,9 @@ interface BoxOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| size | `number` | ✖ | `1` | Edge length measured in scene units. |
+| Field | Type     | Required | Default | Notes                                |
+| ----- | -------- | -------- | ------- | ------------------------------------ |
+| size  | `number` | ✖        | `1`     | Edge length measured in scene units. |
 
 **Returns:** Not applicable (type definition).
 
@@ -74,7 +74,7 @@ interface BoxOptions {
 ## Examples
 
 ```ts
-import type { BoxOptions } from "vgpu/scene";
+import type { BoxOptions } from 'vgpu/scene';
 
 const solid: BoxOptions = { size: 2 };
 ```
@@ -93,23 +93,25 @@ Generates a UV sphere descriptor with configurable radius and tessellation.
 ## Import
 
 ```ts
-import { sphere } from "vgpu/scene";
+import { sphere } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function sphere(options?: import("vgpu/scene").SphereOptions): import("vgpu/scene").SceneGeometryOfKind<"sphere">;
+declare function sphere(
+  options?: import('vgpu/scene').SphereOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'sphere'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `SphereOptions` | ✖ | `{}` | Configure radius or segments before upload. |
-| options.radius | `number` | ✖ | `0.5` | Physical radius. Must be `> 0` once uploaded. |
-| options.widthSegments | `number` | ✖ | `32` | Meridians. Integer `>= 3`. |
-| options.heightSegments | `number` | ✖ | `16` | Latitudes. Integer `>= 2`. |
+| Param                  | Type            | Required | Default | Notes                                         |
+| ---------------------- | --------------- | -------- | ------- | --------------------------------------------- |
+| options                | `SphereOptions` | ✖        | `{}`    | Configure radius or segments before upload.   |
+| options.radius         | `number`        | ✖        | `0.5`   | Physical radius. Must be `> 0` once uploaded. |
+| options.widthSegments  | `number`        | ✖        | `32`    | Meridians. Integer `>= 3`.                    |
+| options.heightSegments | `number`        | ✖        | `16`    | Latitudes. Integer `>= 2`.                    |
 
 **Returns:** `SceneGeometryOfKind<"sphere">`.
 
@@ -118,7 +120,7 @@ declare function sphere(options?: import("vgpu/scene").SphereOptions): import("v
 ## Examples
 
 ```ts
-import { sphere } from "vgpu/scene";
+import { sphere } from 'vgpu/scene';
 
 const globe = sphere({ radius: 1.2, widthSegments: 48, heightSegments: 32 });
 ```
@@ -137,7 +139,7 @@ Configuration interface for `sphere()`.
 ## Import
 
 ```ts
-import type { SphereOptions } from "vgpu/scene";
+import type { SphereOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -152,11 +154,11 @@ interface SphereOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| widthSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| heightSegments | `number` | ✖ | `16` | Integer `>= 2`. |
+| Field          | Type     | Required | Default | Notes           |
+| -------------- | -------- | -------- | ------- | --------------- |
+| radius         | `number` | ✖        | `0.5`   | Must be `> 0`.  |
+| widthSegments  | `number` | ✖        | `32`    | Integer `>= 3`. |
+| heightSegments | `number` | ✖        | `16`    | Integer `>= 2`. |
 
 **Returns:** Not applicable.
 
@@ -165,7 +167,7 @@ interface SphereOptions {
 ## Examples
 
 ```ts
-import type { SphereOptions } from "vgpu/scene";
+import type { SphereOptions } from 'vgpu/scene';
 
 const detail: SphereOptions = { widthSegments: 96, heightSegments: 64 };
 ```
@@ -184,25 +186,25 @@ XZ-aligned quad descriptor centered at the origin with +Y normals. Use it for gr
 ## Import
 
 ```ts
-import { plane } from "vgpu/scene";
+import { plane } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function plane(options?: import("vgpu/scene").PlaneOptions): import("vgpu/scene").SceneGeometryOfKind<"plane">;
+declare function plane(options?: import('vgpu/scene').PlaneOptions): import('vgpu/scene').SceneGeometryOfKind<'plane'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `PlaneOptions` | ✖ | `{}` | Width/height and tessellation controls. |
-| options.width | `number` | ✖ | `1` | Total X extent; must be `> 0`. |
-| options.height | `number` | ✖ | `1` | Total Z extent; must be `> 0`. |
-| options.widthSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| options.heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"flat"` | Present for parity; normals remain +Y today. |
+| Param                  | Type                 | Required | Default  | Notes                                        |
+| ---------------------- | -------------------- | -------- | -------- | -------------------------------------------- |
+| options                | `PlaneOptions`       | ✖        | `{}`     | Width/height and tessellation controls.      |
+| options.width          | `number`             | ✖        | `1`      | Total X extent; must be `> 0`.               |
+| options.height         | `number`             | ✖        | `1`      | Total Z extent; must be `> 0`.               |
+| options.widthSegments  | `number`             | ✖        | `1`      | Integer `>= 1`.                              |
+| options.heightSegments | `number`             | ✖        | `1`      | Integer `>= 1`.                              |
+| options.shading        | `"flat" \| "smooth"` | ✖        | `"flat"` | Present for parity; normals remain +Y today. |
 
 **Returns:** `SceneGeometryOfKind<"plane">`.
 
@@ -211,7 +213,7 @@ declare function plane(options?: import("vgpu/scene").PlaneOptions): import("vgp
 ## Examples
 
 ```ts
-import { plane } from "vgpu/scene";
+import { plane } from 'vgpu/scene';
 
 const tiled = plane({ width: 10, height: 10, widthSegments: 4, heightSegments: 4 });
 ```
@@ -230,7 +232,7 @@ Options bag used by `plane()`.
 ## Import
 
 ```ts
-import type { PlaneOptions } from "vgpu/scene";
+import type { PlaneOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -241,19 +243,19 @@ interface PlaneOptions {
   readonly height?: number;
   readonly widthSegments?: number;
   readonly heightSegments?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| width | `number` | ✖ | `1` | Must be `> 0`. |
-| height | `number` | ✖ | `1` | Must be `> 0`. |
-| widthSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"flat"` | Smooth is reserved for future upgrades. |
+| Field          | Type                 | Required | Default  | Notes                                   |
+| -------------- | -------------------- | -------- | -------- | --------------------------------------- |
+| width          | `number`             | ✖        | `1`      | Must be `> 0`.                          |
+| height         | `number`             | ✖        | `1`      | Must be `> 0`.                          |
+| widthSegments  | `number`             | ✖        | `1`      | Integer `>= 1`.                         |
+| heightSegments | `number`             | ✖        | `1`      | Integer `>= 1`.                         |
+| shading        | `"flat" \| "smooth"` | ✖        | `"flat"` | Smooth is reserved for future upgrades. |
 
 **Returns:** Not applicable.
 
@@ -262,7 +264,7 @@ interface PlaneOptions {
 ## Examples
 
 ```ts
-import type { PlaneOptions } from "vgpu/scene";
+import type { PlaneOptions } from 'vgpu/scene';
 
 const quad: PlaneOptions = { width: 4, height: 2 };
 ```
@@ -281,26 +283,26 @@ Donut descriptor with independent major/minor radii and optional arc slices.
 ## Import
 
 ```ts
-import { torus } from "vgpu/scene";
+import { torus } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function torus(options?: import("vgpu/scene").TorusOptions): import("vgpu/scene").SceneGeometryOfKind<"torus">;
+declare function torus(options?: import('vgpu/scene').TorusOptions): import('vgpu/scene').SceneGeometryOfKind<'torus'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `TorusOptions` | ✖ | `{}` | Controls radii, arc, and tessellation. |
-| options.radius | `number` | ✖ | `0.5` | Distance from origin to tube center; must be `> options.tube`. |
-| options.tube | `number` | ✖ | `0.2` | Minor radius; must be `> 0`. |
-| options.radialSegments | `number` | ✖ | `16` | Around the tube. Integer `>= 3`. |
-| options.tubularSegments | `number` | ✖ | `32` | Around the ring. Integer `>= 3`. |
-| options.arc | `number` | ✖ | `Math.PI * 2` | Radians to sweep; must be `> 0`. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices for per-triangle normals. |
+| Param                   | Type                 | Required | Default       | Notes                                                          |
+| ----------------------- | -------------------- | -------- | ------------- | -------------------------------------------------------------- |
+| options                 | `TorusOptions`       | ✖        | `{}`          | Controls radii, arc, and tessellation.                         |
+| options.radius          | `number`             | ✖        | `0.5`         | Distance from origin to tube center; must be `> options.tube`. |
+| options.tube            | `number`             | ✖        | `0.2`         | Minor radius; must be `> 0`.                                   |
+| options.radialSegments  | `number`             | ✖        | `16`          | Around the tube. Integer `>= 3`.                               |
+| options.tubularSegments | `number`             | ✖        | `32`          | Around the ring. Integer `>= 3`.                               |
+| options.arc             | `number`             | ✖        | `Math.PI * 2` | Radians to sweep; must be `> 0`.                               |
+| options.shading         | `"flat" \| "smooth"` | ✖        | `"smooth"`    | Flat duplicates vertices for per-triangle normals.             |
 
 **Returns:** `SceneGeometryOfKind<"torus">`.
 
@@ -309,7 +311,7 @@ declare function torus(options?: import("vgpu/scene").TorusOptions): import("vgp
 ## Examples
 
 ```ts
-import { torus } from "vgpu/scene";
+import { torus } from 'vgpu/scene';
 
 const gauge = torus({ radius: 1, tube: 0.15, arc: Math.PI * 1.25 });
 ```
@@ -328,7 +330,7 @@ Configuration interface for `torus()`.
 ## Import
 
 ```ts
-import type { TorusOptions } from "vgpu/scene";
+import type { TorusOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -340,20 +342,20 @@ interface TorusOptions {
   readonly radialSegments?: number;
   readonly tubularSegments?: number;
   readonly arc?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> tube`. |
-| tube | `number` | ✖ | `0.2` | Minor radius `> 0`. |
-| radialSegments | `number` | ✖ | `16` | Integer `>= 3`. |
-| tubularSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| arc | `number` | ✖ | `Math.PI * 2` | Radians `> 0`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Field           | Type                 | Required | Default       | Notes                     |
+| --------------- | -------------------- | -------- | ------------- | ------------------------- |
+| radius          | `number`             | ✖        | `0.5`         | Must be `> tube`.         |
+| tube            | `number`             | ✖        | `0.2`         | Minor radius `> 0`.       |
+| radialSegments  | `number`             | ✖        | `16`          | Integer `>= 3`.           |
+| tubularSegments | `number`             | ✖        | `32`          | Integer `>= 3`.           |
+| arc             | `number`             | ✖        | `Math.PI * 2` | Radians `> 0`.            |
+| shading         | `"flat" \| "smooth"` | ✖        | `"smooth"`    | Flat duplicates vertices. |
 
 **Returns:** Not applicable.
 
@@ -362,7 +364,7 @@ interface TorusOptions {
 ## Examples
 
 ```ts
-import type { TorusOptions } from "vgpu/scene";
+import type { TorusOptions } from 'vgpu/scene';
 
 const tight: TorusOptions = { radius: 0.75, tube: 0.3 };
 ```
@@ -381,20 +383,22 @@ Descriptor for a clip-space fullscreen quad (two triangles, six vertices). Use i
 ## Import
 
 ```ts
-import { fullscreenQuad } from "vgpu/scene";
+import { fullscreenQuad } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function fullscreenQuad(options?: import("vgpu/scene").FullscreenQuadOptions): import("vgpu/scene").SceneGeometryOfKind<"fullscreenQuad">;
+declare function fullscreenQuad(
+  options?: import('vgpu/scene').FullscreenQuadOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'fullscreenQuad'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `FullscreenQuadOptions` | ✖ | `{}` | Reserved for future overrides; currently has no fields. |
+| Param   | Type                    | Required | Default | Notes                                                   |
+| ------- | ----------------------- | -------- | ------- | ------------------------------------------------------- |
+| options | `FullscreenQuadOptions` | ✖        | `{}`    | Reserved for future overrides; currently has no fields. |
 
 **Returns:** `SceneGeometryOfKind<"fullscreenQuad">`.
 
@@ -403,7 +407,7 @@ declare function fullscreenQuad(options?: import("vgpu/scene").FullscreenQuadOpt
 ## Examples
 
 ```ts
-import { fullscreenQuad } from "vgpu/scene";
+import { fullscreenQuad } from 'vgpu/scene';
 
 const descriptor = fullscreenQuad();
 ```
@@ -422,7 +426,7 @@ Placeholder interface to keep API surface future-proof.
 ## Import
 
 ```ts
-import type { FullscreenQuadOptions } from "vgpu/scene";
+import type { FullscreenQuadOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -442,7 +446,7 @@ No fields yet.
 ## Examples
 
 ```ts
-import type { FullscreenQuadOptions } from "vgpu/scene";
+import type { FullscreenQuadOptions } from 'vgpu/scene';
 
 const passthrough: FullscreenQuadOptions = {};
 ```
@@ -461,25 +465,27 @@ Rounded capsule descriptor made of a cylinder body and two hemispherical caps.
 ## Import
 
 ```ts
-import { capsule } from "vgpu/scene";
+import { capsule } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function capsule(options?: import("vgpu/scene").CapsuleOptions): import("vgpu/scene").SceneGeometryOfKind<"capsule">;
+declare function capsule(
+  options?: import('vgpu/scene').CapsuleOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'capsule'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `CapsuleOptions` | ✖ | `{}` | Radius/height/tessellation overrides. |
-| options.radius | `number` | ✖ | `0.5` | Cap radius; must be `> 0`. |
-| options.height | `number` | ✖ | `1` | Cylinder length between caps; total height is `height + 2 * radius`. |
-| options.radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| options.heightSegments | `number` | ✖ | `8` | Integer `>= 2`. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices per triangle. |
+| Param                  | Type                 | Required | Default    | Notes                                                                |
+| ---------------------- | -------------------- | -------- | ---------- | -------------------------------------------------------------------- |
+| options                | `CapsuleOptions`     | ✖        | `{}`       | Radius/height/tessellation overrides.                                |
+| options.radius         | `number`             | ✖        | `0.5`      | Cap radius; must be `> 0`.                                           |
+| options.height         | `number`             | ✖        | `1`        | Cylinder length between caps; total height is `height + 2 * radius`. |
+| options.radialSegments | `number`             | ✖        | `32`       | Integer `>= 3`.                                                      |
+| options.heightSegments | `number`             | ✖        | `8`        | Integer `>= 2`.                                                      |
+| options.shading        | `"flat" \| "smooth"` | ✖        | `"smooth"` | Flat duplicates vertices per triangle.                               |
 
 **Returns:** `SceneGeometryOfKind<"capsule">`.
 
@@ -488,9 +494,9 @@ declare function capsule(options?: import("vgpu/scene").CapsuleOptions): import(
 ## Examples
 
 ```ts
-import { capsule } from "vgpu/scene";
+import { capsule } from 'vgpu/scene';
 
-const pillar = capsule({ radius: 0.3, height: 2, shading: "flat" });
+const pillar = capsule({ radius: 0.3, height: 2, shading: 'flat' });
 ```
 
 ## Notes
@@ -507,7 +513,7 @@ Configuration interface for `capsule()`.
 ## Import
 
 ```ts
-import type { CapsuleOptions } from "vgpu/scene";
+import type { CapsuleOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -518,19 +524,19 @@ interface CapsuleOptions {
   readonly height?: number;
   readonly radialSegments?: number;
   readonly heightSegments?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| height | `number` | ✖ | `1` | Can be zero for perfect spheres. |
-| radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| heightSegments | `number` | ✖ | `8` | Integer `>= 2`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Field          | Type                 | Required | Default    | Notes                            |
+| -------------- | -------------------- | -------- | ---------- | -------------------------------- |
+| radius         | `number`             | ✖        | `0.5`      | Must be `> 0`.                   |
+| height         | `number`             | ✖        | `1`        | Can be zero for perfect spheres. |
+| radialSegments | `number`             | ✖        | `32`       | Integer `>= 3`.                  |
+| heightSegments | `number`             | ✖        | `8`        | Integer `>= 2`.                  |
+| shading        | `"flat" \| "smooth"` | ✖        | `"smooth"` | Flat duplicates vertices.        |
 
 **Returns:** Not applicable.
 
@@ -539,7 +545,7 @@ interface CapsuleOptions {
 ## Examples
 
 ```ts
-import type { CapsuleOptions } from "vgpu/scene";
+import type { CapsuleOptions } from 'vgpu/scene';
 
 const short: CapsuleOptions = { height: 0.5 };
 ```
@@ -558,28 +564,28 @@ Circular cone descriptor with optional base cap and angular slice control.
 ## Import
 
 ```ts
-import { cone } from "vgpu/scene";
+import { cone } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function cone(options?: import("vgpu/scene").ConeOptions): import("vgpu/scene").SceneGeometryOfKind<"cone">;
+declare function cone(options?: import('vgpu/scene').ConeOptions): import('vgpu/scene').SceneGeometryOfKind<'cone'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `ConeOptions` | ✖ | `{}` | Controls size, caps, and tessellation. |
-| options.radius | `number` | ✖ | `0.5` | Base radius; must be `> 0`. |
-| options.height | `number` | ✖ | `1` | Must be `> 0`. |
-| options.radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| options.heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| options.openEnded | `boolean` | ✖ | `false` | Omits the base cap. |
-| options.thetaStart | `number` | ✖ | `0` | Start angle in radians. |
-| options.thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices per face. |
+| Param                  | Type                 | Required | Default       | Notes                                  |
+| ---------------------- | -------------------- | -------- | ------------- | -------------------------------------- |
+| options                | `ConeOptions`        | ✖        | `{}`          | Controls size, caps, and tessellation. |
+| options.radius         | `number`             | ✖        | `0.5`         | Base radius; must be `> 0`.            |
+| options.height         | `number`             | ✖        | `1`           | Must be `> 0`.                         |
+| options.radialSegments | `number`             | ✖        | `32`          | Integer `>= 3`.                        |
+| options.heightSegments | `number`             | ✖        | `1`           | Integer `>= 1`.                        |
+| options.openEnded      | `boolean`            | ✖        | `false`       | Omits the base cap.                    |
+| options.thetaStart     | `number`             | ✖        | `0`           | Start angle in radians.                |
+| options.thetaLength    | `number`             | ✖        | `Math.PI * 2` | Sweep `> 0`.                           |
+| options.shading        | `"flat" \| "smooth"` | ✖        | `"smooth"`    | Flat duplicates vertices per face.     |
 
 **Returns:** `SceneGeometryOfKind<"cone">`.
 
@@ -588,7 +594,7 @@ declare function cone(options?: import("vgpu/scene").ConeOptions): import("vgpu/
 ## Examples
 
 ```ts
-import { cone } from "vgpu/scene";
+import { cone } from 'vgpu/scene';
 
 const spotlight = cone({ radius: 0.4, height: 1.2, openEnded: true, thetaLength: Math.PI });
 ```
@@ -607,7 +613,7 @@ Configuration interface for `cone()`.
 ## Import
 
 ```ts
-import type { ConeOptions } from "vgpu/scene";
+import type { ConeOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -621,22 +627,22 @@ interface ConeOptions {
   readonly openEnded?: boolean;
   readonly thetaStart?: number;
   readonly thetaLength?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| height | `number` | ✖ | `1` | Must be `> 0`. |
-| radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| openEnded | `boolean` | ✖ | `false` | Omits the base cap. |
-| thetaStart | `number` | ✖ | `0` | Start angle in radians. |
-| thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Field          | Type                 | Required | Default       | Notes                     |
+| -------------- | -------------------- | -------- | ------------- | ------------------------- |
+| radius         | `number`             | ✖        | `0.5`         | Must be `> 0`.            |
+| height         | `number`             | ✖        | `1`           | Must be `> 0`.            |
+| radialSegments | `number`             | ✖        | `32`          | Integer `>= 3`.           |
+| heightSegments | `number`             | ✖        | `1`           | Integer `>= 1`.           |
+| openEnded      | `boolean`            | ✖        | `false`       | Omits the base cap.       |
+| thetaStart     | `number`             | ✖        | `0`           | Start angle in radians.   |
+| thetaLength    | `number`             | ✖        | `Math.PI * 2` | Sweep `> 0`.              |
+| shading        | `"flat" \| "smooth"` | ✖        | `"smooth"`    | Flat duplicates vertices. |
 
 **Returns:** Not applicable.
 
@@ -645,7 +651,7 @@ interface ConeOptions {
 ## Examples
 
 ```ts
-import type { ConeOptions } from "vgpu/scene";
+import type { ConeOptions } from 'vgpu/scene';
 
 const halfCone: ConeOptions = { thetaLength: Math.PI };
 ```
@@ -664,30 +670,32 @@ Pure descriptor for cylinders or frustums with independent top/bottom radii and 
 ## Import
 
 ```ts
-import { cylinder } from "vgpu/scene";
+import { cylinder } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function cylinder(options?: import("vgpu/scene").CylinderOptions): import("vgpu/scene").SceneGeometryOfKind<"cylinder">;
+declare function cylinder(
+  options?: import('vgpu/scene').CylinderOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'cylinder'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `CylinderOptions` | ✖ | `{}` | Provide either `radius` or both `radiusTop` and `radiusBottom`. |
-| options.radius | `number` | ✖ | `0.5` | Uniform radius fallback when per-end radii are omitted. |
-| options.radiusTop | `number` | ✖ | `options.radius` | Provide with `radiusBottom` for frustums. Must be `>= 0`. |
-| options.radiusBottom | `number` | ✖ | `options.radius` | Same as `radiusTop`. |
-| options.height | `number` | ✖ | `1` | Must be `> 0`. |
-| options.radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| options.heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| options.openEnded | `boolean` | ✖ | `false` | Omits caps (zero-radius caps are always skipped). |
-| options.thetaStart | `number` | ✖ | `0` | Start angle. |
-| options.thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Param                  | Type                 | Required | Default          | Notes                                                           |
+| ---------------------- | -------------------- | -------- | ---------------- | --------------------------------------------------------------- |
+| options                | `CylinderOptions`    | ✖        | `{}`             | Provide either `radius` or both `radiusTop` and `radiusBottom`. |
+| options.radius         | `number`             | ✖        | `0.5`            | Uniform radius fallback when per-end radii are omitted.         |
+| options.radiusTop      | `number`             | ✖        | `options.radius` | Provide with `radiusBottom` for frustums. Must be `>= 0`.       |
+| options.radiusBottom   | `number`             | ✖        | `options.radius` | Same as `radiusTop`.                                            |
+| options.height         | `number`             | ✖        | `1`              | Must be `> 0`.                                                  |
+| options.radialSegments | `number`             | ✖        | `32`             | Integer `>= 3`.                                                 |
+| options.heightSegments | `number`             | ✖        | `1`              | Integer `>= 1`.                                                 |
+| options.openEnded      | `boolean`            | ✖        | `false`          | Omits caps (zero-radius caps are always skipped).               |
+| options.thetaStart     | `number`             | ✖        | `0`              | Start angle.                                                    |
+| options.thetaLength    | `number`             | ✖        | `Math.PI * 2`    | Sweep `> 0`.                                                    |
+| options.shading        | `"flat" \| "smooth"` | ✖        | `"smooth"`       | Flat duplicates vertices.                                       |
 
 **Returns:** `SceneGeometryOfKind<"cylinder">`.
 
@@ -696,7 +704,7 @@ declare function cylinder(options?: import("vgpu/scene").CylinderOptions): impor
 ## Examples
 
 ```ts
-import { cylinder } from "vgpu/scene";
+import { cylinder } from 'vgpu/scene';
 
 const tapered = cylinder({ radiusTop: 0.2, radiusBottom: 0.4, height: 1.5, radialSegments: 48 });
 ```
@@ -715,7 +723,7 @@ Configuration interface for `cylinder()`.
 ## Import
 
 ```ts
-import type { CylinderOptions } from "vgpu/scene";
+import type { CylinderOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -731,24 +739,24 @@ interface CylinderOptions {
   readonly openEnded?: boolean;
   readonly thetaStart?: number;
   readonly thetaLength?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Uniform fallback radius. |
-| radiusTop | `number` | ✖ | omitted; resolved from `radius` | Provide with `radiusBottom` for frustums. If `radius` is set, omitting this uses `radius`. |
-| radiusBottom | `number` | ✖ | omitted; resolved from `radius` | Provide with `radiusTop`. If `radius` is set, omitting this uses `radius`. |
-| height | `number` | ✖ | `1` | Must be `> 0`. |
-| radialSegments | `number` | ✖ | `32` | Integer `>= 3`. |
-| heightSegments | `number` | ✖ | `1` | Integer `>= 1`. |
-| openEnded | `boolean` | ✖ | `false` | Skip caps when `true`. |
-| thetaStart | `number` | ✖ | `0` | Start angle. |
-| thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Field          | Type                 | Required | Default                         | Notes                                                                                      |
+| -------------- | -------------------- | -------- | ------------------------------- | ------------------------------------------------------------------------------------------ |
+| radius         | `number`             | ✖        | `0.5`                           | Uniform fallback radius.                                                                   |
+| radiusTop      | `number`             | ✖        | omitted; resolved from `radius` | Provide with `radiusBottom` for frustums. If `radius` is set, omitting this uses `radius`. |
+| radiusBottom   | `number`             | ✖        | omitted; resolved from `radius` | Provide with `radiusTop`. If `radius` is set, omitting this uses `radius`.                 |
+| height         | `number`             | ✖        | `1`                             | Must be `> 0`.                                                                             |
+| radialSegments | `number`             | ✖        | `32`                            | Integer `>= 3`.                                                                            |
+| heightSegments | `number`             | ✖        | `1`                             | Integer `>= 1`.                                                                            |
+| openEnded      | `boolean`            | ✖        | `false`                         | Skip caps when `true`.                                                                     |
+| thetaStart     | `number`             | ✖        | `0`                             | Start angle.                                                                               |
+| thetaLength    | `number`             | ✖        | `Math.PI * 2`                   | Sweep `> 0`.                                                                               |
+| shading        | `"flat" \| "smooth"` | ✖        | `"smooth"`                      | Flat duplicates vertices.                                                                  |
 
 **Returns:** Not applicable.
 
@@ -757,7 +765,7 @@ interface CylinderOptions {
 ## Examples
 
 ```ts
-import type { CylinderOptions } from "vgpu/scene";
+import type { CylinderOptions } from 'vgpu/scene';
 
 const frustum: CylinderOptions = { radiusTop: 0.25, radiusBottom: 0.6 };
 ```
@@ -776,24 +784,24 @@ Flat disk descriptor oriented on the XZ plane with upward normals.
 ## Import
 
 ```ts
-import { disk } from "vgpu/scene";
+import { disk } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function disk(options?: import("vgpu/scene").DiskOptions): import("vgpu/scene").SceneGeometryOfKind<"disk">;
+declare function disk(options?: import('vgpu/scene').DiskOptions): import('vgpu/scene').SceneGeometryOfKind<'disk'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `DiskOptions` | ✖ | `{}` | Radius and polar slice overrides. |
-| options.radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| options.segments | `number` | ✖ | `32` | Integer `>= 3`. |
-| options.thetaStart | `number` | ✖ | `0` | Slice start angle. |
-| options.thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
+| Param               | Type          | Required | Default       | Notes                             |
+| ------------------- | ------------- | -------- | ------------- | --------------------------------- |
+| options             | `DiskOptions` | ✖        | `{}`          | Radius and polar slice overrides. |
+| options.radius      | `number`      | ✖        | `0.5`         | Must be `> 0`.                    |
+| options.segments    | `number`      | ✖        | `32`          | Integer `>= 3`.                   |
+| options.thetaStart  | `number`      | ✖        | `0`           | Slice start angle.                |
+| options.thetaLength | `number`      | ✖        | `Math.PI * 2` | Sweep `> 0`.                      |
 
 **Returns:** `SceneGeometryOfKind<"disk">`.
 
@@ -802,7 +810,7 @@ declare function disk(options?: import("vgpu/scene").DiskOptions): import("vgpu/
 ## Examples
 
 ```ts
-import { disk } from "vgpu/scene";
+import { disk } from 'vgpu/scene';
 
 const portal = disk({ radius: 1, segments: 64, thetaLength: Math.PI * 1.5 });
 ```
@@ -821,7 +829,7 @@ Configuration interface for `disk()`.
 ## Import
 
 ```ts
-import type { DiskOptions } from "vgpu/scene";
+import type { DiskOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -837,12 +845,12 @@ interface DiskOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| segments | `number` | ✖ | `32` | Integer `>= 3`. |
-| thetaStart | `number` | ✖ | `0` | Slice start angle. |
-| thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
+| Field       | Type     | Required | Default       | Notes              |
+| ----------- | -------- | -------- | ------------- | ------------------ |
+| radius      | `number` | ✖        | `0.5`         | Must be `> 0`.     |
+| segments    | `number` | ✖        | `32`          | Integer `>= 3`.    |
+| thetaStart  | `number` | ✖        | `0`           | Slice start angle. |
+| thetaLength | `number` | ✖        | `Math.PI * 2` | Sweep `> 0`.       |
 
 **Returns:** Not applicable.
 
@@ -851,7 +859,7 @@ interface DiskOptions {
 ## Examples
 
 ```ts
-import type { DiskOptions } from "vgpu/scene";
+import type { DiskOptions } from 'vgpu/scene';
 
 const slice: DiskOptions = { thetaLength: Math.PI };
 ```
@@ -870,21 +878,23 @@ Regular dodecahedron descriptor backed by the polyhedron geometry builder.
 ## Import
 
 ```ts
-import { dodecahedron } from "vgpu/scene";
+import { dodecahedron } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function dodecahedron(options?: import("vgpu/scene").PolyhedronOptions): import("vgpu/scene").SceneGeometryOfKind<"dodecahedron">;
+declare function dodecahedron(
+  options?: import('vgpu/scene').PolyhedronOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'dodecahedron'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `PolyhedronOptions` | ✖ | `{}` | Provide a radius override. |
-| options.radius | `number` | ✖ | `0.5` | Circumscribed radius; must be `> 0`. |
+| Param          | Type                | Required | Default | Notes                                |
+| -------------- | ------------------- | -------- | ------- | ------------------------------------ |
+| options        | `PolyhedronOptions` | ✖        | `{}`    | Provide a radius override.           |
+| options.radius | `number`            | ✖        | `0.5`   | Circumscribed radius; must be `> 0`. |
 
 **Returns:** `SceneGeometryOfKind<"dodecahedron">`.
 
@@ -893,7 +903,7 @@ declare function dodecahedron(options?: import("vgpu/scene").PolyhedronOptions):
 ## Examples
 
 ```ts
-import { dodecahedron } from "vgpu/scene";
+import { dodecahedron } from 'vgpu/scene';
 
 const rock = dodecahedron({ radius: 0.8 });
 ```
@@ -912,7 +922,7 @@ Shared options for `dodecahedron`, `icosahedron`, `octahedron`, and `tetrahedron
 ## Import
 
 ```ts
-import type { PolyhedronOptions } from "vgpu/scene";
+import type { PolyhedronOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -925,9 +935,9 @@ interface PolyhedronOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Circumscribed radius; must be `> 0`. |
+| Field  | Type     | Required | Default | Notes                                |
+| ------ | -------- | -------- | ------- | ------------------------------------ |
+| radius | `number` | ✖        | `0.5`   | Circumscribed radius; must be `> 0`. |
 
 **Returns:** Not applicable.
 
@@ -936,7 +946,7 @@ interface PolyhedronOptions {
 ## Examples
 
 ```ts
-import type { PolyhedronOptions } from "vgpu/scene";
+import type { PolyhedronOptions } from 'vgpu/scene';
 
 const hudIcon: PolyhedronOptions = { radius: 0.25 };
 ```
@@ -955,13 +965,15 @@ Regular 20-faced polyhedron descriptor.
 ## Import
 
 ```ts
-import { icosahedron } from "vgpu/scene";
+import { icosahedron } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function icosahedron(options?: import("vgpu/scene").PolyhedronOptions): import("vgpu/scene").SceneGeometryOfKind<"icosahedron">;
+declare function icosahedron(
+  options?: import('vgpu/scene').PolyhedronOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'icosahedron'>;
 ```
 
 ## Parameters
@@ -975,7 +987,7 @@ Same as `dodecahedron`; omit or override `radius`.
 ## Examples
 
 ```ts
-import { icosahedron } from "vgpu/scene";
+import { icosahedron } from 'vgpu/scene';
 
 const crystal = icosahedron({ radius: 0.6 });
 ```
@@ -994,23 +1006,25 @@ Geodesic sphere descriptor obtained by subdividing an icosahedron.
 ## Import
 
 ```ts
-import { icosphere } from "vgpu/scene";
+import { icosphere } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function icosphere(options?: import("vgpu/scene").IcosphereOptions): import("vgpu/scene").SceneGeometryOfKind<"icosphere">;
+declare function icosphere(
+  options?: import('vgpu/scene').IcosphereOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'icosphere'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `IcosphereOptions` | ✖ | `{}` | Radius and subdivision overrides. |
-| options.radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| options.subdivisions | `number` | ✖ | `2` | Integer in `[0, 6]`; each step quadruples triangle count. |
-| options.shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices for per-face normals. |
+| Param                | Type                 | Required | Default    | Notes                                                     |
+| -------------------- | -------------------- | -------- | ---------- | --------------------------------------------------------- |
+| options              | `IcosphereOptions`   | ✖        | `{}`       | Radius and subdivision overrides.                         |
+| options.radius       | `number`             | ✖        | `0.5`      | Must be `> 0`.                                            |
+| options.subdivisions | `number`             | ✖        | `2`        | Integer in `[0, 6]`; each step quadruples triangle count. |
+| options.shading      | `"flat" \| "smooth"` | ✖        | `"smooth"` | Flat duplicates vertices for per-face normals.            |
 
 **Returns:** `SceneGeometryOfKind<"icosphere">`.
 
@@ -1019,9 +1033,9 @@ declare function icosphere(options?: import("vgpu/scene").IcosphereOptions): imp
 ## Examples
 
 ```ts
-import { icosphere } from "vgpu/scene";
+import { icosphere } from 'vgpu/scene';
 
-const moon = icosphere({ radius: 1, subdivisions: 4, shading: "flat" });
+const moon = icosphere({ radius: 1, subdivisions: 4, shading: 'flat' });
 ```
 
 ## Notes
@@ -1038,7 +1052,7 @@ Configuration interface for `icosphere()`.
 ## Import
 
 ```ts
-import type { IcosphereOptions } from "vgpu/scene";
+import type { IcosphereOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -1047,17 +1061,17 @@ import type { IcosphereOptions } from "vgpu/scene";
 interface IcosphereOptions {
   readonly radius?: number;
   readonly subdivisions?: number;
-  readonly shading?: "flat" | "smooth";
+  readonly shading?: 'flat' | 'smooth';
 }
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| radius | `number` | ✖ | `0.5` | Must be `> 0`. |
-| subdivisions | `number` | ✖ | `2` | Integer in `[0, 6]`. |
-| shading | `"flat" \| "smooth"` | ✖ | `"smooth"` | Flat duplicates vertices. |
+| Field        | Type                 | Required | Default    | Notes                     |
+| ------------ | -------------------- | -------- | ---------- | ------------------------- |
+| radius       | `number`             | ✖        | `0.5`      | Must be `> 0`.            |
+| subdivisions | `number`             | ✖        | `2`        | Integer in `[0, 6]`.      |
+| shading      | `"flat" \| "smooth"` | ✖        | `"smooth"` | Flat duplicates vertices. |
 
 **Returns:** Not applicable.
 
@@ -1066,7 +1080,7 @@ interface IcosphereOptions {
 ## Examples
 
 ```ts
-import type { IcosphereOptions } from "vgpu/scene";
+import type { IcosphereOptions } from 'vgpu/scene';
 
 const lowPoly: IcosphereOptions = { subdivisions: 1 };
 ```
@@ -1085,13 +1099,15 @@ Regular octahedron descriptor.
 ## Import
 
 ```ts
-import { octahedron } from "vgpu/scene";
+import { octahedron } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function octahedron(options?: import("vgpu/scene").PolyhedronOptions): import("vgpu/scene").SceneGeometryOfKind<"octahedron">;
+declare function octahedron(
+  options?: import('vgpu/scene').PolyhedronOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'octahedron'>;
 ```
 
 ## Parameters
@@ -1105,7 +1121,7 @@ Same as `dodecahedron`.
 ## Examples
 
 ```ts
-import { octahedron } from "vgpu/scene";
+import { octahedron } from 'vgpu/scene';
 
 const diamond = octahedron({ radius: 0.7 });
 ```
@@ -1124,25 +1140,25 @@ Annulus descriptor with independent inner/outer radii and optional polar slices.
 ## Import
 
 ```ts
-import { ring } from "vgpu/scene";
+import { ring } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function ring(options?: import("vgpu/scene").RingOptions): import("vgpu/scene").SceneGeometryOfKind<"ring">;
+declare function ring(options?: import('vgpu/scene').RingOptions): import('vgpu/scene').SceneGeometryOfKind<'ring'>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options | `RingOptions` | ✖ | `{}` | Controls radii and slices. |
-| options.innerRadius | `number` | ✖ | `0.25` | Must be `> 0`. |
-| options.outerRadius | `number` | ✖ | `0.5` | Must be `> innerRadius`. |
-| options.segments | `number` | ✖ | `32` | Integer `>= 3`. |
-| options.thetaStart | `number` | ✖ | `0` | Slice start. |
-| options.thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
+| Param               | Type          | Required | Default       | Notes                      |
+| ------------------- | ------------- | -------- | ------------- | -------------------------- |
+| options             | `RingOptions` | ✖        | `{}`          | Controls radii and slices. |
+| options.innerRadius | `number`      | ✖        | `0.25`        | Must be `> 0`.             |
+| options.outerRadius | `number`      | ✖        | `0.5`         | Must be `> innerRadius`.   |
+| options.segments    | `number`      | ✖        | `32`          | Integer `>= 3`.            |
+| options.thetaStart  | `number`      | ✖        | `0`           | Slice start.               |
+| options.thetaLength | `number`      | ✖        | `Math.PI * 2` | Sweep `> 0`.               |
 
 **Returns:** `SceneGeometryOfKind<"ring">`.
 
@@ -1151,7 +1167,7 @@ declare function ring(options?: import("vgpu/scene").RingOptions): import("vgpu/
 ## Examples
 
 ```ts
-import { ring } from "vgpu/scene";
+import { ring } from 'vgpu/scene';
 
 const halo = ring({ innerRadius: 0.9, outerRadius: 1, segments: 48 });
 ```
@@ -1170,7 +1186,7 @@ Configuration interface for `ring()`.
 ## Import
 
 ```ts
-import type { RingOptions } from "vgpu/scene";
+import type { RingOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -1187,13 +1203,13 @@ interface RingOptions {
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| innerRadius | `number` | ✖ | `0.25` | Must be `> 0`. |
-| outerRadius | `number` | ✖ | `0.5` | Must be `> innerRadius`. |
-| segments | `number` | ✖ | `32` | Integer `>= 3`. |
-| thetaStart | `number` | ✖ | `0` | Slice start. |
-| thetaLength | `number` | ✖ | `Math.PI * 2` | Sweep `> 0`. |
+| Field       | Type     | Required | Default       | Notes                    |
+| ----------- | -------- | -------- | ------------- | ------------------------ |
+| innerRadius | `number` | ✖        | `0.25`        | Must be `> 0`.           |
+| outerRadius | `number` | ✖        | `0.5`         | Must be `> innerRadius`. |
+| segments    | `number` | ✖        | `32`          | Integer `>= 3`.          |
+| thetaStart  | `number` | ✖        | `0`           | Slice start.             |
+| thetaLength | `number` | ✖        | `Math.PI * 2` | Sweep `> 0`.             |
 
 **Returns:** Not applicable.
 
@@ -1202,7 +1218,7 @@ interface RingOptions {
 ## Examples
 
 ```ts
-import type { RingOptions } from "vgpu/scene";
+import type { RingOptions } from 'vgpu/scene';
 
 const arc: RingOptions = { thetaLength: Math.PI * 0.75 };
 ```
@@ -1221,13 +1237,15 @@ Regular tetrahedron descriptor.
 ## Import
 
 ```ts
-import { tetrahedron } from "vgpu/scene";
+import { tetrahedron } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-declare function tetrahedron(options?: import("vgpu/scene").PolyhedronOptions): import("vgpu/scene").SceneGeometryOfKind<"tetrahedron">;
+declare function tetrahedron(
+  options?: import('vgpu/scene').PolyhedronOptions,
+): import('vgpu/scene').SceneGeometryOfKind<'tetrahedron'>;
 ```
 
 ## Parameters
@@ -1241,7 +1259,7 @@ Same as `dodecahedron`.
 ## Examples
 
 ```ts
-import { tetrahedron } from "vgpu/scene";
+import { tetrahedron } from 'vgpu/scene';
 
 const marker = tetrahedron({ radius: 0.3 });
 ```
@@ -1260,36 +1278,36 @@ Frozen namespace exposing every primitive helper through properties, useful for 
 ## Import
 
 ```ts
-import { geometries } from "vgpu/scene";
+import { geometries } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare const geometries: {
-  readonly box: typeof import("vgpu/scene")["box"];
-  readonly capsule: typeof import("vgpu/scene")["capsule"];
-  readonly cone: typeof import("vgpu/scene")["cone"];
-  readonly cylinder: typeof import("vgpu/scene")["cylinder"];
-  readonly disk: typeof import("vgpu/scene")["disk"];
-  readonly dodecahedron: typeof import("vgpu/scene")["dodecahedron"];
-  readonly fullscreenQuad: typeof import("vgpu/scene")["fullscreenQuad"];
-  readonly icosahedron: typeof import("vgpu/scene")["icosahedron"];
-  readonly icosphere: typeof import("vgpu/scene")["icosphere"];
-  readonly octahedron: typeof import("vgpu/scene")["octahedron"];
-  readonly plane: typeof import("vgpu/scene")["plane"];
-  readonly ring: typeof import("vgpu/scene")["ring"];
-  readonly sphere: typeof import("vgpu/scene")["sphere"];
-  readonly tetrahedron: typeof import("vgpu/scene")["tetrahedron"];
-  readonly torus: typeof import("vgpu/scene")["torus"];
+  readonly box: (typeof import('vgpu/scene'))['box'];
+  readonly capsule: (typeof import('vgpu/scene'))['capsule'];
+  readonly cone: (typeof import('vgpu/scene'))['cone'];
+  readonly cylinder: (typeof import('vgpu/scene'))['cylinder'];
+  readonly disk: (typeof import('vgpu/scene'))['disk'];
+  readonly dodecahedron: (typeof import('vgpu/scene'))['dodecahedron'];
+  readonly fullscreenQuad: (typeof import('vgpu/scene'))['fullscreenQuad'];
+  readonly icosahedron: (typeof import('vgpu/scene'))['icosahedron'];
+  readonly icosphere: (typeof import('vgpu/scene'))['icosphere'];
+  readonly octahedron: (typeof import('vgpu/scene'))['octahedron'];
+  readonly plane: (typeof import('vgpu/scene'))['plane'];
+  readonly ring: (typeof import('vgpu/scene'))['ring'];
+  readonly sphere: (typeof import('vgpu/scene'))['sphere'];
+  readonly tetrahedron: (typeof import('vgpu/scene'))['tetrahedron'];
+  readonly torus: (typeof import('vgpu/scene'))['torus'];
 };
 ```
 
 ## Parameters
 
-| Property | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| `geometries.<name>` | `Function` | ✔ | — | Each property mirrors the standalone export. |
+| Property            | Type       | Required | Default | Notes                                        |
+| ------------------- | ---------- | -------- | ------- | -------------------------------------------- |
+| `geometries.<name>` | `Function` | ✔        | —       | Each property mirrors the standalone export. |
 
 **Returns:** Frozen object with the same helpers you can import individually.
 
@@ -1298,7 +1316,7 @@ declare const geometries: {
 ## Examples
 
 ```ts
-import { geometries } from "vgpu/scene";
+import { geometries } from 'vgpu/scene';
 
 const primitiveNames = Object.keys(geometries);
 ```
@@ -1317,35 +1335,35 @@ String-literal union covering every built-in geometry kind.
 ## Import
 
 ```ts
-import type { GeometryKind } from "vgpu/scene";
+import type { GeometryKind } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 type GeometryKind =
-  | "box"
-  | "capsule"
-  | "cone"
-  | "cylinder"
-  | "disk"
-  | "dodecahedron"
-  | "fullscreenQuad"
-  | "icosahedron"
-  | "icosphere"
-  | "octahedron"
-  | "plane"
-  | "ring"
-  | "sphere"
-  | "tetrahedron"
-  | "torus";
+  | 'box'
+  | 'capsule'
+  | 'cone'
+  | 'cylinder'
+  | 'disk'
+  | 'dodecahedron'
+  | 'fullscreenQuad'
+  | 'icosahedron'
+  | 'icosphere'
+  | 'octahedron'
+  | 'plane'
+  | 'ring'
+  | 'sphere'
+  | 'tetrahedron'
+  | 'torus';
 ```
 
 ## Parameters
 
-| Value | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| listed literals | `GeometryKind` | ✔ | — | Each literal matches a descriptor `kind`. |
+| Value           | Type           | Required | Default | Notes                                     |
+| --------------- | -------------- | -------- | ------- | ----------------------------------------- |
+| listed literals | `GeometryKind` | ✔        | —       | Each literal matches a descriptor `kind`. |
 
 **Returns:** Not applicable.
 
@@ -1354,10 +1372,10 @@ type GeometryKind =
 ## Examples
 
 ```ts
-import type { GeometryKind } from "vgpu/scene";
+import type { GeometryKind } from 'vgpu/scene';
 
 function isPolyhedron(kind: GeometryKind): boolean {
-  return ["dodecahedron", "icosahedron", "octahedron", "tetrahedron"].includes(kind);
+  return ['dodecahedron', 'icosahedron', 'octahedron', 'tetrahedron'].includes(kind);
 }
 ```
 
@@ -1375,21 +1393,21 @@ Union of every primitive descriptor returned by the geometry helpers.
 ## Import
 
 ```ts
-import type { SceneGeometry } from "vgpu/scene";
+import type { SceneGeometry } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-type SceneGeometry = import("vgpu/scene").SceneGeometry;
+type SceneGeometry = import('vgpu/scene').SceneGeometry;
 ```
 
 ## Parameters
 
-| Field | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| kind | `GeometryKind` | ✔ | — | Identifies the primitive helper that produced the descriptor. |
-| props | `Readonly<...>` | ✔ | — | Captured options exactly as provided and frozen; upload-time geometry factories apply the defaults listed on each option table. |
+| Field | Type            | Required | Default | Notes                                                                                                                           |
+| ----- | --------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| kind  | `GeometryKind`  | ✔        | —       | Identifies the primitive helper that produced the descriptor.                                                                   |
+| props | `Readonly<...>` | ✔        | —       | Captured options exactly as provided and frozen; upload-time geometry factories apply the defaults listed on each option table. |
 
 **Returns:** Not applicable (type definition).
 
@@ -1398,8 +1416,8 @@ type SceneGeometry = import("vgpu/scene").SceneGeometry;
 ## Examples
 
 ```ts
-import { box } from "vgpu/scene";
-import type { SceneGeometry } from "vgpu/scene";
+import { box } from 'vgpu/scene';
+import type { SceneGeometry } from 'vgpu/scene';
 
 const primitives: SceneGeometry[] = [box({ size: 2 })];
 ```
@@ -1418,20 +1436,23 @@ Conditional helper that narrows a `SceneGeometry` union to a specific primitive.
 ## Import
 
 ```ts
-import type { SceneGeometryOfKind } from "vgpu/scene";
+import type { SceneGeometryOfKind } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
-type SceneGeometryOfKind<K extends import("vgpu/scene").GeometryKind> = Extract<import("vgpu/scene").SceneGeometry, { readonly kind: K }>;
+type SceneGeometryOfKind<K extends import('vgpu/scene').GeometryKind> = Extract<
+  import('vgpu/scene').SceneGeometry,
+  { readonly kind: K }
+>;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| K | `GeometryKind` | ✔ | — | Primitive to extract from the union. |
+| Param | Type           | Required | Default | Notes                                |
+| ----- | -------------- | -------- | ------- | ------------------------------------ |
+| K     | `GeometryKind` | ✔        | —       | Primitive to extract from the union. |
 
 **Returns:** Not applicable.
 
@@ -1440,10 +1461,10 @@ type SceneGeometryOfKind<K extends import("vgpu/scene").GeometryKind> = Extract<
 ## Examples
 
 ```ts
-import { sphere } from "vgpu/scene";
-import type { SceneGeometryOfKind } from "vgpu/scene";
+import { sphere } from 'vgpu/scene';
+import type { SceneGeometryOfKind } from 'vgpu/scene';
 
-const glossy: SceneGeometryOfKind<"sphere"> = sphere({ radius: 1 });
+const glossy: SceneGeometryOfKind<'sphere'> = sphere({ radius: 1 });
 ```
 
 ## Notes

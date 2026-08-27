@@ -7,19 +7,35 @@ Target-agnostic renderable shader unit created by `draw(gpu)`. It reflects WGSL 
 ## Import
 
 ```ts
-import type { DepthOptions, Draw, DrawOptions, DrawCallOptions, DrawLayoutOptions, GeometryLike, StencilFaceOptions, StencilOptions } from "vgpu";
+import type {
+  DepthOptions,
+  Draw,
+  DrawOptions,
+  DrawCallOptions,
+  DrawLayoutOptions,
+  GeometryLike,
+  StencilFaceOptions,
+  StencilOptions,
+} from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { ShaderSource, StorageBuffer, Target, TargetSignature } from "vgpu";
+import type { ShaderSource, StorageBuffer, Target, TargetSignature } from 'vgpu';
 
 type SetBag = Record<string, unknown>;
 
-type BlendPreset = "alpha" | "additive" | "premultiplied";
-interface BlendComponentOptions { readonly src: GPUBlendFactor; readonly dst: GPUBlendFactor; readonly op?: GPUBlendOperation; }
-interface BlendOptions { readonly color: BlendComponentOptions; readonly alpha?: BlendComponentOptions; }
+type BlendPreset = 'alpha' | 'additive' | 'premultiplied';
+interface BlendComponentOptions {
+  readonly src: GPUBlendFactor;
+  readonly dst: GPUBlendFactor;
+  readonly op?: GPUBlendOperation;
+}
+interface BlendOptions {
+  readonly color: BlendComponentOptions;
+  readonly alpha?: BlendComponentOptions;
+}
 
 interface DepthOptions {
   readonly write?: boolean;
@@ -55,10 +71,13 @@ interface DrawOptions {
   readonly firstInstance?: number;
   readonly blend?: BlendPreset | BlendOptions;
   readonly blendConstant?: readonly [number, number, number, number];
-  readonly writeMask?: readonly ("r" | "g" | "b" | "a")[];
-  readonly colors?: readonly ({ readonly blend?: BlendPreset | BlendOptions; readonly writeMask?: readonly ("r" | "g" | "b" | "a")[] } | null)[];
-  readonly cull?: "none" | "front" | "back";
-  readonly frontFace?: "ccw" | "cw";
+  readonly writeMask?: readonly ('r' | 'g' | 'b' | 'a')[];
+  readonly colors?: readonly ({
+    readonly blend?: BlendPreset | BlendOptions;
+    readonly writeMask?: readonly ('r' | 'g' | 'b' | 'a')[];
+  } | null)[];
+  readonly cull?: 'none' | 'front' | 'back';
+  readonly frontFace?: 'ccw' | 'cw';
   readonly unclippedDepth?: boolean;
   readonly depth?: false | DepthOptions;
   readonly stencil?: StencilOptions;
@@ -80,7 +99,9 @@ interface DrawCallOptions {
   readonly indirect?: StorageBuffer | { readonly buffer: StorageBuffer; readonly offset?: number };
 }
 
-interface DrawLayoutOptions { readonly dynamicOffsets?: boolean; }
+interface DrawLayoutOptions {
+  readonly dynamicOffsets?: boolean;
+}
 
 interface GeometryLike {
   readonly vertexCount?: number;
@@ -111,70 +132,70 @@ interface Draw {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts.shader | `string \| ShaderSource` | ✔ | — | WGSL string or loader-produced `ShaderSource`. Must contain compatible vertex/fragment entry points; default names are `vs_main` and `fs_main` if reflection does not find them. |
-| opts.geometry | `GeometryLike` | ✖ | `undefined` | Supplies vertex/index buffers and layouts. Omit for generated vertex-index drawing. |
-| opts.set | `Record<string, unknown>` | ✖ | `undefined` | Initial `.set()` call. |
-| opts.label | `string` | ✖ | `"draw"` | Debug/error label. |
-| opts.targets | `readonly Target[]` | ✖ | `undefined` | Synchronous pre-warm sugar for the listed target signatures. In browser load paths, prefer `await draw.compile(target)`. |
-| opts.instances | `number` | ✖ | `1` | Default instance count. Integer `>= 0`; per-call `instances` overrides. |
-| opts.vertices | `number` | ✖ | `3` for non-indexed, unless `geometry.vertexCount` exists | Default non-indexed vertex count. Ignored by indexed geometries. Integer `>= 0`. |
-| opts.firstInstance | `number` | ✖ | `0` | Default first instance. Integer `>= 0`; per-call `firstInstance` overrides. |
-| opts.blend | `"alpha" \| "additive" \| "premultiplied" \| BlendOptions` | ✖ | `undefined` | Constructor-only blend state applied uniformly to every color target. Presets resolve at construction; explicit components use `src`/`dst` and optional `op` (`"add"` default). Omitted `alpha` copies `color`. |
-| opts.blendConstant | `readonly [number, number, number, number]` | ✖ | whatever the pass holds — `(0, 0, 0, 0)` at pass start | Scales `"constant"`/`"one-minus-constant"` blend factors. Use it to fade or crossfade a whole layer per draw without touching per-vertex alpha. Encoder state, not pipeline state (see Notes). Components must be finite; values outside `[0, 1]` are legal. When omitted, no `setBlendConstant` is emitted for this draw, so constant factors read the current pass value: the `(0, 0, 0, 0)` default at the start of the pass, or the value an earlier draw in the same pass set, which persists until the next set. At least one color target's effective blend (`colors[i].blend` when that target has one, else the top-level `blend`) must use a constant factor. |
-| opts.writeMask | `readonly ("r" \| "g" \| "b" \| "a")[]` | ✖ | all channels | Constructor-only color channel mask applied uniformly to every color target. Omit to write RGBA; `[]` writes no channels; `["r","g","b"]` skips alpha. |
-| opts.colors | `readonly ({ blend?, writeMask? } \| null)[]` | ✖ | `undefined` | Per-attachment blend/writeMask overrides for MRT — the deferred-shading case, where one draw writes a G-buffer (`target(gpu, { colors: [...] })`) and each attachment needs different state. One entry per color attachment, aligned by index. Inheritance is per field: `null` entries and omitted fields fall back to the top-level `blend`/`writeMask`; `{ writeMask: [] }` leaves that attachment untouched. |
-| opts.cull | `"none" \| "front" \| "back"` | ✖ | `"none"` | Skips rasterizing triangles that face away from the chosen side. `"back"`: culls faces pointing away from the viewer; on a closed geometry they are never visible, so the GPU skips roughly half the fragment work. `"front"`: culls faces toward the viewer; used when rendering shadow maps to reduce peter panning. When omitted, no triangles are culled — required for open geometry such as foliage cards. |
-| opts.frontFace | `"ccw" \| "cw"` | ✖ | `"ccw"` | Winding order that counts as front-facing — the reference `cull` works against. Set `"cw"` for geometry authored clockwise, or for draws with a negative (mirrored) scale, which flips the on-screen winding. When omitted, counter-clockwise triangles are front. |
-| opts.unclippedDepth | `boolean` | ✖ | `false` | Disables depth clipping so geometry outside `[near, far]` rasterizes instead of vanishing. Use it for shadow-map pancaking: casters behind the light's near plane flatten onto it instead of being clipped out of the map. Requires the `"depth-clip-control"` device feature. When omitted or `false`, standard clipping applies. |
-| opts.depth | `false \| DepthOptions` | ✖ | `{ write: true, compare: "less-equal" }` | Depth test/write state for targets with a depth attachment; fields are in the `DepthOptions` table below. `false` disables depth testing for overlays and gizmos that must draw over the scene regardless of distance. When omitted, nearer fragments win and coplanar re-draws still pass; ignored when the target has no depth. |
-| opts.stencil | `StencilOptions` | ✖ | WebGPU pass-through defaults | Masks draws to marked screen regions using the stencil aspect of the depth attachment — portals, mirrors, object outlines, masked UI. Requires a target depth format with a stencil aspect (`depth: "depth24plus-stencil8"`). Fields are in the `StencilOptions` table below. |
-| opts.multisample | `{ alphaToCoverage?, mask? }` | ✖ | `{ alphaToCoverage: false, mask: 0xFFFFFFFF }` | MSAA state. `alphaToCoverage`: turns fragment alpha into a per-sample coverage mask, so alpha-tested foliage antialiases in any draw order — no blending, no transparency sorting; requires an `msaa: true` target. `mask`: bitmask of samples the draw may write — a niche debugging tool most draws never set. Only the low `sampleCount` bits matter; higher bits are legal and ignored. |
-| opts.constants | `Readonly<Record<string, number \| boolean>>` | ✖ | the WGSL defaults | Values for WGSL `override` constants, fixed at pipeline creation. Use them to specialize one shader — quality tiers, feature toggles, workgroup-size tuning — without string-templating the WGSL. Key by override name, or by the decimal string of `N` when the declaration has `@id(N)` (the name is not usable then). Booleans become `1`/`0`; every override declared without a default must be provided. |
-| opts.entry | `{ vertex?: string; fragment?: string }` | ✖ | first entry point of each stage | Selects which `@vertex`/`@fragment` functions to compile when one WGSL module declares several — variants of one technique sharing helpers, such as depth-only and shaded passes from the same source. Names must exist in the shader with the matching stage. Omitted fields keep the first entry point of that stage. |
-| draw.set.values | `Record<string, unknown>` | ✔ | — | Values keyed by WGSL binding variable name. JS objects/numbers are packed; resources are bound by identity. |
-| draw.group.n | `number` | ✔ | — | Bind group index to claim for manual bind-group binding (`group(n, bindGroup)`). |
-| draw.group.bindGroup | `GPUBindGroup` | ✔ | — | Must be compatible with `draw.layout(n)` or `draw.layout(n, { dynamicOffsets: true })`. |
-| draw.layout.n | `number` | ✔ | — | Reflected bind group index. |
-| draw.layout.opts.dynamicOffsets | `boolean` | ✖ | `false` | When `true`, returns/reuses a layout whose buffer entries have `hasDynamicOffset: true` and clears cached pipelines. |
-| draw.draw.target | `Target \| DrawCallOptions` | ✖ | `{}` | One-shot draw options. Pass a bare target for the common case, or an options bag when setting counts or offsets. |
-| opts.target | `Target` | ✖ | — | Required at runtime when an options bag is used. Use a `Surface` or an offscreen `Target`. |
-| opts.offsets | `readonly number[] \| Partial<Record<number, readonly number[]>>` | ✖ | Reflected/claimed fallback offsets | Dynamic offsets for claimed/dynamic groups. Array applies to every group; object keys by group. |
-| opts.instances | `number` | ✖ | `DrawOptions.instances ?? geometry.instanceCount ?? 1` | Per-call instance count; integer `>= 0`. |
-| opts.vertices | `number` | ✖ | `geometry.vertexCount ?? DrawOptions.vertices ?? 3` | Per-call non-indexed vertex count; indexed geometries use `geometry.indexCount`. |
-| opts.firstVertex | `number` | ✖ | `0` | Non-indexed first vertex; indexed geometries use firstIndex/baseVertex `0`. |
-| opts.firstInstance | `number` | ✖ | `DrawOptions.firstInstance ?? 0` | Per-call first instance. |
-| opts.indirect | `StorageBuffer \| { buffer, offset? }` | ✖ | `undefined` | GPU-driven draw: the GPU reads the draw arguments from the buffer at byte `offset` (default `0`) instead of CPU-side counts. Use it when a culling compute pass decides what to draw — the arguments are written on the GPU and the CPU never round-trips. Create the buffer with `storage(gpu, bytes, { indirect: true })`; argument layouts are in Notes. |
+| Param                           | Type                                                              | Required | Default                                                   | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------- | ----------------------------------------------------------------- | -------: | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| opts.shader                     | `string \| ShaderSource`                                          |        ✔ | —                                                         | WGSL string or loader-produced `ShaderSource`. Must contain compatible vertex/fragment entry points; default names are `vs_main` and `fs_main` if reflection does not find them.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| opts.geometry                   | `GeometryLike`                                                    |        ✖ | `undefined`                                               | Supplies vertex/index buffers and layouts. Omit for generated vertex-index drawing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| opts.set                        | `Record<string, unknown>`                                         |        ✖ | `undefined`                                               | Initial `.set()` call.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| opts.label                      | `string`                                                          |        ✖ | `"draw"`                                                  | Debug/error label.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| opts.targets                    | `readonly Target[]`                                               |        ✖ | `undefined`                                               | Synchronous pre-warm sugar for the listed target signatures. In browser load paths, prefer `await draw.compile(target)`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| opts.instances                  | `number`                                                          |        ✖ | `1`                                                       | Default instance count. Integer `>= 0`; per-call `instances` overrides.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| opts.vertices                   | `number`                                                          |        ✖ | `3` for non-indexed, unless `geometry.vertexCount` exists | Default non-indexed vertex count. Ignored by indexed geometries. Integer `>= 0`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| opts.firstInstance              | `number`                                                          |        ✖ | `0`                                                       | Default first instance. Integer `>= 0`; per-call `firstInstance` overrides.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| opts.blend                      | `"alpha" \| "additive" \| "premultiplied" \| BlendOptions`        |        ✖ | `undefined`                                               | Constructor-only blend state applied uniformly to every color target. Presets resolve at construction; explicit components use `src`/`dst` and optional `op` (`"add"` default). Omitted `alpha` copies `color`.                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| opts.blendConstant              | `readonly [number, number, number, number]`                       |        ✖ | whatever the pass holds — `(0, 0, 0, 0)` at pass start    | Scales `"constant"`/`"one-minus-constant"` blend factors. Use it to fade or crossfade a whole layer per draw without touching per-vertex alpha. Encoder state, not pipeline state (see Notes). Components must be finite; values outside `[0, 1]` are legal. When omitted, no `setBlendConstant` is emitted for this draw, so constant factors read the current pass value: the `(0, 0, 0, 0)` default at the start of the pass, or the value an earlier draw in the same pass set, which persists until the next set. At least one color target's effective blend (`colors[i].blend` when that target has one, else the top-level `blend`) must use a constant factor. |
+| opts.writeMask                  | `readonly ("r" \| "g" \| "b" \| "a")[]`                           |        ✖ | all channels                                              | Constructor-only color channel mask applied uniformly to every color target. Omit to write RGBA; `[]` writes no channels; `["r","g","b"]` skips alpha.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| opts.colors                     | `readonly ({ blend?, writeMask? } \| null)[]`                     |        ✖ | `undefined`                                               | Per-attachment blend/writeMask overrides for MRT — the deferred-shading case, where one draw writes a G-buffer (`target(gpu, { colors: [...] })`) and each attachment needs different state. One entry per color attachment, aligned by index. Inheritance is per field: `null` entries and omitted fields fall back to the top-level `blend`/`writeMask`; `{ writeMask: [] }` leaves that attachment untouched.                                                                                                                                                                                                                                                        |
+| opts.cull                       | `"none" \| "front" \| "back"`                                     |        ✖ | `"none"`                                                  | Skips rasterizing triangles that face away from the chosen side. `"back"`: culls faces pointing away from the viewer; on a closed geometry they are never visible, so the GPU skips roughly half the fragment work. `"front"`: culls faces toward the viewer; used when rendering shadow maps to reduce peter panning. When omitted, no triangles are culled — required for open geometry such as foliage cards.                                                                                                                                                                                                                                                        |
+| opts.frontFace                  | `"ccw" \| "cw"`                                                   |        ✖ | `"ccw"`                                                   | Winding order that counts as front-facing — the reference `cull` works against. Set `"cw"` for geometry authored clockwise, or for draws with a negative (mirrored) scale, which flips the on-screen winding. When omitted, counter-clockwise triangles are front.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| opts.unclippedDepth             | `boolean`                                                         |        ✖ | `false`                                                   | Disables depth clipping so geometry outside `[near, far]` rasterizes instead of vanishing. Use it for shadow-map pancaking: casters behind the light's near plane flatten onto it instead of being clipped out of the map. Requires the `"depth-clip-control"` device feature. When omitted or `false`, standard clipping applies.                                                                                                                                                                                                                                                                                                                                      |
+| opts.depth                      | `false \| DepthOptions`                                           |        ✖ | `{ write: true, compare: "less-equal" }`                  | Depth test/write state for targets with a depth attachment; fields are in the `DepthOptions` table below. `false` disables depth testing for overlays and gizmos that must draw over the scene regardless of distance. When omitted, nearer fragments win and coplanar re-draws still pass; ignored when the target has no depth.                                                                                                                                                                                                                                                                                                                                       |
+| opts.stencil                    | `StencilOptions`                                                  |        ✖ | WebGPU pass-through defaults                              | Masks draws to marked screen regions using the stencil aspect of the depth attachment — portals, mirrors, object outlines, masked UI. Requires a target depth format with a stencil aspect (`depth: "depth24plus-stencil8"`). Fields are in the `StencilOptions` table below.                                                                                                                                                                                                                                                                                                                                                                                           |
+| opts.multisample                | `{ alphaToCoverage?, mask? }`                                     |        ✖ | `{ alphaToCoverage: false, mask: 0xFFFFFFFF }`            | MSAA state. `alphaToCoverage`: turns fragment alpha into a per-sample coverage mask, so alpha-tested foliage antialiases in any draw order — no blending, no transparency sorting; requires an `msaa: true` target. `mask`: bitmask of samples the draw may write — a niche debugging tool most draws never set. Only the low `sampleCount` bits matter; higher bits are legal and ignored.                                                                                                                                                                                                                                                                             |
+| opts.constants                  | `Readonly<Record<string, number \| boolean>>`                     |        ✖ | the WGSL defaults                                         | Values for WGSL `override` constants, fixed at pipeline creation. Use them to specialize one shader — quality tiers, feature toggles, workgroup-size tuning — without string-templating the WGSL. Key by override name, or by the decimal string of `N` when the declaration has `@id(N)` (the name is not usable then). Booleans become `1`/`0`; every override declared without a default must be provided.                                                                                                                                                                                                                                                           |
+| opts.entry                      | `{ vertex?: string; fragment?: string }`                          |        ✖ | first entry point of each stage                           | Selects which `@vertex`/`@fragment` functions to compile when one WGSL module declares several — variants of one technique sharing helpers, such as depth-only and shaded passes from the same source. Names must exist in the shader with the matching stage. Omitted fields keep the first entry point of that stage.                                                                                                                                                                                                                                                                                                                                                 |
+| draw.set.values                 | `Record<string, unknown>`                                         |        ✔ | —                                                         | Values keyed by WGSL binding variable name. JS objects/numbers are packed; resources are bound by identity.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| draw.group.n                    | `number`                                                          |        ✔ | —                                                         | Bind group index to claim for manual bind-group binding (`group(n, bindGroup)`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| draw.group.bindGroup            | `GPUBindGroup`                                                    |        ✔ | —                                                         | Must be compatible with `draw.layout(n)` or `draw.layout(n, { dynamicOffsets: true })`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| draw.layout.n                   | `number`                                                          |        ✔ | —                                                         | Reflected bind group index.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| draw.layout.opts.dynamicOffsets | `boolean`                                                         |        ✖ | `false`                                                   | When `true`, returns/reuses a layout whose buffer entries have `hasDynamicOffset: true` and clears cached pipelines.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| draw.draw.target                | `Target \| DrawCallOptions`                                       |        ✖ | `{}`                                                      | One-shot draw options. Pass a bare target for the common case, or an options bag when setting counts or offsets.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| opts.target                     | `Target`                                                          |        ✖ | —                                                         | Required at runtime when an options bag is used. Use a `Surface` or an offscreen `Target`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| opts.offsets                    | `readonly number[] \| Partial<Record<number, readonly number[]>>` |        ✖ | Reflected/claimed fallback offsets                        | Dynamic offsets for claimed/dynamic groups. Array applies to every group; object keys by group.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| opts.instances                  | `number`                                                          |        ✖ | `DrawOptions.instances ?? geometry.instanceCount ?? 1`    | Per-call instance count; integer `>= 0`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| opts.vertices                   | `number`                                                          |        ✖ | `geometry.vertexCount ?? DrawOptions.vertices ?? 3`       | Per-call non-indexed vertex count; indexed geometries use `geometry.indexCount`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| opts.firstVertex                | `number`                                                          |        ✖ | `0`                                                       | Non-indexed first vertex; indexed geometries use firstIndex/baseVertex `0`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| opts.firstInstance              | `number`                                                          |        ✖ | `DrawOptions.firstInstance ?? 0`                          | Per-call first instance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| opts.indirect                   | `StorageBuffer \| { buffer, offset? }`                            |        ✖ | `undefined`                                               | GPU-driven draw: the GPU reads the draw arguments from the buffer at byte `offset` (default `0`) instead of CPU-side counts. Use it when a culling compute pass decides what to draw — the arguments are written on the GPU and the CPU never round-trips. Create the buffer with `storage(gpu, bytes, { indirect: true })`; argument layouts are in Notes.                                                                                                                                                                                                                                                                                                             |
 
 **`DepthOptions`** — the object form of `opts.depth`:
 
-| Field | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| write | `boolean` | ✖ | `true` | `false` keeps testing against the depth buffer without writing it. Use it for blended transparents and decals, which must hide behind opaque geometry but not occlude what draws after them. |
-| compare | `GPUCompareFunction` | ✖ | `"less-equal"` | Comparison a fragment must pass against the stored depth. `"greater"` plus `clearDepth: 0` on the pass gives reversed-Z, which spreads floating-point precision evenly across the view distance. |
-| bias | `number` | ✖ | `0` | Constant offset added to each fragment's depth. Must be an integer (WebGPU `depthBias` is `i32`). A small positive bias while rendering the shadow map removes shadow acne; a small negative bias lets coplanar decals win the depth test instead of z-fighting. |
-| biasSlopeScale | `number` | ✖ | `0` | Extra bias proportional to the polygon's depth slope. Surfaces at glancing angles need more offset than facing ones — pair it with `bias` to remove acne on sloped ground. |
-| biasClamp | `number` | ✖ | `0` (no clamp) | Upper bound on the total bias. Caps runaway slope-scaled bias on near-edge-on triangles, which otherwise detaches shadows from their casters (peter panning). |
+| Field          | Type                 | Required | Default        | Notes                                                                                                                                                                                                                                                            |
+| -------------- | -------------------- | -------: | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| write          | `boolean`            |        ✖ | `true`         | `false` keeps testing against the depth buffer without writing it. Use it for blended transparents and decals, which must hide behind opaque geometry but not occlude what draws after them.                                                                     |
+| compare        | `GPUCompareFunction` |        ✖ | `"less-equal"` | Comparison a fragment must pass against the stored depth. `"greater"` plus `clearDepth: 0` on the pass gives reversed-Z, which spreads floating-point precision evenly across the view distance.                                                                 |
+| bias           | `number`             |        ✖ | `0`            | Constant offset added to each fragment's depth. Must be an integer (WebGPU `depthBias` is `i32`). A small positive bias while rendering the shadow map removes shadow acne; a small negative bias lets coplanar decals win the depth test instead of z-fighting. |
+| biasSlopeScale | `number`             |        ✖ | `0`            | Extra bias proportional to the polygon's depth slope. Surfaces at glancing angles need more offset than facing ones — pair it with `bias` to remove acne on sloped ground.                                                                                       |
+| biasClamp      | `number`             |        ✖ | `0` (no clamp) | Upper bound on the total bias. Caps runaway slope-scaled bias on near-edge-on triangles, which otherwise detaches shadows from their casters (peter panning).                                                                                                    |
 
 **`StencilOptions`** — the fields of `opts.stencil`:
 
-| Field | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| front | `StencilFaceOptions` | ✖ | `{ compare: "always", fail/depthFail/pass: "keep" }` | Test and operations for front-facing triangles; fields are in the `StencilFaceOptions` table below. |
-| back | `StencilFaceOptions` | ✖ | mirrors the normalized `front` | Give it explicitly when the two sides must differ — incrementing on front faces and decrementing on back faces to count volume crossings. With `back` given and `front` omitted, the front keeps the WebGPU face defaults. |
-| readMask | `number` | ✖ | `0xFFFFFFFF` | Bits of the stored stencil value visible to `compare`. Integer in `[0, 0xFFFFFFFF]`. |
-| writeMask | `number` | ✖ | `0xFFFFFFFF` | Bits the face operations may change. Integer in `[0, 0xFFFFFFFF]`. Disjoint masks let several effects share one stencil buffer. |
-| ref | `number` | ✖ | pass default `0` | Value `compare` tests against and `"replace"` writes. Integer in `[0, 0xFFFFFFFF]`. Encoder state, not pipeline state (see Notes); an explicit `0` still emits, restoring the pass default after an earlier draw changed it. |
+| Field     | Type                 | Required | Default                                              | Notes                                                                                                                                                                                                                        |
+| --------- | -------------------- | -------: | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| front     | `StencilFaceOptions` |        ✖ | `{ compare: "always", fail/depthFail/pass: "keep" }` | Test and operations for front-facing triangles; fields are in the `StencilFaceOptions` table below.                                                                                                                          |
+| back      | `StencilFaceOptions` |        ✖ | mirrors the normalized `front`                       | Give it explicitly when the two sides must differ — incrementing on front faces and decrementing on back faces to count volume crossings. With `back` given and `front` omitted, the front keeps the WebGPU face defaults.   |
+| readMask  | `number`             |        ✖ | `0xFFFFFFFF`                                         | Bits of the stored stencil value visible to `compare`. Integer in `[0, 0xFFFFFFFF]`.                                                                                                                                         |
+| writeMask | `number`             |        ✖ | `0xFFFFFFFF`                                         | Bits the face operations may change. Integer in `[0, 0xFFFFFFFF]`. Disjoint masks let several effects share one stencil buffer.                                                                                              |
+| ref       | `number`             |        ✖ | pass default `0`                                     | Value `compare` tests against and `"replace"` writes. Integer in `[0, 0xFFFFFFFF]`. Encoder state, not pipeline state (see Notes); an explicit `0` still emits, restoring the pass default after an earlier draw changed it. |
 
 **`StencilFaceOptions`** — the `front` / `back` faces:
 
-| Field | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| compare | `GPUCompareFunction` | ✖ | `"always"` | Comparison between the masked `ref` and the masked stored value. `"equal"` draws only inside a previously marked region — the portal or mirror interior. |
-| fail | `GPUStencilOperation` | ✖ | `"keep"` | Operation when the stencil comparison fails. |
-| depthFail | `GPUStencilOperation` | ✖ | `"keep"` | Operation when the stencil comparison passes but the depth test fails. |
-| pass | `GPUStencilOperation` | ✖ | `"keep"` | Operation when both comparisons pass. `"replace"` writes `ref`, marking the region for later draws. |
+| Field     | Type                  | Required | Default    | Notes                                                                                                                                                    |
+| --------- | --------------------- | -------: | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| compare   | `GPUCompareFunction`  |        ✖ | `"always"` | Comparison between the masked `ref` and the masked stored value. `"equal"` draws only inside a previously marked region — the portal or mirror interior. |
+| fail      | `GPUStencilOperation` |        ✖ | `"keep"`   | Operation when the stencil comparison fails.                                                                                                             |
+| depthFail | `GPUStencilOperation` |        ✖ | `"keep"`   | Operation when the stencil comparison passes but the depth test fails.                                                                                   |
+| pass      | `GPUStencilOperation` |        ✖ | `"keep"`   | Operation when both comparisons pass. `"replace"` writes `ref`, marking the region for later draws.                                                      |
 
 **Returns:** `draw(gpu)` returns `Draw`; `set()`, `group()`, and `compileSync()` return the same `Draw`; `layout()` returns a `GPUBindGroupLayout`; one-shot `draw()` returns `void`; `compile()` returns `Promise<this>`.
 
@@ -183,7 +204,7 @@ interface Draw {
 - `VGPU-LIMIT-STORAGE-VERTEX` / `VGPU-LIMIT-STORAGE-FRAGMENT` — static storage-buffer use by a selected entry point exceeds the granted stage limit. Request the supported `requiredLimits` value, or reduce/move the storage data.
 - `VGPU-TARGET-REQUIRED` — `draw.draw()` was called without a target and the draw has none to fall back on. Pass a `Target`, or an options bag with `target`.
 - `VGPU-BLEND-INVALID` — unknown blend preset or malformed blend object. Use `"alpha"`, `"additive"`, `"premultiplied"`, or `{ color: { src, dst, op? }, alpha? }`.
-- `VGPU-BLEND-CONSTANT-INVALID` — `blendConstant` is not exactly four finite numbers, or no color target's effective blend uses a `"constant"`/`"one-minus-constant"` factor (the value could never apply). The effective blend of a target is its `colors[i].blend` when it has one, else the top-level `blend` — so a top-level constant factor overridden on *every* target is still dead, while a constant factor reached only through `colors[i].blend` is live. Fix the tuple, or add a constant factor to a blend that survives the per-target overrides.
+- `VGPU-BLEND-CONSTANT-INVALID` — `blendConstant` is not exactly four finite numbers, or no color target's effective blend uses a `"constant"`/`"one-minus-constant"` factor (the value could never apply). The effective blend of a target is its `colors[i].blend` when it has one, else the top-level `blend` — so a top-level constant factor overridden on _every_ target is still dead, while a constant factor reached only through `colors[i].blend` is live. Fix the tuple, or add a constant factor to a blend that survives the per-target overrides.
 - `VGPU-WRITEMASK-INVALID` — `writeMask` is not an array, or contains a channel outside `"r"`/`"g"`/`"b"`/`"a"`.
 - `VGPU-COLORS-INVALID` — `colors` is not an array; an entry is neither `null` nor `{ blend?, writeMask? }`; or † its length differs from the target's color attachment count (both counts are in the message). Give one entry per attachment.
 - `VGPU-CULL-INVALID` — `cull` is outside `"none"`/`"front"`/`"back"`.
@@ -208,12 +229,12 @@ interface Draw {
 ## Examples
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [64, 64] });
 const tri = draw(gpu, {
-  label: "tri",
+  label: 'tri',
   targets: [colorTarget],
   shader: `
     @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
@@ -230,7 +251,7 @@ tri.draw({ target: colorTarget, vertices: 3, instances: 1 });
 Backface culling for a closed imported geometry:
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [256, 256], depth: true });
@@ -244,8 +265,8 @@ const opaque = draw(gpu, {
     @fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.8, 0.8, 0.7, 1); }
   `,
   geometry: statue,
-  cull: "back",    // closed geometry: faces pointing away are never visible
-  frontFace: "cw", // the importer produced clockwise triangles
+  cull: 'back', // closed geometry: faces pointing away are never visible
+  frontFace: 'cw', // the importer produced clockwise triangles
 });
 opaque.draw(scene);
 ```
@@ -255,11 +276,11 @@ Culling back faces skips roughly half the fragment work on the closed statue, an
 Shadow map with depth bias and pancaking:
 
 ```ts
-import { init, createMockAdapter, draw, target } from "vgpu/mock";
+import { init, createMockAdapter, draw, target } from 'vgpu/mock';
 
 const gpu = await init({
-  adapter: createMockAdapter({ features: ["depth-clip-control"] }),
-  requiredFeatures: ["depth-clip-control"],
+  adapter: createMockAdapter({ features: ['depth-clip-control'] }),
+  requiredFeatures: ['depth-clip-control'],
 });
 const shadowMap = target(gpu, { size: [1024, 1024], depth: true });
 const casters = draw(gpu, {
@@ -283,13 +304,13 @@ The bias pair keeps lit surfaces acne-free, and `unclippedDepth` flattens caster
 MRT decal into a G-buffer:
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 // Deferred-shading G-buffer: albedo + world-space normals.
 const gbuffer = target(gpu, {
   size: [512, 512],
-  colors: [{ format: "rgba8unorm" }, { format: "rgba16float" }],
+  colors: [{ format: 'rgba8unorm' }, { format: 'rgba16float' }],
   depth: true,
 });
 const decal = draw(gpu, {
@@ -302,8 +323,8 @@ const decal = draw(gpu, {
     @fragment fn fs_main() -> Frag { return Frag(vec4f(0.6, 0.1, 0.1, 0.8), vec4f(0, 1, 0, 0)); }
   `,
   colors: [
-    { blend: "alpha" },   // blend the decal into the albedo
-    { writeMask: [] },    // leave the normals untouched
+    { blend: 'alpha' }, // blend the decal into the albedo
+    { writeMask: [] }, // leave the normals untouched
   ],
   depth: { write: false }, // the decal sits on existing geometry
 });
@@ -315,7 +336,7 @@ One draw blends the decal into `gbuffer.colors[0]` while `{ writeMask: [] }` lea
 Alpha-tested foliage without transparency sorting:
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [256, 256], depth: true, msaa: true });
@@ -338,10 +359,10 @@ Fragment alpha becomes per-sample coverage, so leaf edges antialias in any draw 
 Stencil-masked portal:
 
 ```ts
-import { init, draw, frame, target } from "vgpu/mock";
+import { init, draw, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
-const scene = target(gpu, { size: [256, 256], depth: "depth24plus-stencil8" });
+const scene = target(gpu, { size: [256, 256], depth: 'depth24plus-stencil8' });
 const SHADER = `
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
     var p = array<vec2f, 3>(vec2f(-1, -1), vec2f(3, -1), vec2f(-1, 3));
@@ -350,12 +371,17 @@ const SHADER = `
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.2, 0.2, 1, 1); }
 `;
 // Mark the portal's pixels with stencil value 1; write no color, no depth.
-const portalMask = draw(gpu, { shader: SHADER, writeMask: [], depth: false, stencil: { front: { pass: "replace" }, ref: 1 } });
+const portalMask = draw(gpu, {
+  shader: SHADER,
+  writeMask: [],
+  depth: false,
+  stencil: { front: { pass: 'replace' }, ref: 1 },
+});
 // Draw the far world only where the mask matches.
-const otherWorld = draw(gpu, { shader: SHADER, stencil: { front: { compare: "equal" }, ref: 1 } });
+const otherWorld = draw(gpu, { shader: SHADER, stencil: { front: { compare: 'equal' }, ref: 1 } });
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass({ target: scene }, (pass) => {
+frame(gpu, currentFrame => {
+  currentFrame.pass({ target: scene }, pass => {
     pass.draw(portalMask);
     pass.draw(otherWorld);
   });
@@ -367,7 +393,7 @@ The first draw marks the portal region in the stencil buffer; the second renders
 Per-draw layer fade with the blend constant:
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [128, 128] });
@@ -380,7 +406,7 @@ const overlay = draw(gpu, {
     @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1, 0.5, 0, 1); }
   `,
   // Weight the whole layer by the blend constant, not per-vertex alpha.
-  blend: { color: { src: "constant", dst: "one-minus-constant" } },
+  blend: { color: { src: 'constant', dst: 'one-minus-constant' } },
   blendConstant: [0.25, 0.25, 0.25, 0.25], // the layer shows at 25%
 });
 overlay.draw(colorTarget);
@@ -391,7 +417,7 @@ The whole overlay fades with one per-draw value — no per-vertex alpha rewrite,
 Pipeline specialization with `constants` and `entry`:
 
 ```ts
-import { init, draw, target } from "vgpu/mock";
+import { init, draw, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [128, 128] });
@@ -405,8 +431,8 @@ const SOURCE = `
   @fragment fn fs_shaded() -> @location(0) vec4f { return vec4f(f32(STEPS) / 64.0, 0, 0, 1); }
   @fragment fn fs_flat() -> @location(0) vec4f { return vec4f(0.5, 0.5, 0.5, 1); }
 `;
-const hero = draw(gpu, { shader: SOURCE, constants: { STEPS: 64 } });        // high quality tier
-const backdrop = draw(gpu, { shader: SOURCE, entry: { fragment: "fs_flat" } }); // cheap variant
+const hero = draw(gpu, { shader: SOURCE, constants: { STEPS: 64 } }); // high quality tier
+const backdrop = draw(gpu, { shader: SOURCE, entry: { fragment: 'fs_flat' } }); // cheap variant
 
 hero.draw(colorTarget);
 backdrop.draw(colorTarget);
@@ -417,18 +443,21 @@ Both draws compile from the same module: `constants` specializes the shaded vari
 GPU-driven draw with `indirect`:
 
 ```ts
-import { init, compute, draw, storage, target } from "vgpu/mock";
+import { init, compute, draw, storage, target } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [256, 256], depth: true });
 // drawIndirect arguments: vertexCount, instanceCount, firstVertex, firstInstance.
 const args = storage(gpu, 16, { indirect: true });
-const cullPass = compute(gpu, `
+const cullPass = compute(
+  gpu,
+  `
   @group(0) @binding(0) var<storage, read_write> args: array<u32, 4>;
   @compute @workgroup_size(1) fn cs_main() {
     args = array<u32, 4>(3u, 1u, 0u, 0u); // survivors of the culling test
   }
-`);
+`,
+);
 cullPass.set({ args });
 const grass = draw(gpu, {
   shader: `
@@ -439,7 +468,7 @@ const grass = draw(gpu, {
     @fragment fn fs_main() -> @location(0) vec4f { return vec4f(0, 0.6, 0, 1); }
   `,
 });
-cullPass.dispatch(1);                          // the GPU decides the counts
+cullPass.dispatch(1); // the GPU decides the counts
 grass.draw({ target: scene, indirect: args }); // the CPU never reads them back
 ```
 
@@ -464,7 +493,7 @@ Each color/depth/sample-count variant is a different pipeline. A missed variant 
 - With `alphaToCoverage` on, WebGPU additionally requires the first color target to be blendable with an alpha channel and forbids a fragment `sample_mask` output; native validation reports those.
 - WebGPU matches `constants` keys against the module's override declarations, not per entry point, so one record serves both stages even when an override is referenced by only one of them.
 - `entry` selection happens at construction: binding visibility, bind group layouts, vertex input layouts (the selected vertex entry's inputs drive geometry attribute matching), and storage-stage limit checks all reflect the chosen variant. Unused declarations keep visibility `0` in reflected layouts, so build claimed bind groups from `draw.layout(n)` rather than guessing a raw layout.
-- `blendConstant` and `stencil.ref` are encoder state: emitted as `setBlendConstant`/`setStencilReference` after `setPipeline` and before the draw, so draws that differ only in them share pipelines. Both are *pass* state and persist: a value set by one draw stays in effect for every later draw in the same pass that does not set its own. The `(0, 0, 0, 0)` blend-constant default therefore only holds until the first draw in the pass sets one — pass `blendConstant` explicitly on any draw in a pass that must not inherit a previous draw's value (`stencil.ref` behaves the same, and an explicit `0` re-emits). Render bundle encoders cannot set render-pass state, so `bundle()` rejects such draws with `VGPU-BUNDLE-BLEND-CONSTANT`/`VGPU-BUNDLE-STENCIL-REF`; encode them in a frame pass instead.
+- `blendConstant` and `stencil.ref` are encoder state: emitted as `setBlendConstant`/`setStencilReference` after `setPipeline` and before the draw, so draws that differ only in them share pipelines. Both are _pass_ state and persist: a value set by one draw stays in effect for every later draw in the same pass that does not set its own. The `(0, 0, 0, 0)` blend-constant default therefore only holds until the first draw in the pass sets one — pass `blendConstant` explicitly on any draw in a pass that must not inherit a previous draw's value (`stencil.ref` behaves the same, and an explicit `0` re-emits). Render bundle encoders cannot set render-pass state, so `bundle()` rejects such draws with `VGPU-BUNDLE-BLEND-CONSTANT`/`VGPU-BUNDLE-STENCIL-REF`; encode them in a frame pass instead.
 - Blend presets: `"alpha"` uses source alpha over, `"premultiplied"` uses premultiplied source over, and `"additive"` uses one-plus-one additive blending for color and alpha. In explicit blends, `op` defaults to `"add"` and omitted `alpha` copies `color`.
 - `indirect` argument layouts: a non-indexed geometry (or no geometry) encodes `drawIndirect` — 4 u32 values, `vertexCount, instanceCount, firstVertex, firstInstance` (16 bytes); an indexed geometry still sets its index buffer and encodes `drawIndexedIndirect` — 5 32-bit values, `indexCount, instanceCount, firstIndex, baseVertex (signed), firstInstance` (20 bytes). Write them from a compute shader (bind the same buffer as storage) or from JS via `write()`. Indirect draws record fine into `bundle()`: `drawIndirect`/`drawIndexedIndirect` exist on render bundle encoders.
 - A non-zero `firstInstance` inside the buffered indirect arguments silently turns the draw into a no-op unless the device has the `"indirect-first-instance"` feature. The value lives on the GPU, so vgpu cannot validate it — request the feature with `init({ requiredFeatures: ["indirect-first-instance"] })` when you need it.

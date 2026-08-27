@@ -7,7 +7,7 @@ Creates an `InspectMaterial` configured to render line segments from a readable 
 ## Import
 
 ```ts
-import { wireframeMaterial } from "@vgpu/render/inspect";
+import { wireframeMaterial } from '@vgpu/render/inspect';
 ```
 
 ## Signature
@@ -18,32 +18,27 @@ export function wireframeMaterial(spec: WireframeMaterialSpec): InspectMaterial;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| spec | WireframeMaterialSpec | ✔ | — | Configuration object used to allocate the pipeline. |
-| spec.device | Device | ✔ | — | Device that owns the pipeline, bind group layout, and uniform buffer writes. |
-| spec.color | readonly [number, number, number] | ✖ | [1, 1, 1] | Linear RGB line color; each component must be between 0 and 1. |
-| spec.targetFormat | GPUTextureFormat | ✖ | "bgra8unorm-srgb" | Color attachment format for the fragment target. Use "rgba8unorm-srgb" on implementations that lack BGRA support. |
+| Param             | Type                              | Required | Default           | Notes                                                                                                             |
+| ----------------- | --------------------------------- | -------- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| spec              | WireframeMaterialSpec             | ✔        | —                 | Configuration object used to allocate the pipeline.                                                               |
+| spec.device       | Device                            | ✔        | —                 | Device that owns the pipeline, bind group layout, and uniform buffer writes.                                      |
+| spec.color        | readonly [number, number, number] | ✖        | [1, 1, 1]         | Linear RGB line color; each component must be between 0 and 1.                                                    |
+| spec.targetFormat | GPUTextureFormat                  | ✖        | "bgra8unorm-srgb" | Color attachment format for the fragment target. Use "rgba8unorm-srgb" on implementations that lack BGRA support. |
 
 **Returns:** `InspectMaterial` — exposes the configured `pipeline`, `bindGroupLayout`, uniform byte size (144 bytes), and a writer that packs view-projection, model matrices, and the wire color.
 
 ## Examples
 
 ```ts
-import { createMockAdapter } from "@vgpu/adapter-mock";
-import { InspectMaterial, wireframeMaterial } from "@vgpu/render/inspect";
+import { createMockAdapter } from '@vgpu/adapter-mock';
+import { InspectMaterial, wireframeMaterial } from '@vgpu/render/inspect';
 
-const IDENTITY_MATRIX = new Float32Array([
-  1, 0, 0, 0,
-  0, 1, 0, 0,
-  0, 0, 1, 0,
-  0, 0, 0, 1,
-]);
+const IDENTITY_MATRIX = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 
 async function main(): Promise<void> {
   const device = await createMockAdapter().requestDevice();
   const material: InspectMaterial = wireframeMaterial({ device, color: [1, 0.75, 0.5] });
-  const uniforms = device.createBuffer({ size: material.uniformByteSize, usage: ["uniform", "copy_dst"] });
+  const uniforms = device.createBuffer({ size: material.uniformByteSize, usage: ['uniform', 'copy_dst'] });
 
   material.writeUniforms(uniforms.gpu, 0, {
     viewProjectionMatrix: IDENTITY_MATRIX,
@@ -51,7 +46,7 @@ async function main(): Promise<void> {
   });
 }
 
-main().catch((error) => {
+main().catch(error => {
   console.error(error);
 });
 ```

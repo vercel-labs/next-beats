@@ -21,13 +21,13 @@ export fn fbmSimplex3d(position: vec3f, octaves: i32, lacunarity: f32, gain: f32
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| position | `vec2f` | ✔ | — | 2D sample position for `simplex2d` / `fbmSimplex2d`. One unit is one lattice cell; scale the input to set the feature size. |
-| position | `vec3f` | ✔ | — | 3D sample position for `simplex3d` / `fbmSimplex3d`. Passing time as Z animates a 2D field, but see the note on unbounded time below. |
-| octaves | `i32` | ✔ | — | Number of fBM octaves. **Silently clamped to `[1, 16]`**: an unbounded dynamic loop count is a GPU-hang risk. `1` returns exactly the base noise. |
-| lacunarity | `f32` | ✔ | — | Per-octave frequency multiplier. Not clamped. `2.0` is the usual choice; a slightly irrational value such as `2.17` avoids octaves lining up on the lattice. |
-| gain | `f32` | ✔ | — | Per-octave amplitude multiplier. **Silently clamped to `[0, 1]`**: a negative gain would break the amplitude sum the range guarantee rests on. `0.5` is the usual choice; `0` collapses to a single octave. |
+| Param      | Type    | Required | Default | Notes                                                                                                                                                                                                       |
+| ---------- | ------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| position   | `vec2f` | ✔        | —       | 2D sample position for `simplex2d` / `fbmSimplex2d`. One unit is one lattice cell; scale the input to set the feature size.                                                                                 |
+| position   | `vec3f` | ✔        | —       | 3D sample position for `simplex3d` / `fbmSimplex3d`. Passing time as Z animates a 2D field, but see the note on unbounded time below.                                                                       |
+| octaves    | `i32`   | ✔        | —       | Number of fBM octaves. **Silently clamped to `[1, 16]`**: an unbounded dynamic loop count is a GPU-hang risk. `1` returns exactly the base noise.                                                           |
+| lacunarity | `f32`   | ✔        | —       | Per-octave frequency multiplier. Not clamped. `2.0` is the usual choice; a slightly irrational value such as `2.17` avoids octaves lining up on the lattice.                                                |
+| gain       | `f32`   | ✔        | —       | Per-octave amplitude multiplier. **Silently clamped to `[0, 1]`**: a negative gain would break the amplitude sum the range guarantee rests on. `0.5` is the usual choice; `0` collapses to a single octave. |
 
 **Returns:** `f32` in the open interval `(-1, 1)` — never clipped, for every finite input, including all fBM parameter combinations. The bound is a proof, not an observation: the normalizers (`98.0` for 2D, `76.0` for 3D) sit just below `1 / sup` of the raw kernel sum (`0.0100802047` and `0.0130071572`), so `abs(simplex2d) <= 0.98786` and `abs(simplex3d) <= 0.98854`; fBM divides by the sum of the amplitudes, so the bound survives octaves.
 
@@ -35,10 +35,10 @@ export fn fbmSimplex3d(position: vec3f, octaves: i32, lacunarity: f32, gain: f32
 
 ## Measured field properties
 
-| fn | guaranteed range | max after normalization | observed max | sigma | max slope | hashes per call |
-|---|---|---|---|---|---|---|
-| `simplex2d` | `(-1, 1)` | 0.98786 | 0.9878 | **0.533** | ≈6.95 | 3 × `pcg2d` |
-| `simplex3d` | `(-1, 1)` | 0.98854 | 0.9884 | **0.388** | ≈6.53 | 4 × `pcg3d` |
+| fn          | guaranteed range | max after normalization | observed max | sigma     | max slope | hashes per call |
+| ----------- | ---------------- | ----------------------- | ------------ | --------- | --------- | --------------- |
+| `simplex2d` | `(-1, 1)`        | 0.98786                 | 0.9878       | **0.533** | ≈6.95     | 3 × `pcg2d`     |
+| `simplex3d` | `(-1, 1)`        | 0.98854                 | 0.9884       | **0.388** | ≈6.53     | 4 × `pcg3d`     |
 
 Extremes are rare: with sigma ≈ 0.39–0.53 most samples sit well inside the range. **Remap, do not saturate** — `saturate(simplex3d(p))` throws away the whole negative half of the field. Use `remap(-0.6, 0.6, 0.0, 1.0, value)` from `@vgpu/wgsl-std/math` and clamp afterwards if you need `[0, 1]`.
 
@@ -56,7 +56,7 @@ fn smoke(position: vec2f, time: f32) -> f32 {
 }
 `;
 
-console.log(simplexWgsl.includes("smoke"));
+console.log(simplexWgsl.includes('smoke'));
 ```
 
 ```ts
@@ -83,7 +83,7 @@ fn cloudCoverage(position: vec3f, time: f32) -> f32 {
 }
 `;
 
-console.log(cloudWgsl.includes("cloudCoverage"));
+console.log(cloudWgsl.includes('cloudCoverage'));
 ```
 
 ```ts
@@ -123,7 +123,7 @@ fn ridgedSimplex3d(position: vec3f, octaves: i32) -> f32 {
 }
 `;
 
-console.log(shapedWgsl.includes("ridgedSimplex3d"));
+console.log(shapedWgsl.includes('ridgedSimplex3d'));
 ```
 
 ```ts
@@ -136,19 +136,19 @@ fn twoIndependentFields(position: vec2f) -> vec2f {
 }
 `;
 
-console.log(seededWgsl.includes("twoIndependentFields"));
+console.log(seededWgsl.includes('twoIndependentFields'));
 ```
 
 ## Notes
 
 - **Kernel radius² is `0.5`, not the widespread `0.6`.** The canonical Gustavson/webgl-noise value has a support radius of 0.775, which exceeds the reach of the 3-corner (2D) / 4-corner (3D) traversal, so corners that still carry a non-zero contribution get dropped at a simplex face: a genuine C0 crack. Measured with a dense line scan (step `1e-6`): max `|Δv|` is `9.5e-5` / `4.6e-5` (raw field) at `0.6` versus `4.8e-8` / `2.9e-8` at `0.5`, i.e. ~1000× worse, ~0.8% of the normalized range. It is invisible in a flat colour ramp and obvious as a seam in normals or high-contrast ramps. `0.5` is not merely "smaller and safer": it is exactly the largest radius² for which every dropped corner is already outside the kernel (equality is attained, in 2D, at `d = (G2 - 0.5, 0.5)`). **Do not "fix" this back to `0.6`** — `tests/simplex.test.ts` fails loudly, by design, if you do.
-- **Simplex vs Perlin at the same input scale:** ~2.5× the slope and ~1.7× the sigma. `simplex3d(p)` is *not* "`perlin3d(p)` but faster" — it is a higher-frequency, higher-contrast field. When migrating, **scale `p` by ~0.4–0.5** (`simplex3d(p * 0.45)`) to get a comparable look.
+- **Simplex vs Perlin at the same input scale:** ~2.5× the slope and ~1.7× the sigma. `simplex3d(p)` is _not_ "`perlin3d(p)` but faster" — it is a higher-frequency, higher-contrast field. When migrating, **scale `p` by ~0.4–0.5** (`simplex3d(p * 0.45)`) to get a comparable look.
 - **Cost:** `simplex3d` costs 4 `pcg3d` hashes against `perlin3d`'s 8, so it is roughly half the price per call — but a fair comparison has to account for the frequency difference above: matching Perlin's look means sampling a scaled-down domain, not a cheaper field. A 6-octave `fbmSimplex3d` is 24 `pcg3d` hashes; the cloud recipe above (3 warp fields at 3 octaves plus 5 detail octaves) is ~14 `simplex3d` calls, i.e. ~56 hashes per pixel. Prefer `simplex2d` where the third axis is only animation.
 - **Seeding is by input offset; there is no `seed` parameter** (same convention as `voronoi2d`/`voronoi3d`). Measured Pearson correlation between `p` and `p + offset`: `(0.5,0,0)` → 0.400, `(1,0,0)` → −0.043, `(2,0,0)` → 0.0017, `(17,0,0)` → −0.0004, `(101,53,7)` → 0.0035. **Any offset of ≥ 2.0 units on some axis decorrelates; sub-cell offsets do not.** Keep offsets in the tens–thousands, not `1e6`, because of the f32 mantissa.
 - **Period is 2³² cells** — the gradient index comes from `pcg2d`/`pcg3d` over the integer cell, not from a float `mod 289` permutation, so there is no visible tiling.
 - **f32 domain:** the fractional part `p - floor(p)` is quantized to ~2⁻²⁴·|p|, so detail visibly bands beyond `|p| ≈ 1e4` and vanishes entirely at `|p| >= 2²³`. fBM multiplies the effective coordinate by `lacunarity^(octaves - 1)` (6 octaves at λ=2 → 32×), so it reaches that limit 32× sooner. **An animation that feeds unbounded `time` into the third axis degrades after long sessions** — wrap or scale time (`fract(time * 0.05) * 20.0`, or reset a session clock), do not let it grow without bound.
-- Unlike Perlin, simplex has **no zero on the integer grid**: the simplex lattice is sheared, so integer coordinates are generically interior points. The field *is* exactly 0 at each lattice vertex of the sheared grid (e.g. `simplex3d(vec3f(0.5))` is `0.0`), because there the gradient offset is the zero vector and every other corner lies outside the kernel. Do not build a lattice-zero assumption on top of `simplex2d`/`simplex3d`.
-- This module is pure WGSL: no `@group`, no `@binding`, no overrides, no entry points, no hidden state. It contains no lookup table (no `array<...>`) and no `sin`/`cos`/`sqrt`/`inverseSqrt`/`pow`: those have implementation-defined accuracy, so an angle-based gradient would drift per driver. Gradient *selection* is therefore bit-identical on every backend; only the final interpolation may differ by a few ulp.
+- Unlike Perlin, simplex has **no zero on the integer grid**: the simplex lattice is sheared, so integer coordinates are generically interior points. The field _is_ exactly 0 at each lattice vertex of the sheared grid (e.g. `simplex3d(vec3f(0.5))` is `0.0`), because there the gradient offset is the zero vector and every other corner lies outside the kernel. Do not build a lattice-zero assumption on top of `simplex2d`/`simplex3d`.
+- This module is pure WGSL: no `@group`, no `@binding`, no overrides, no entry points, no hidden state. It contains no lookup table (no `array<...>`) and no `sin`/`cos`/`sqrt`/`inverseSqrt`/`pow`: those have implementation-defined accuracy, so an angle-based gradient would drift per driver. Gradient _selection_ is therefore bit-identical on every backend; only the final interpolation may differ by a few ulp.
 - The module returns a scalar field only. It does not choose colours, coverage curves, warp strength, animation speed, or material policy — the recipes above are examples to copy and tune, not policy the module enforces.
-- Algorithmic references (no code copied, no third-party licence obligation incurred): Perlin 2001, *Hardware-accelerated procedural texturing* / simplex construction; Stefan Gustavson, *Simplex noise demystified*. The US patent on simplex noise (US 6,867,776 B2) expired in 2022.
+- Algorithmic references (no code copied, no third-party licence obligation incurred): Perlin 2001, _Hardware-accelerated procedural texturing_ / simplex construction; Stefan Gustavson, _Simplex noise demystified_. The US patent on simplex noise (US 6,867,776 B2) expired in 2022.
 - **See also:** `@vgpu/wgsl-std/noise/perlin` (`perlin2d`/`perlin3d`/`fbmPerlin2d`/`fbmPerlin3d` — smoother, exactly 0 on the integer lattice, ~2.5× less slope), `@vgpu/wgsl-std/noise` (Voronoi cells), `@vgpu/wgsl-std/math` (`remap`, `saturate`), `@vgpu/wgsl-std/hash` (`pcg2d`, `pcg3d`).

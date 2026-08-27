@@ -7,14 +7,14 @@ Webpack loader that turns `.wgsl` files into JavaScript modules exporting `Shade
 ## Import
 
 ```ts
-import wgslWebpackLoader from "@vgpu/wgsl/loader-webpack";
+import wgslWebpackLoader from '@vgpu/wgsl/loader-webpack';
 ```
 
 ## Signature
 
 ```ts
 interface WgslWebpackLoaderOptions {
-  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: "none" | "safe" };
+  readonly minify?: boolean | { readonly whitespace?: boolean; readonly identifiers?: 'none' | 'safe' };
 }
 
 type LoaderContext = {
@@ -29,14 +29,14 @@ type WgslWebpackLoader = (this: LoaderContext, source: string) => string | void;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| source | string | ✔ | — | Raw WGSL file contents supplied by webpack. Leaf files without top-level imports are emitted directly, optionally minified. Files with top-level imports are resolved from `this.resourcePath`. |
-| this.resourcePath | string | ✖ | `"<webpack>"` for resolver entry fallback | Absolute path to the `.wgsl` file. Needed for relative import resolution and dependency reporting. |
-| this.async | `() => callback` | ✖ | synchronous mode | Required only when the WGSL source has top-level imports. Without async mode, imports throw `VGPU-WGSL-RUNTIME-IMPORT`. |
-| this.addDependency | `(file: string) => void` | ✖ | no explicit extra dependencies | Called as each transitive dependency is discovered, before it is loaded, so webpack invalidates on imported `.wgsl` changes even when the current resolution fails. |
-| this.getOptions | `() => unknown` | ✖ | `{}` | Reads `options.minify` when present. Unknown options are ignored. |
-| options.minify | `boolean | MinifyOptions` | ✖ | `false` | `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`. |
+| Param              | Type                     | Required       | Default                                   | Notes                                                                                                                                                                                           |
+| ------------------ | ------------------------ | -------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| source             | string                   | ✔              | —                                         | Raw WGSL file contents supplied by webpack. Leaf files without top-level imports are emitted directly, optionally minified. Files with top-level imports are resolved from `this.resourcePath`. |
+| this.resourcePath  | string                   | ✖              | `"<webpack>"` for resolver entry fallback | Absolute path to the `.wgsl` file. Needed for relative import resolution and dependency reporting.                                                                                              |
+| this.async         | `() => callback`         | ✖              | synchronous mode                          | Required only when the WGSL source has top-level imports. Without async mode, imports throw `VGPU-WGSL-RUNTIME-IMPORT`.                                                                         |
+| this.addDependency | `(file: string) => void` | ✖              | no explicit extra dependencies            | Called as each transitive dependency is discovered, before it is loaded, so webpack invalidates on imported `.wgsl` changes even when the current resolution fails.                             |
+| this.getOptions    | `() => unknown`          | ✖              | `{}`                                      | Reads `options.minify` when present. Unknown options are ignored.                                                                                                                               |
+| options.minify     | `boolean                 | MinifyOptions` | ✖                                         | `false`                                                                                                                                                                                         | `true` means `{ whitespace: true, identifiers: "safe" }`; object form defaults to `{ whitespace: true, identifiers: "none" }`. |
 
 **Returns:** `string | void` — for leaf shaders, returns JavaScript module source synchronously. For import graphs, returns `void` and passes JavaScript module source to webpack's async callback.
 
@@ -52,7 +52,7 @@ const config = {
     rules: [
       {
         test: /\.wgsl$/,
-        loader: "@vgpu/wgsl/loader-webpack",
+        loader: '@vgpu/wgsl/loader-webpack',
         options: { minify: true },
       },
     ],
@@ -63,11 +63,11 @@ export default config;
 ```
 
 ```ts
-import type { ShaderSource } from "@vgpu/wgsl";
+import type { ShaderSource } from '@vgpu/wgsl';
 
 const shader: ShaderSource = {
   version: 1,
-  wgsl: "@compute @workgroup_size(1) fn main() {}",
+  wgsl: '@compute @workgroup_size(1) fn main() {}',
 };
 
 console.log(shader.version);

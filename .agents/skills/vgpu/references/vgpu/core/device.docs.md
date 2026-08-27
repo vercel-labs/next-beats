@@ -7,13 +7,13 @@
 ## Import
 
 ```ts
-import { Device } from "vgpu/core";
+import { Device } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Buffer, BufferOptions, Queue, Shader, ShaderInput, Texture, TextureOptions, VGPUError } from "vgpu/core";
+import type { Buffer, BufferOptions, Queue, Shader, ShaderInput, Texture, TextureOptions, VGPUError } from 'vgpu/core';
 
 interface DeviceOptions {
   readonly isCompatibilityMode?: boolean;
@@ -41,36 +41,36 @@ declare class Device {
 
 ### Constructor
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| gpu | `GPUDevice` | ✔ | — | Raw WebGPU device. `Device` does not request adapters itself. |
-| adapterInfo | `GPUAdapterInfo \| null` | ✖ | `null` | Stored as `device.adapterInfo`; pass adapter metadata when an adapter provides it. |
-| opts | `DeviceOptions` | ✖ | `{}` | Core-only options for wrapper behavior. |
-| opts.isCompatibilityMode | `boolean` | ✖ | `false` | Stored as `device.isCompatibilityMode`; adapters set it when they requested WebGPU `featureLevel: "compatibility"`. |
+| Param                    | Type                     | Required | Default | Notes                                                                                                               |
+| ------------------------ | ------------------------ | -------: | ------- | ------------------------------------------------------------------------------------------------------------------- |
+| gpu                      | `GPUDevice`              |        ✔ | —       | Raw WebGPU device. `Device` does not request adapters itself.                                                       |
+| adapterInfo              | `GPUAdapterInfo \| null` |        ✖ | `null`  | Stored as `device.adapterInfo`; pass adapter metadata when an adapter provides it.                                  |
+| opts                     | `DeviceOptions`          |        ✖ | `{}`    | Core-only options for wrapper behavior.                                                                             |
+| opts.isCompatibilityMode | `boolean`                |        ✖ | `false` | Stored as `device.isCompatibilityMode`; adapters set it when they requested WebGPU `featureLevel: "compatibility"`. |
 
 ### `createShader(input)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| input | `ShaderInput` | ✔ | — | A WGSL string or a resolved shader object with `.wgsl`. Strings are compiled with `@vgpu/wgsl` before creating the native shader module. |
+| Param | Type          | Required | Default | Notes                                                                                                                                    |
+| ----- | ------------- | -------: | ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| input | `ShaderInput` |        ✔ | —       | A WGSL string or a resolved shader object with `.wgsl`. Strings are compiled with `@vgpu/wgsl` before creating the native shader module. |
 
 ### `createTexture(opts)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `TextureOptions` | ✔ | — | Descriptor-first texture options; see `TextureOptions` rows in `Texture`. |
+| Param | Type             | Required | Default | Notes                                                                     |
+| ----- | ---------------- | -------: | ------- | ------------------------------------------------------------------------- |
+| opts  | `TextureOptions` |        ✔ | —       | Descriptor-first texture options; see `TextureOptions` rows in `Texture`. |
 
 ### `createBuffer(opts)`
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| opts | `BufferOptions` | ✔ | — | Descriptor-first buffer options; see `BufferOptions` rows in `Buffer`. |
+| Param | Type            | Required | Default | Notes                                                                  |
+| ----- | --------------- | -------: | ------- | ---------------------------------------------------------------------- |
+| opts  | `BufferOptions` |        ✔ | —       | Descriptor-first buffer options; see `BufferOptions` rows in `Buffer`. |
 
 ### Error scopes and teardown
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| filter | `GPUErrorFilter` | ✔ | — | Passed to `gpu.pushErrorScope(filter)` and also starts a vgpu structured-error scope. |
+| Param  | Type             | Required | Default | Notes                                                                                 |
+| ------ | ---------------- | -------: | ------- | ------------------------------------------------------------------------------------- |
+| filter | `GPUErrorFilter` |        ✔ | —       | Passed to `gpu.pushErrorScope(filter)` and also starts a vgpu structured-error scope. |
 
 **Returns:**
 
@@ -90,14 +90,14 @@ declare class Device {
 ## Examples
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 
 const buffer = device.createBuffer({
-  label: "positions",
+  label: 'positions',
   size: 16,
-  usage: ["vertex", "copy_dst", "copy_src"],
+  usage: ['vertex', 'copy_dst', 'copy_src'],
 });
 
 buffer.write(new Float32Array([0, 1, 2, 3]));
@@ -108,12 +108,12 @@ device.destroy();
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 
-device.pushErrorScope("validation");
-const badBuffer = device.createBuffer({ size: 0, usage: ["copy_dst"] });
+device.pushErrorScope('validation');
+const badBuffer = device.createBuffer({ size: 0, usage: ['copy_dst'] });
 const error = await device.popErrorScope();
 
 console.log(badBuffer.options.size, error?.code); // "VGPU-CORE-INVALID-USAGE"
@@ -121,12 +121,12 @@ device.dispose();
 ```
 
 ```ts
-import { createMockAdapter } from "vgpu/mock";
+import { createMockAdapter } from 'vgpu/mock';
 
 const device = await createMockAdapter().requestDevice();
 
-if (device.features.has("timestamp-query")) {
-  console.log("timestamp queries are available");
+if (device.features.has('timestamp-query')) {
+  console.log('timestamp queries are available');
 }
 
 console.log(device.limits.maxTextureDimension2D);

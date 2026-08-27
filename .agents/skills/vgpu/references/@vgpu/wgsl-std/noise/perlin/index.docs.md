@@ -21,25 +21,25 @@ export fn fbmPerlin3d(position: vec3f, octaves: i32, lacunarity: f32, gain: f32)
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| position | `vec2f` / `vec3f` | ✔ | — | Sample position in noise space. One unit is one lattice cell, so scale the input to choose the feature size (`perlin3d(worldPosition * 0.35)`). There is no seed parameter — offset `position` instead (see Notes). |
-| octaves | `i32` | ✔ | — | Number of fBM octaves. **Silently clamped to `[1, 16]`**: `0` and negatives behave as `1`, values above `16` as `16`. The clamp bounds shader cost and keeps a garbage value (from a uniform, say) from hanging the GPU. |
-| lacunarity | `f32` | ✔ | — | Frequency multiplier per octave; `2.0` is the usual choice. Not clamped. Irrational-ish values (`2.17`) hide the lattice better than exact powers of two. Effective coordinate of the last octave is `position * lacunarity^(octaves - 1)`. |
-| gain | `f32` | ✔ | — | Amplitude multiplier per octave; `0.5` is the usual choice. **Silently clamped to `[0, 1]`**, because a negative gain would break the range proof. `gain = 0` reduces fBM to a single octave. |
+| Param      | Type              | Required | Default | Notes                                                                                                                                                                                                                                       |
+| ---------- | ----------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| position   | `vec2f` / `vec3f` | ✔        | —       | Sample position in noise space. One unit is one lattice cell, so scale the input to choose the feature size (`perlin3d(worldPosition * 0.35)`). There is no seed parameter — offset `position` instead (see Notes).                         |
+| octaves    | `i32`             | ✔        | —       | Number of fBM octaves. **Silently clamped to `[1, 16]`**: `0` and negatives behave as `1`, values above `16` as `16`. The clamp bounds shader cost and keeps a garbage value (from a uniform, say) from hanging the GPU.                    |
+| lacunarity | `f32`             | ✔        | —       | Frequency multiplier per octave; `2.0` is the usual choice. Not clamped. Irrational-ish values (`2.17`) hide the lattice better than exact powers of two. Effective coordinate of the last octave is `position * lacunarity^(octaves - 1)`. |
+| gain       | `f32`             | ✔        | —       | Amplitude multiplier per octave; `0.5` is the usual choice. **Silently clamped to `[0, 1]`**, because a negative gain would break the range proof. `gain = 0` reduces fBM to a single octave.                                               |
 
 **Returns:** `f32` in the open interval `(-1, 1)` for every finite input, for all four functions. This is a proof, not an observation: the quintic blend is a convex combination of the corner gradient dot products, and each normalizer is strictly below `1 / sup`. fBM divides by the sum of its amplitudes, so `|sum| <= weight` keeps the same bound across octaves.
 
 Measured over 1e6 random samples (`packages/wgsl-std/tests/perlin.test.ts` pins these):
 
-| fn | max &#124;value&#124; | typical σ | max slope | corners hashed |
-|---|---|---|---|---|
-| `perlin2d` | 0.9937 (bound 0.99996) | 0.305 | ≈2.74 | 4 × `pcg2d` |
-| `perlin3d` | 0.9560 (bound 0.99956) | 0.260 | ≈2.45 | 8 × `pcg3d` |
+| fn         | max &#124;value&#124;  | typical σ | max slope | corners hashed |
+| ---------- | ---------------------- | --------- | --------- | -------------- |
+| `perlin2d` | 0.9937 (bound 0.99996) | 0.305     | ≈2.74     | 4 × `pcg2d`    |
+| `perlin3d` | 0.9560 (bound 0.99956) | 0.260     | ≈2.45     | 8 × `pcg3d`    |
 
 `perlin2d` and `perlin3d` are **exactly `0.0` at every integer lattice point** (`perlin3d(vec3f(3.0, -1.0, 8.0)) == 0.0`). That is inherent to gradient noise, not a bug: if your field looks like a zero grid, you are sampling integers — offset by a fraction of a cell.
 
-**Throws:** These WGSL declarations do not throw. `resolveShader()` can still throw `VGPU-WGSL-SYM-NOEXPORT` for a misspelled import (note this module is `@vgpu/wgsl-std/noise/perlin`, *not* `@vgpu/wgsl-std/noise`), `VGPU-WGSL-PKG-NOTFOUND` if the package cannot be resolved, or validation errors such as `VGPU-WGSL-NAGA-UNKNOWN` if caller WGSL is invalid. This module also reaches `@vgpu/wgsl-std/hash`, so that package export must resolve too.
+**Throws:** These WGSL declarations do not throw. `resolveShader()` can still throw `VGPU-WGSL-SYM-NOEXPORT` for a misspelled import (note this module is `@vgpu/wgsl-std/noise/perlin`, _not_ `@vgpu/wgsl-std/noise`), `VGPU-WGSL-PKG-NOTFOUND` if the package cannot be resolved, or validation errors such as `VGPU-WGSL-NAGA-UNKNOWN` if caller WGSL is invalid. This module also reaches `@vgpu/wgsl-std/hash`, so that package export must resolve too.
 
 ## Examples
 
@@ -57,7 +57,7 @@ fn fogDensity(worldPosition: vec3f, time: f32) -> f32 {
 }
 `;
 
-console.log(remapWgsl.includes("fogDensity"));
+console.log(remapWgsl.includes('fogDensity'));
 ```
 
 ```ts
@@ -84,7 +84,7 @@ fn cloudCoverage(position: vec3f, time: f32) -> f32 {
 }
 `;
 
-console.log(cloudsWgsl.includes("cloudCoverage"));
+console.log(cloudsWgsl.includes('cloudCoverage'));
 ```
 
 ```ts
@@ -121,7 +121,7 @@ fn ridged3d(position: vec3f, octaves: i32) -> f32 {
 // derivatives are not part of this release.
 `;
 
-console.log(shapingWgsl.includes("turbulence3d"));
+console.log(shapingWgsl.includes('turbulence3d'));
 ```
 
 ## Notes
@@ -130,19 +130,20 @@ console.log(shapingWgsl.includes("turbulence3d"));
 - **Zero on the lattice.** `perlin2d`/`perlin3d` return exactly `0.0` at integer coordinates. Sample at cell fractions, and remember that `fbmPerlin*` inherits this at octave 1 only (later octaves land off-lattice).
 - **Seeding is an input offset — there is no `seed` argument.** Measured Pearson correlation of `perlin3d(p)` against `perlin3d(p + offset)` over 2e5 samples:
 
-  | offset | correlation |
-  |---|---|
-  | `(0.5, 0, 0)` | 0.400 |
-  | `(1, 0, 0)` | −0.043 |
-  | `(2, 0, 0)` | 0.0017 |
-  | `(17, 0, 0)` | −0.0004 |
-  | `(101, 53, 7)` | 0.0035 |
+  | offset         | correlation |
+  | -------------- | ----------- |
+  | `(0.5, 0, 0)`  | 0.400       |
+  | `(1, 0, 0)`    | −0.043      |
+  | `(2, 0, 0)`    | 0.0017      |
+  | `(17, 0, 0)`   | −0.0004     |
+  | `(101, 53, 7)` | 0.0035      |
 
   So **any offset of ≥ 2.0 units on some axis decorrelates**; sub-cell offsets do not (`+0.5` still correlates at 0.40). Keep offsets in the tens–thousands, not 1e6, because of the f32 mantissa.
+
 - **Period and f32 domain.** The gradient hash covers 2³² cells, so there is no visible tiling (compare the period-289 float `permute` hashes found in GLSL ports). The practical limit is f32 precision, not the period: `position - floor(position)` is quantized to ~2⁻²⁴·|p|, so detail bands visibly past `|p| ≈ 1e4` and vanishes entirely at `|p| ≥ 2²³` (the field is then exactly 0, because every sample lands on a lattice point). fBM multiplies the effective coordinate by `lacunarity^(octaves - 1)` — 6 octaves at `lacunarity = 2.0` reaches 32× your input.
 - **Animating with time.** Feeding an unbounded `time` into the third axis works, but it walks the coordinate toward the f32 limit above, so a long-running session eventually looks blocky. Wrap or scale time (`time * 0.05`, reset periodically), or animate a 2D field's offset instead.
 - **Cost model.** `perlin2d` = 4 `pcg2d` hashes, `perlin3d` = 8 `pcg3d` hashes. A 6-octave `fbmPerlin3d` is 48 hashes per sample, and the domain-warped clouds recipe above is ≈4× that (three warp calls plus the detail call). Prefer `fbmPerlin2d` when the third axis only carries animation, and measure before shipping a fullscreen 6-octave 3D field.
 - **Determinism.** Gradient selection goes through the integer `pcg2d`/`pcg3d` hashes and the arithmetic uses no `sin`/`cos`/`sqrt`/`inverseSqrt`/`pow`, whose accuracy is implementation-defined. Which gradient a cell gets is therefore bit-identical on every backend; only the final interpolation may differ by a few ulp. The test suite compares real GPU output against an f32-exact CPU reference at 1e-5.
 - **Purity.** This module declares no `@group`, no `@binding`, no overrides, no entry points and no hidden state. It imports pure hash helpers plus a private gradient core shared with the simplex module.
-- **Credit.** Algorithmic reference: Ken Perlin, *Improving Noise* (SIGGRAPH 2002) — quintic fade and the 12 cube-edge gradient set. No code was copied from any implementation; the gradients are re-derived on this package's own `pcg2d`/`pcg3d` hashes.
+- **Credit.** Algorithmic reference: Ken Perlin, _Improving Noise_ (SIGGRAPH 2002) — quintic fade and the 12 cube-edge gradient set. No code was copied from any implementation; the gradients are re-derived on this package's own `pcg2d`/`pcg3d` hashes.
 - **See also:** `@vgpu/wgsl-std/noise/simplex` (same shape, ~2.5× the slope and ~1.7× the σ at the same input scale — scale `position` by ~0.4–0.5 when migrating, and it hashes 4 corners instead of 8 in 3D), `@vgpu/wgsl-std/noise` (Voronoi/cellular, for cells rather than smooth fields), `@vgpu/wgsl-std/math` (`remap`, `saturate`), `@vgpu/wgsl-std/hash`, `resolveShader`.

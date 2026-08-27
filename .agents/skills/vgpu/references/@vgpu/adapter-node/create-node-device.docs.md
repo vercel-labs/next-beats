@@ -274,7 +274,7 @@ Warning: Vulkan shaderUniform*ArrayDynamicIndexing required.
 Those lines come from the driver stack, not from vgpu; the prebuilt Dawn binding
 exposes no logging hook, so vgpu cannot capture or relabel them. Instead, when a
 run ends up on the CPU renderer, vgpu prints one labelled notice on stderr —
-once per process, after the adapter is known, so it lands *below* the native
+once per process, after the adapter is known, so it lands _below_ the native
 lines it explains:
 
 ```text
@@ -292,11 +292,17 @@ an option.
 ## Choosing an adapter
 
 ```ts
-import { init } from "vgpu/node";
+import { init } from 'vgpu/node';
 
-{ const gpu = await init(); }                        // auto: hardware first, cached software renderer as last resort
-{ const gpu = await init({ adapter: "hardware" }); } // require a real GPU — fails loud, never falls back
-{ const gpu = await init({ adapter: "software" }); } // force the portable renderer — deterministic pixels on any machine
+{
+  const gpu = await init();
+} // auto: hardware first, cached software renderer as last resort
+{
+  const gpu = await init({ adapter: 'hardware' });
+} // require a real GPU — fails loud, never falls back
+{
+  const gpu = await init({ adapter: 'software' });
+} // force the portable renderer — deterministic pixels on any machine
 ```
 
 `gpu.adapter` reports what was selected: `{ name, type: "gpu" | "cpu" }`.

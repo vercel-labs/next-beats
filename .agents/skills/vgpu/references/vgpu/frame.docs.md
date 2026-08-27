@@ -7,13 +7,23 @@
 ## Import
 
 ```ts
-import type { Frame, FramePass, FramePassOptions, FrameLoopHandle, FrameRunner } from "vgpu";
+import type { Frame, FramePass, FramePassOptions, FrameLoopHandle, FrameRunner } from 'vgpu';
 ```
 
 ## Signature
 
 ```ts
-import type { Bundle, ClearColor, Draw, DrawCallOptions, Effect, Target, TimerSpan, Visibility, VisibilityQuery } from "vgpu";
+import type {
+  Bundle,
+  ClearColor,
+  Draw,
+  DrawCallOptions,
+  Effect,
+  Target,
+  TimerSpan,
+  Visibility,
+  VisibilityQuery,
+} from 'vgpu';
 
 interface FramePassOptions {
   readonly target: Target;
@@ -34,8 +44,12 @@ interface FramePassOptions {
   readonly visibility?: Visibility;
 }
 
-interface FrameLoopHandle { stop(): void; }
-interface FrameLoopOptions { readonly fps?: number; }
+interface FrameLoopHandle {
+  stop(): void;
+}
+interface FrameLoopOptions {
+  readonly fps?: number;
+}
 type FrameLoopCallback = (frame: Frame) => void;
 
 declare class Frame {
@@ -61,28 +75,28 @@ declare class FrameRunner {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| frame.cb | `(frame: Frame) => void` | ✖ | `undefined` | If supplied, called and then `frame.submit()` runs in `finally`. If omitted, submit manually. |
-| target.clearColor | `ClearColor` | ✖ | `[0, 0, 0, 1]` | Writable default clear color of the pass target, used when pass `clear` is omitted or `true`. Set it at creation (`surface(gpu, canvas, { clearColor })`, `target(gpu, { size, clearColor })`) or assign it later. Assign a `GPUColor` object or `[r, g, b, a]`. |
-| frame.pass.target | `Target \| FramePassOptions` | ✔ | — | Pass a bare target for the allocation-free common case, or an options bag when customizing clear/preserve behavior. |
-| opts.target | `Target` | ✔ | — | Required inside `FramePassOptions`. Use a `Surface` from `surface(gpu, canvas)` or an offscreen `Target` from `target(gpu, { size })`. |
-| opts.clear | `boolean \| ClearColor` | ✖ | `true` | Omitted or `true` clears with `target.clearColor`; `false` preserves existing color and depth with load ops; a color clears this pass with that color. |
-| opts.clearDepth | `number` | ✖ | `1` | Depth clear value used when the pass clears, in `[0, 1]`. Clear to `0` and give draws `depth: { compare: "greater" }` for reversed-Z, which evens out float depth precision and cuts distant z-fighting. Invalid alongside `clear: false`, which preserves depth, and on a target without depth (the value would have nowhere to land). |
-| opts.clearStencil | `number` | ✖ | `0` | Stencil clear value used when the pass clears; integer in `[0, 0xFFFFFFFF]`, masked to the stencil aspect's bit width by taking the LSBs (values above `0xFF` are legal on 8-bit aspects). Clear to `0` before stencil-masking draws mark pixels via `DrawOptions.stencil` — portals, mirrors, UI cutouts. Requires a target depth format with a stencil aspect (e.g. `depth: "depth24plus-stencil8"`). Invalid alongside `clear: false`, which preserves stencil. |
-| opts.depthReadOnly | `boolean` | ✖ | `false` | Opens the pass with a read-only depth attachment: draws depth-test against it and may sample `target.depth` in the same pass — the soft-particles/SSAO setup. Every draw in the pass needs `depth: { write: false }` (or `depth: false`); the default depth state writes and throws `VGPU-PASS-DEPTH-READONLY` at encode. Effects always keep the writing default, so an `Effect` cannot run in a depthReadOnly pass on a depth target. Combined depth-stencil formats mark the stencil aspect read-only too. Requires a target with depth; invalid alongside `clearDepth`/`clearStencil` (color `clear` still applies), and invalid on MSAA targets, whose depth aspect is stored with `storeOp: "discard"` — there is no retained depth to read. |
-| opts.viewport | `{ x?, y?, width, height, minDepth?, maxDepth? }` | ✖ | full target | Restricts rasterization to a sub-rectangle for every draw in this pass. Use it for split-screen views, minimaps, and picture-in-picture insets. Floats (fractional values allowed); defaults `x`/`y` `0`, `minDepth` `0`, `maxDepth` `1`. May extend past the target — validated at pass open against device limits, not the attachment. |
-| opts.scissor | `readonly [number, number, number, number]` | ✖ | full target | Clips every draw in this pass to `[x, y, width, height]`. Use it for UI clipping and partial redraw of damaged regions. Non-negative integers; `x + width` and `y + height` must fit the target's **current** pixel size at pass open (targets are resizable). Never affects the clear — `loadOp: "clear"` fills the whole attachment; to clear a sub-rectangle, draw it inside a scissored pass. |
-| opts.timer | `TimerSpan` | ✖ | `undefined` | Times this pass on the GPU: pass `timer.span(name)` from a `timer(gpu)` (needs the `"timestamp-query"` device feature). See `Timer` for results, capacity, and feature gating. |
-| opts.visibility | `Visibility` | ✖ | `undefined` | Enables occlusion queries in this pass: pass a `visibility(gpu)` instance, then wrap proxy draws in `pass.occlusion(handle, body)`. Requires a target with a depth attachment. See `Visibility` for handle semantics and capacity. |
-| frame.pass.body | `Effect \| Draw \| ((pass: FramePass) => void)` | ✔ | — | Pass a drawable directly for a single draw, or a callback to encode multiple draw and bundle commands. |
-| pass.draw.drawable | `Draw \| Effect` | ✔ | — | A main API (`vgpu`) draw or fullscreen effect. |
-| pass.draw.opts | `DrawCallOptions` | ✖ | `{}` | Per-call counts and dynamic offsets. Target is the frame pass target. |
-| pass.occlusion.query | `VisibilityQuery` | ✔ | — | Stable handle from `vis.query(label)` of the same visibility instance the pass was opened with. One use per handle per frame, across passes too. |
-| pass.occlusion.body | `Draw \| Effect \| (() => void)` | ✔ | — | Wrapped in `beginOcclusionQuery`/`endOcclusionQuery`. The body ALWAYS executes — it is the proxy the GPU measures; condition your real draws on `q.hidden` outside the scope. |
-| pass.bundles.bundles | `readonly Bundle[]` | ✔ | — | Bundles recorded by `bundle(gpu, { target }, cb)`. |
-| runner.loop.cb | `(frame: Frame) => void` | ✔ | — | Called on each scheduled frame; frame is submitted in `finally`. Surface auto-resize runs before this callback. |
-| runner.loop.opts.fps | `number` | ✖ | `0` (uncapped) | Positive values cap by minimum frame interval `1000 / fps`; omitted or non-positive uses every rAF/timer tick. |
+| Param                | Type                                              | Required | Default        | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------- | ------------------------------------------------- | -------: | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| frame.cb             | `(frame: Frame) => void`                          |        ✖ | `undefined`    | If supplied, called and then `frame.submit()` runs in `finally`. If omitted, submit manually.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| target.clearColor    | `ClearColor`                                      |        ✖ | `[0, 0, 0, 1]` | Writable default clear color of the pass target, used when pass `clear` is omitted or `true`. Set it at creation (`surface(gpu, canvas, { clearColor })`, `target(gpu, { size, clearColor })`) or assign it later. Assign a `GPUColor` object or `[r, g, b, a]`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| frame.pass.target    | `Target \| FramePassOptions`                      |        ✔ | —              | Pass a bare target for the allocation-free common case, or an options bag when customizing clear/preserve behavior.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| opts.target          | `Target`                                          |        ✔ | —              | Required inside `FramePassOptions`. Use a `Surface` from `surface(gpu, canvas)` or an offscreen `Target` from `target(gpu, { size })`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| opts.clear           | `boolean \| ClearColor`                           |        ✖ | `true`         | Omitted or `true` clears with `target.clearColor`; `false` preserves existing color and depth with load ops; a color clears this pass with that color.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| opts.clearDepth      | `number`                                          |        ✖ | `1`            | Depth clear value used when the pass clears, in `[0, 1]`. Clear to `0` and give draws `depth: { compare: "greater" }` for reversed-Z, which evens out float depth precision and cuts distant z-fighting. Invalid alongside `clear: false`, which preserves depth, and on a target without depth (the value would have nowhere to land).                                                                                                                                                                                                                                                                                                                                                                                                            |
+| opts.clearStencil    | `number`                                          |        ✖ | `0`            | Stencil clear value used when the pass clears; integer in `[0, 0xFFFFFFFF]`, masked to the stencil aspect's bit width by taking the LSBs (values above `0xFF` are legal on 8-bit aspects). Clear to `0` before stencil-masking draws mark pixels via `DrawOptions.stencil` — portals, mirrors, UI cutouts. Requires a target depth format with a stencil aspect (e.g. `depth: "depth24plus-stencil8"`). Invalid alongside `clear: false`, which preserves stencil.                                                                                                                                                                                                                                                                                 |
+| opts.depthReadOnly   | `boolean`                                         |        ✖ | `false`        | Opens the pass with a read-only depth attachment: draws depth-test against it and may sample `target.depth` in the same pass — the soft-particles/SSAO setup. Every draw in the pass needs `depth: { write: false }` (or `depth: false`); the default depth state writes and throws `VGPU-PASS-DEPTH-READONLY` at encode. Effects always keep the writing default, so an `Effect` cannot run in a depthReadOnly pass on a depth target. Combined depth-stencil formats mark the stencil aspect read-only too. Requires a target with depth; invalid alongside `clearDepth`/`clearStencil` (color `clear` still applies), and invalid on MSAA targets, whose depth aspect is stored with `storeOp: "discard"` — there is no retained depth to read. |
+| opts.viewport        | `{ x?, y?, width, height, minDepth?, maxDepth? }` |        ✖ | full target    | Restricts rasterization to a sub-rectangle for every draw in this pass. Use it for split-screen views, minimaps, and picture-in-picture insets. Floats (fractional values allowed); defaults `x`/`y` `0`, `minDepth` `0`, `maxDepth` `1`. May extend past the target — validated at pass open against device limits, not the attachment.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| opts.scissor         | `readonly [number, number, number, number]`       |        ✖ | full target    | Clips every draw in this pass to `[x, y, width, height]`. Use it for UI clipping and partial redraw of damaged regions. Non-negative integers; `x + width` and `y + height` must fit the target's **current** pixel size at pass open (targets are resizable). Never affects the clear — `loadOp: "clear"` fills the whole attachment; to clear a sub-rectangle, draw it inside a scissored pass.                                                                                                                                                                                                                                                                                                                                                  |
+| opts.timer           | `TimerSpan`                                       |        ✖ | `undefined`    | Times this pass on the GPU: pass `timer.span(name)` from a `timer(gpu)` (needs the `"timestamp-query"` device feature). See `Timer` for results, capacity, and feature gating.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| opts.visibility      | `Visibility`                                      |        ✖ | `undefined`    | Enables occlusion queries in this pass: pass a `visibility(gpu)` instance, then wrap proxy draws in `pass.occlusion(handle, body)`. Requires a target with a depth attachment. See `Visibility` for handle semantics and capacity.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| frame.pass.body      | `Effect \| Draw \| ((pass: FramePass) => void)`   |        ✔ | —              | Pass a drawable directly for a single draw, or a callback to encode multiple draw and bundle commands.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| pass.draw.drawable   | `Draw \| Effect`                                  |        ✔ | —              | A main API (`vgpu`) draw or fullscreen effect.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| pass.draw.opts       | `DrawCallOptions`                                 |        ✖ | `{}`           | Per-call counts and dynamic offsets. Target is the frame pass target.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| pass.occlusion.query | `VisibilityQuery`                                 |        ✔ | —              | Stable handle from `vis.query(label)` of the same visibility instance the pass was opened with. One use per handle per frame, across passes too.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| pass.occlusion.body  | `Draw \| Effect \| (() => void)`                  |        ✔ | —              | Wrapped in `beginOcclusionQuery`/`endOcclusionQuery`. The body ALWAYS executes — it is the proxy the GPU measures; condition your real draws on `q.hidden` outside the scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| pass.bundles.bundles | `readonly Bundle[]`                               |        ✔ | —              | Bundles recorded by `bundle(gpu, { target }, cb)`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| runner.loop.cb       | `(frame: Frame) => void`                          |        ✔ | —              | Called on each scheduled frame; frame is submitted in `finally`. Surface auto-resize runs before this callback.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| runner.loop.opts.fps | `number`                                          |        ✖ | `0` (uncapped) | Positive values cap by minimum frame interval `1000 / fps`; omitted or non-positive uses every rAF/timer tick.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 **Returns:** `frame(gpu)` / `FrameRunner.frame()` return `Frame`; `Frame.pass()`, `Frame.submit()`, and `Frame.cancel()` return `void`; `FramePass.draw()`, `.occlusion()`, and `.bundles()` return `void`; `loop()` returns `FrameLoopHandle` with `stop()`.
 
@@ -118,45 +132,51 @@ declare class FrameRunner {
 ## Examples
 
 ```ts
-import { init, draw, frame, target } from "vgpu/mock";
+import { init, draw, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
-const scene = target(gpu, { size: [64, 64], format: "rgba8unorm", clearColor: [0.02, 0.02, 0.04, 1] });
+const scene = target(gpu, { size: [64, 64], format: 'rgba8unorm', clearColor: [0.02, 0.02, 0.04, 1] });
 scene.clearColor = [0.02, 0.02, 0.04, 1]; // and it stays writable at runtime
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
     var p = array<vec2f, 3>(vec2f(-1, -1), vec2f(3, -1), vec2f(-1, 3));
     return vec4f(p[vi], 0, 1);
   }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.2, 0.4, 1.0, 1.0); }
-` });
+`,
+});
 
-frame(gpu, (currentFrame) => {
-  currentFrame.pass(scene, (pass) => pass.draw(drawable)); // clears with scene.clearColor
+frame(gpu, currentFrame => {
+  currentFrame.pass(scene, pass => pass.draw(drawable)); // clears with scene.clearColor
 });
 ```
 
 ```ts
-import { init, effect, frameLoop, target } from "vgpu/mock";
+import { init, effect, frameLoop, target } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [16, 16] });
 const shader = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
-const handle = frameLoop(gpu, (frame) => {
-  frame.pass({ target: colorTarget, clear: false }, shader); // preserve color and depth
-}, { fps: 30 });
+const handle = frameLoop(
+  gpu,
+  frame => {
+    frame.pass({ target: colorTarget, clear: false }, shader); // preserve color and depth
+  },
+  { fps: 30 },
+);
 handle.stop();
 ```
 
 ```ts
-import { init, effect, frame, target } from "vgpu/mock";
+import { init, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const screen = target(gpu, { size: [640, 360] });
 const p1View = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.1, 0.3, 0.6, 1); }`);
 const p2View = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(0.6, 0.3, 0.1, 1); }`);
 
-frame(gpu, (currentFrame) => {
+frame(gpu, currentFrame => {
   currentFrame.pass({ target: screen, viewport: { width: 320, height: 360 } }, p1View); // player 1, left half
   currentFrame.pass({ target: screen, clear: false, viewport: { x: 320, width: 320, height: 360 } }, p2View); // player 2, right half
 });
@@ -165,7 +185,7 @@ frame(gpu, (currentFrame) => {
 Split-screen: the first pass clears the whole target and rasterizes one camera into the left viewport; the second preserves it (`clear: false`) and rasterizes the other camera into the right viewport.
 
 ```ts
-import { init, draw, effect, frame, target } from "vgpu/mock";
+import { init, draw, effect, frame, target } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [256, 256], depth: true });
@@ -184,11 +204,11 @@ const particles = draw(gpu, {
     }
   `,
   depth: { write: false }, // required: the pass depth is read-only
-  blend: "additive",
+  blend: 'additive',
   set: { sceneDepth: scene.depth },
 });
 
-frame(gpu, (currentFrame) => {
+frame(gpu, currentFrame => {
   currentFrame.pass(scene, opaque); // pass 1: opaque geometry writes depth
   currentFrame.pass({ target: scene, clear: false, depthReadOnly: true }, particles); // pass 2: test + sample that depth
 });
@@ -197,7 +217,7 @@ frame(gpu, (currentFrame) => {
 Soft particles: pass 2 depth-tests against the opaque depth while sampling the same `scene.depth` texture, which WebGPU only allows because the attachment is read-only.
 
 ```ts
-import { init, effect, frame, target, visibility } from "vgpu/mock";
+import { init, effect, frame, target, visibility } from 'vgpu/mock';
 
 const gpu = await init();
 const scene = target(gpu, { size: [64, 64], depth: true });
@@ -205,7 +225,7 @@ const vis = visibility(gpu);
 const proxy = effect(gpu, `@fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }`);
 
 const currentFrame = frame(gpu); // manual frame: nothing submits it for you
-currentFrame.pass({ target: scene, visibility: vis }, (pass) => pass.occlusion(vis.query("statue"), proxy));
+currentFrame.pass({ target: scene, visibility: vis }, pass => pass.occlusion(vis.query('statue'), proxy));
 
 if (sceneChangedUnderneath()) {
   currentFrame.cancel(); // no GPU work runs, and the occlusion query set stops being retained for this frame
@@ -214,7 +234,9 @@ if (sceneChangedUnderneath()) {
   currentFrame.submit();
 }
 
-function sceneChangedUnderneath(): boolean { return true; }
+function sceneChangedUnderneath(): boolean {
+  return true;
+}
 ```
 
 Cancelling a manual frame: `cancel()` drops the encoder and releases the telemetry retains the frame took, so a `timer(gpu)` / `visibility(gpu)` can be disposed for good without submitting work you no longer want.

@@ -7,7 +7,7 @@ Converts sRGB color literals into linear RGB floats for CPU-side scene constants
 ## Import
 
 ```ts
-import { srgb } from "vgpu/scene";
+import { srgb } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -21,9 +21,9 @@ declare function srgb(input: SrgbInput): LinearRgb;
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| input | `number \| string \| [number, number, number]` | ✔ | — | A packed `0xRRGGBB` number, a `"#rrggbb"` hex string, or a three-channel sRGB tuple. Tuple channels are expected in normalized `0..1` units, not byte `0..255` units. |
+| Param | Type                                           | Required | Default | Notes                                                                                                                                                                 |
+| ----- | ---------------------------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| input | `number \| string \| [number, number, number]` | ✔        | —       | A packed `0xRRGGBB` number, a `"#rrggbb"` hex string, or a three-channel sRGB tuple. Tuple channels are expected in normalized `0..1` units, not byte `0..255` units. |
 
 **Returns:** `LinearRgb` (`[number, number, number]`) — normalized linear RGB channels. Each channel uses the standard sRGB transfer curve: `channel / 12.92` for `channel <= 0.04045`, otherwise `((channel + 0.055) / 1.055) ** 2.4`.
 **Throws:** `VGPU-CORE-INVALID-USAGE` for malformed hex strings; numeric and tuple inputs are not validated.
@@ -31,15 +31,15 @@ declare function srgb(input: SrgbInput): LinearRgb;
 ## Examples
 
 ```ts
-import { srgb } from "vgpu/scene";
+import { srgb } from 'vgpu/scene';
 
 const albedo = srgb(0xff8040);
-const sky = srgb("#3b82f6");
+const sky = srgb('#3b82f6');
 console.log(albedo.length, sky.length); // 3 3
 ```
 
 ```ts
-import { srgb } from "vgpu/scene";
+import { srgb } from 'vgpu/scene';
 
 const normalizedWhite = srgb([1, 1, 1]);
 const normalizedGray = srgb([0.5, 0.5, 0.5]);

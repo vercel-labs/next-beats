@@ -27,24 +27,17 @@ Validate the complete import graph with `npx vgpu check ./apps/docs/examples/tra
 For a raw `effect(gpu)` debug shader, extract the binding-free prefix from the live entry shader and inline its live helper module:
 
 ```ts
-import { readFileSync } from "node:fs";
+import { readFileSync } from 'node:fs';
 
-const stripModuleSyntax = (source: string): string =>
-  source.replace(/^import .*$/gmu, "").replace(/\bexport\s+/gu, "");
+const stripModuleSyntax = (source: string): string => source.replace(/^import .*$/gmu, '').replace(/\bexport\s+/gu, '');
 
-const glass = readFileSync(
-  "./apps/docs/examples/transmission/glass.wgsl",
-  "utf8"
-);
-const entryStart = glass.indexOf("\n// The glass bends rays");
-if (entryStart < 0) throw new Error("Could not isolate transmission math");
+const glass = readFileSync('./apps/docs/examples/transmission/glass.wgsl', 'utf8');
+const entryStart = glass.indexOf('\n// The glass bends rays');
+if (entryStart < 0) throw new Error('Could not isolate transmission math');
 
-const helpers = [
-  readFileSync("./apps/docs/examples/transmission/env-common.wgsl", "utf8"),
-  glass.slice(0, entryStart),
-]
+const helpers = [readFileSync('./apps/docs/examples/transmission/env-common.wgsl', 'utf8'), glass.slice(0, entryStart)]
   .map(stripModuleSyntax)
-  .join("\n");
+  .join('\n');
 ```
 
 `effect(gpu)` reflects one raw WGSL string and rejects remaining imports with `VGPU-WGSL-REFLECT-SOURCE-IMPORT`. The extraction therefore uses the exact shipped math while excluding bindings and entry points.
@@ -61,7 +54,7 @@ Render an 8×1 or 1×1 target where each pixel is a slot and each channel carrie
 | distance, thickness    | `distance * scale` with a fixed scale                      | `byte / 255 / scale`               |
 
 ```ts
-import { init, effect, target } from "vgpu/node";
+import { init, effect, target } from 'vgpu/node';
 
 // Reuse `helpers` extracted from the shipped shaders in step 1.
 declare const helpers: string;
@@ -82,11 +75,11 @@ effect(
     // normalized LOD: divide by levels - 1 so full roughness reaches exactly 1.0
     return vec4f(transmission_lod(0.0, 8.0) / 7.0, transmission_lod(0.5, 8.0) / 7.0, transmission_lod(1.0, 8.0) / 7.0, 1.0);
   }
-`
+`,
 ).draw(colorTarget);
 
 const pixels = await colorTarget.read();
-const slot0 = [...pixels.slice(0, 3)].map((byte) => byte / 255);
+const slot0 = [...pixels.slice(0, 3)].map(byte => byte / 255);
 console.log(slot0);
 gpu.dispose();
 ```
@@ -98,7 +91,7 @@ Give each slot exactly one meaning and comment it. A debug shader nobody can dec
 Reimplement the same math in TypeScript and diff value by value. The tolerance is **`2 / 255` ≈ 0.0078** — the quantization floor of an `rgba8unorm` target. Write the comparison to JSON so the run leaves evidence behind:
 
 ```ts
-import { writeFileSync } from "node:fs";
+import { writeFileSync } from 'node:fs';
 
 const tolerance = 2 / 255; // rgba8unorm quantization
 
@@ -107,28 +100,15 @@ const fresnel = (ior: number, facing: number): number => {
   return f0 + (1 - f0) * (1 - facing) ** 5;
 };
 
-export function compare(
-  reference: number[],
-  pixels: Uint8Array,
-  out: string
-): boolean {
+export function compare(reference: number[], pixels: Uint8Array, out: string): boolean {
   const gpu = reference.map((_, index) => pixels[index] / 255);
-  const maxError = Math.max(
-    ...reference.map((value, index) => Math.abs(value - gpu[index]))
-  );
+  const maxError = Math.max(...reference.map((value, index) => Math.abs(value - gpu[index])));
   const pass = maxError <= tolerance;
-  writeFileSync(
-    out,
-    JSON.stringify({ reference, gpu, maxError, tolerance, pass }, null, 2)
-  );
+  writeFileSync(out, JSON.stringify({ reference, gpu, maxError, tolerance, pass }, null, 2));
   return pass;
 }
 
-export const reference = [
-  fresnel(1.5, 0.2),
-  fresnel(1.5, 0.5),
-  fresnel(1.5, 1),
-];
+export const reference = [fresnel(1.5, 0.2), fresnel(1.5, 0.5), fresnel(1.5, 1)];
 ```
 
 The original extraction run used while building `transmission` reported `maxError: 0.0019` against `tolerance: 0.0078` across Fresnel, dispersion weights, LOD selection, refracted ray direction, cube-exit distance, and eleven cone samples. `2 / 255` is only the quantization floor for values **stored** in `rgba8unorm`; for a derived or iterative quantity, set the budget from the algorithm's physical epsilon instead — for example, compare a sphere tracer's impact point after N steps over a filtered field against its hit-distance epsilon, not `2 / 255`. Exit non-zero when `pass` is false so the harness works in CI, and keep the JSON next to the PNGs as the evidence for your claim.
@@ -138,9 +118,9 @@ The original extraction run used while building `transmission` reported `maxErro
 In a multi-pass pipeline the numbers can be right and the image still wrong, because a pass reads the wrong thing. Write **every** intermediate target to a PNG and look at them one by one:
 
 ```ts
-import { writeFileSync } from "node:fs";
-import { PNG } from "pngjs";
-import type { Target } from "vgpu";
+import { writeFileSync } from 'node:fs';
+import { PNG } from 'pngjs';
+import type { Target } from 'vgpu';
 
 export async function dump(target: Target, file: string): Promise<void> {
   const [width, height] = target.size;
@@ -155,11 +135,11 @@ export async function dump(target: Target, file: string): Promise<void> {
 Float targets can be read directly: `target.read()` returns their raw texel bytes, while `target.readFloats()` decodes `rgba16float` and `rgba32float` into a `Float32Array` without clipping HDR values. For a displayable PNG, render an encode pass into a separate `rgba8unorm` target and read that target. Choose an encoding for the quantity: the example maps signed directions with `x * 0.5 + 0.5`; use a fixed range appropriate to distances or radiance instead.
 
 ```typescript
-import { init, effect, sampler, target } from "vgpu/node";
+import { init, effect, sampler, target } from 'vgpu/node';
 
 const gpu = await init();
-const hdr = target(gpu, { size: [64, 64], format: "rgba16float" });
-const encoded = target(gpu, { size: [64, 64], format: "rgba8unorm" });
+const hdr = target(gpu, { size: [64, 64], format: 'rgba16float' });
+const encoded = target(gpu, { size: [64, 64], format: 'rgba8unorm' });
 
 const encode = effect(
   gpu,
@@ -171,12 +151,12 @@ const encode = effect(
     let value = textureSampleLevel(source, sourceSampler, uv, 0.0);
     return vec4f(value.rgb * 0.5 + vec3f(0.5), 1.0); // signed direction -> [0, 1]
   }
-`
+`,
 );
 encode
   .set({
     source: hdr,
-    sourceSampler: sampler(gpu, { minFilter: "linear", magFilter: "linear" }),
+    sourceSampler: sampler(gpu, { minFilter: 'linear', magFilter: 'linear' }),
   })
   .draw(encoded);
 const pixels = await encoded.read();

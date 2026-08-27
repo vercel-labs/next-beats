@@ -7,7 +7,7 @@ Creates a stateful orthographic camera node that maps a box in world space direc
 ## Import
 
 ```ts
-import { orthographicCamera, type OrthographicCameraOptions } from "vgpu/scene";
+import { orthographicCamera, type OrthographicCameraOptions } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -20,28 +20,28 @@ interface OrthographicCameraOptions {
   readonly top: number;
   readonly near?: number;
   readonly far?: number;
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly target?: import("vgpu/scene").CameraVec3;
-  readonly up?: import("vgpu/scene").CameraVec3;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly target?: import('vgpu/scene').CameraVec3;
+  readonly up?: import('vgpu/scene').CameraVec3;
   readonly label?: string;
 }
 
-declare function orthographicCamera(options: OrthographicCameraOptions): import("vgpu/scene").OrthographicCamera;
+declare function orthographicCamera(options: OrthographicCameraOptions): import('vgpu/scene').OrthographicCamera;
 ```
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---|---|---|
-| options.left | number | ✔ | — | Left plane of the world-space box. |
-| options.right | number | ✔ | — | Right plane. Must be greater than `left`. |
-| options.bottom | number | ✔ | — | Bottom plane. |
-| options.top | number | ✔ | — | Top plane. Must be greater than `bottom`. |
-| options.near | number | ✖ | `0.1` | Near clip plane distance. Must be positive. |
-| options.far | number | ✖ | `100` | Far clip plane distance. Must be greater than `near`. |
-| options.position | Vec3Like | ✖ | `[0, 0, 0]` | Initial local position. |
-| options.target | CameraVec3 | ✖ | — | When given, the camera is oriented with `lookAt(target, up)`. |
-| options.up | CameraVec3 | ✖ | `[0, 1, 0]` | Up vector used only with `target`. |
+| Param            | Type       | Required | Default     | Notes                                                         |
+| ---------------- | ---------- | -------- | ----------- | ------------------------------------------------------------- |
+| options.left     | number     | ✔        | —           | Left plane of the world-space box.                            |
+| options.right    | number     | ✔        | —           | Right plane. Must be greater than `left`.                     |
+| options.bottom   | number     | ✔        | —           | Bottom plane.                                                 |
+| options.top      | number     | ✔        | —           | Top plane. Must be greater than `bottom`.                     |
+| options.near     | number     | ✖        | `0.1`       | Near clip plane distance. Must be positive.                   |
+| options.far      | number     | ✖        | `100`       | Far clip plane distance. Must be greater than `near`.         |
+| options.position | Vec3Like   | ✖        | `[0, 0, 0]` | Initial local position.                                       |
+| options.target   | CameraVec3 | ✖        | —           | When given, the camera is oriented with `lookAt(target, up)`. |
+| options.up       | CameraVec3 | ✖        | `[0, 1, 0]` | Up vector used only with `target`.                            |
 
 **Returns:** `OrthographicCamera` — a scene node (`kind: "orthographic-camera"`) with `viewProjection`, `view`, `projection`, `position`, and `worldPosition`.
 **Throws:** `VGPU-SCENE-VALUE-INVALID` for non-positive `near` or `far <= near`. Avoid `left === right` and `bottom === top`; they produce unusable matrices rather than a validation error.
@@ -49,7 +49,7 @@ declare function orthographicCamera(options: OrthographicCameraOptions): import(
 ## Examples
 
 ```ts
-import { orthographicCamera } from "vgpu/scene";
+import { orthographicCamera } from 'vgpu/scene';
 
 const cam = orthographicCamera({
   left: -2,
@@ -78,15 +78,15 @@ Class returned by `orthographicCamera()`. Extends `SceneNode`, implements `Scene
 ## Import
 
 ```ts
-import type { OrthographicCamera } from "vgpu/scene";
+import type { OrthographicCamera } from 'vgpu/scene';
 ```
 
 ## Signature
 
 ```ts
 declare class OrthographicCamera {
-  set(values: import("vgpu/scene").OrthographicCameraValues): this;
-  lookAt(target: import("vgpu/scene").Vec3Like, up?: import("vgpu/scene").Vec3Like): this;
+  set(values: import('vgpu/scene').OrthographicCameraValues): this;
+  lookAt(target: import('vgpu/scene').Vec3Like, up?: import('vgpu/scene').Vec3Like): this;
   readonly left: number;
   readonly right: number;
   readonly bottom: number;
@@ -106,7 +106,7 @@ declare class OrthographicCamera {
 ## Examples
 
 ```ts
-import { orthographicCamera, type OrthographicCamera } from "vgpu/scene";
+import { orthographicCamera, type OrthographicCamera } from 'vgpu/scene';
 
 const cam: OrthographicCamera = orthographicCamera({ left: -1, right: 1, bottom: -1, top: 1 });
 void cam.projection;
@@ -125,7 +125,7 @@ Values accepted by `OrthographicCamera.set()`: projection planes plus node trans
 ## Import
 
 ```ts
-import type { OrthographicCameraValues } from "vgpu/scene";
+import type { OrthographicCameraValues } from 'vgpu/scene';
 ```
 
 ## Signature
@@ -138,10 +138,10 @@ interface OrthographicCameraValues {
   readonly top?: number;
   readonly near?: number;
   readonly far?: number;
-  readonly position?: import("vgpu/scene").Vec3Like;
-  readonly rotation?: import("vgpu/scene").Vec3Like;
-  readonly quaternion?: import("vgpu/scene").QuatLike;
-  readonly scale?: number | import("vgpu/scene").Vec3Like;
+  readonly position?: import('vgpu/scene').Vec3Like;
+  readonly rotation?: import('vgpu/scene').Vec3Like;
+  readonly quaternion?: import('vgpu/scene').QuatLike;
+  readonly scale?: number | import('vgpu/scene').Vec3Like;
   readonly visible?: boolean;
   readonly label?: string;
 }
@@ -150,7 +150,7 @@ interface OrthographicCameraValues {
 ## Examples
 
 ```ts
-import { orthographicCamera } from "vgpu/scene";
+import { orthographicCamera } from 'vgpu/scene';
 
 orthographicCamera({ left: -1, right: 1, bottom: -1, top: 1 }).set({ near: 0.01 });
 ```

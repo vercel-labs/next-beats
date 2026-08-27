@@ -7,7 +7,7 @@ Values-first shared uniform/storage object created by `uniforms(gpu, values)`. I
 ## Import
 
 ```ts
-import type { SharedUniforms } from "vgpu";
+import type { SharedUniforms } from 'vgpu';
 ```
 
 ## Signature
@@ -20,10 +20,10 @@ interface SharedUniforms<T extends Record<string, unknown> = Record<string, unkn
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| uniforms.values | `T extends Record<string, unknown>` | ✔ | — | Initial values are cloned. Layout and buffer are not created until first binding to a reflected uniform/storage buffer. |
-| shared.set.values | `Partial<T>` | ✔ | — | Deep-merges plain objects and clones arrays/typed arrays before writing current values to the adopted layout. |
+| Param             | Type                                | Required | Default | Notes                                                                                                                   |
+| ----------------- | ----------------------------------- | -------: | ------- | ----------------------------------------------------------------------------------------------------------------------- |
+| uniforms.values   | `T extends Record<string, unknown>` |        ✔ | —       | Initial values are cloned. Layout and buffer are not created until first binding to a reflected uniform/storage buffer. |
+| shared.set.values | `Partial<T>`                        |        ✔ | —       | Deep-merges plain objects and clones arrays/typed arrays before writing current values to the adopted layout.           |
 
 **Returns:** `uniforms(gpu)` returns `SharedUniforms<T>`; `shared.set()` returns `void`.
 
@@ -32,25 +32,29 @@ interface SharedUniforms<T extends Record<string, unknown> = Record<string, unkn
 ## Examples
 
 ```ts
-import { init, clock, effect, frame, target, uniforms } from "vgpu/mock";
+import { init, clock, effect, frame, target, uniforms } from 'vgpu/mock';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [64, 64] });
 const globals = uniforms(gpu, { time: 0, mouse: [0, 0] });
-const wave = effect(gpu, `
+const wave = effect(
+  gpu,
+  `
   struct Globals { time: f32, mouse: vec2f }
   @group(0) @binding(0) var<uniform> globals: Globals;
   @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     return vec4f(uv, sin(globals.time) * 0.5 + 0.5, 1);
   }
-`, { set: { globals } });
+`,
+  { set: { globals } },
+);
 
 globals.set({ time: clock(gpu).time });
-frame(gpu, (currentFrame) => currentFrame.pass({ target: colorTarget }, (pass) => pass.draw(wave)));
+frame(gpu, currentFrame => currentFrame.pass({ target: colorTarget }, pass => pass.draw(wave)));
 ```
 
 ```ts
-import { init, uniforms } from "vgpu/mock";
+import { init, uniforms } from 'vgpu/mock';
 
 const gpu = await init();
 const globals = uniforms(gpu, { exposure: 1, tint: [1, 1, 1] });

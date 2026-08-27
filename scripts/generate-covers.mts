@@ -1,127 +1,190 @@
-// Bakes the cover shader into looping WebP overlays, so the app ships artwork as image
-// assets instead of running WebGPU on every page.
-//
-// The shader emits a transparent luminance overlay, so one asset works for every item
-// that shares a motif -- the colour still comes from each element's own CSS gradient.
-// That means the output is 8 motifs x 2 shapes, not one file per track.
-//
-//   pnpm covers
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+ 
+// Pre-generates deterministic WebP fallback cover overlays through vGPU in Chrome.
+// Chrome is the render backend on macOS because vGPU's Node software renderer is
+// Linux-only. Large artwork animates live; these stills cover loading, reduced motion,
+// small thumbnails, and browsers without WebGPU.
+import { execFileSync, spawn } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { deflateSync } from 'node:zlib';
-import { effect, init, target } from 'vgpu/node';
-import { COVER_FRAME_MS, COVER_FRAMES, COVER_SHAPES, MOTIF_COUNT, coverAssetName } from '../lib/cover-motif.ts';
+import { dirname, join } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { chromium } from '@playwright/test';
+import { config } from 'dotenv';
+import { PrismaClient } from '../generated/prisma/client.ts';
+import { normalizeDatabaseUrl } from '../lib/database-url.ts';
+import {
+  artworkVariant,
+  COVER_SHAPES,
+  coverAssetPath,
+  PLAYLIST_VARIANT_COUNT,
+  seedVector,
+} from '../lib/cover-motif.ts';
+import type { ArtworkKind, CoverShape } from '../lib/cover-motif.ts';
+import type { ChildProcess } from 'node:child_process';
 
-const SHADER = readFileSync('components/ui/album-art.wgsl', 'utf8');
-const OUT_DIR = 'public/covers';
+config({ path: '.env.local' });
 
-function crc32(buffer: Buffer) {
-  let crc = ~0;
-  for (const byte of buffer) {
-    crc ^= byte;
-    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+type CoverItem = { kind: ArtworkKind; label: string; seed: string };
+type StudioOptions = {
+  detail: number;
+  height: number;
+  kind: ArtworkKind;
+  label: string;
+  mode?: 'final' | 'normal' | 'sdf';
+  seed: string;
+  turn: number;
+  width: number;
+};
+
+const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const STUDIO_PORT = Number(process.env.COVER_STUDIO_PORT ?? 3217);
+const STUDIO_FALLBACK_URL = `http://127.0.0.1:${STUDIO_PORT}/cover-studio`;
+
+async function isReachable(url: string) {
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(1_500) });
+    return response.ok;
+  } catch {
+    return false;
   }
-  return ~crc >>> 0;
 }
 
-function pngChunk(type: string, data: Buffer) {
-  const length = Buffer.alloc(4);
-  length.writeUInt32BE(data.length);
-  const body = Buffer.concat([Buffer.from(type, 'ascii'), data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(body));
-  return Buffer.concat([length, body, crc]);
-}
+async function studioServer() {
+  const configured = process.env.COVER_STUDIO_URL;
+  if (configured) return { child: undefined, url: configured };
 
-/** Straight-alpha RGBA to PNG. Avoids pulling an encoder dependency into the project. */
-function writePng(path: string, width: number, height: number, rgba: Uint8Array) {
-  const stride = width * 4;
-  const raw = Buffer.alloc((stride + 1) * height);
-  for (let y = 0; y < height; y += 1) {
-    raw[y * (stride + 1)] = 0;
-    Buffer.from(rgba.buffer, rgba.byteOffset + y * stride, stride).copy(raw, y * (stride + 1) + 1);
+  const child = spawn('pnpm', ['dev', '--hostname', '127.0.0.1', '--port', String(STUDIO_PORT)], {
+    env: { ...process.env, COVER_STUDIO: '1', NEXT_DIST_DIR: '.next-cover-studio' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  let logs = '';
+  child.stdout?.on('data', chunk => (logs += String(chunk)));
+  child.stderr?.on('data', chunk => (logs += String(chunk)));
+
+  for (let attempt = 0; attempt < 90; attempt += 1) {
+    if (child.exitCode !== null) throw new Error(`Cover studio exited early.\n${logs}`);
+    if (await isReachable(STUDIO_FALLBACK_URL)) return { child, url: STUDIO_FALLBACK_URL };
+    await delay(1_000);
   }
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(width, 0);
-  header.writeUInt32BE(height, 4);
-  header[8] = 8;
-  header[9] = 6;
-  writeFileSync(
-    path,
-    Buffer.concat([
-      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-      pngChunk('IHDR', header),
-      pngChunk('IDAT', deflateSync(raw, { level: 6 })),
-      pngChunk('IEND', Buffer.alloc(0)),
-    ]),
-  );
+
+  child.kill('SIGTERM');
+  throw new Error(`Timed out starting the cover studio.\n${logs}`);
 }
 
-/**
- * The shader writes premultiplied alpha because that is what the browser composites a
- * canvas with. PNG and WebP store straight alpha, so undo the premultiplication.
- */
-function unpremultiply(pixels: Uint8Array) {
-  for (let index = 0; index < pixels.length; index += 4) {
-    const alpha = pixels[index + 3];
-    if (alpha === 0 || alpha === 255) continue;
-    const scale = 255 / alpha;
-    pixels[index] = Math.min(255, Math.round(pixels[index] * scale));
-    pixels[index + 1] = Math.min(255, Math.round(pixels[index + 1] * scale));
-    pixels[index + 2] = Math.min(255, Math.round(pixels[index + 2] * scale));
+function stopServer(child: ChildProcess | undefined) {
+  if (child?.exitCode === null) child.kill('SIGTERM');
+}
+
+async function coverCatalog(): Promise<CoverItem[]> {
+  const connectionString = normalizeDatabaseUrl(process.env.DATABASE_URL!);
+  const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  try {
+    const tracks = await prisma.track.findMany({ orderBy: { id: 'asc' }, select: { id: true, title: true } });
+    if (tracks.length === 0) throw new Error('No tracks found. Seed the database before running pnpm covers.');
+
+    const trackItems: CoverItem[] = tracks.map(track => ({ kind: 'track', label: track.title, seed: track.id }));
+    const genreItems: CoverItem[] = ['electronic', 'synthwave', 'hip-hop', 'indie', 'pop', 'lo-fi'].map(genre => ({
+      kind: 'genre',
+      label: genre,
+      seed: genre,
+    }));
+    const playlistItems: CoverItem[] = [];
+    for (let variant = 0; variant < PLAYLIST_VARIANT_COUNT; variant += 1) {
+      for (let candidate = 0; candidate < 10_000; candidate += 1) {
+        const seed = `playlist-variant-${variant}-${candidate}`;
+        if (artworkVariant(seed, 'playlist', seedVector(seed)[3]) !== variant) continue;
+        playlistItems.push({ kind: 'playlist', label: seed, seed });
+        break;
+      }
+    }
+    return [...trackItems, ...playlistItems, ...genreItems];
+  } finally {
+    await prisma.$disconnect();
   }
-  return pixels;
 }
 
-// A fixed seed: assets are shared per motif, so the light has to be identical for every
-// item that uses one.
-const SEED: [number, number, number, number] = [0.31, 0.62, 0.0, 0.17];
+function shapesFor(kind: ArtworkKind) {
+  const names: CoverShape[] = kind === 'genre' ? ['banner'] : kind === 'playlist' ? ['square'] : ['square', 'thumb'];
+  return COVER_SHAPES.filter(shape => names.includes(shape.name));
+}
 
-const gpu = await init();
-const cover = effect(gpu, SHADER);
-mkdirSync(OUT_DIR, { recursive: true });
+function outputPath(item: CoverItem, shape: CoverShape) {
+  return join('public', coverAssetPath(item.seed, item.label, item.kind, shape, true).slice(1));
+}
 
-const report: string[] = [];
+function pngBytes(dataUrl: string) {
+  return Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64');
+}
 
-for (const shape of COVER_SHAPES) {
-  const canvas = target(gpu, { size: [shape.width, shape.height] });
-  const frames = target(gpu, { size: [shape.width, shape.height] });
-  void frames;
+async function main() {
+  if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required. Add it to .env.local first.');
+  const catalog = await coverCatalog();
+  const sampleIds = new Set(['t11', 't16', 't17', 't18']);
+  const items = process.argv.includes('--sample')
+    ? catalog.filter(item => item.kind !== 'track' || sampleIds.has(item.seed))
+    : catalog;
+  const { child, url } = await studioServer();
+  const browser = await chromium.launch({
+    args: ['--disable-gpu-sandbox', '--enable-unsafe-webgpu'],
+    executablePath: existsSync(CHROME_PATH) ? CHROME_PATH : undefined,
+    headless: process.env.COVER_HEADLESS === '1',
+  });
 
-  for (let motif = 0; motif < MOTIF_COUNT; motif += 1) {
-    const scratch = mkdtempSync(join(tmpdir(), 'covers-'));
-    const framePaths: string[] = [];
+  try {
+    const page = await browser.newPage();
+    page.on('console', message => console.log(`[cover-studio:${message.type()}] ${message.text()}`));
+    page.on('pageerror', error => console.error(`[cover-studio:error] ${error.message}`));
+    await page.context().addCookies([{ name: 'beats-user', value: 'cover-studio', url: new URL(url).origin }]);
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(3_000);
+    console.log(`[cover-studio:status] ${await page.locator('[data-cover-studio-status]').innerText()}`);
+    await page.waitForFunction(
+      () => window.__coverStudioReady === true || typeof window.__coverStudioError === 'string',
+      undefined,
+      { timeout: 60_000 },
+    );
+    const studioError = await page.evaluate(() => window.__coverStudioError);
+    if (studioError) throw new Error(`Cover studio failed: ${studioError}`);
 
-    for (let index = 0; index < COVER_FRAMES; index += 1) {
-      cover.set({
-        cover: {
-          params: [index / COVER_FRAMES, shape.kind, motif, 2 / shape.height],
-          seed: SEED,
-          shape: [shape.width / shape.height, 0, 0, 0],
-        },
-      });
-      cover.draw(canvas);
-      const pixels = unpremultiply(await canvas.read());
-      const framePath = join(scratch, `${String(index).padStart(3, '0')}.png`);
-      writePng(framePath, shape.width, shape.height, pixels);
-      framePaths.push(framePath);
+    const report: string[] = [];
+    for (const item of items) {
+      for (const shape of shapesFor(item.kind)) {
+        console.log(`[cover] ${item.kind.padEnd(8)} ${item.label.padEnd(28)} ${shape.name}`);
+        const scratch = mkdtempSync(join(tmpdir(), 'next-beats-covers-'));
+        try {
+          const options: StudioOptions = {
+            detail: shape.detail,
+            height: shape.height,
+            kind: item.kind,
+            label: item.label,
+            seed: item.seed,
+            turn: seedVector(item.seed)[3],
+            width: shape.width,
+          };
+          const dataUrl = await page.evaluate(async value => {
+            if (!window.__renderCoverFrame) throw new Error('Cover studio renderer is unavailable.');
+            return window.__renderCoverFrame(value);
+          }, options);
+          const framePath = join(scratch, 'cover.png');
+          writeFileSync(framePath, pngBytes(dataUrl));
+
+          const still = outputPath(item, shape.name);
+          mkdirSync(dirname(still), { recursive: true });
+          execFileSync('img2webp', ['-lossy', '-q', '78', '-m', '3', framePath, '-o', still], { stdio: 'pipe' });
+          report.push(`${still.padEnd(62)} ${(readFileSync(still).length / 1024).toFixed(0)} KB`);
+        } finally {
+          rmSync(scratch, { force: true, recursive: true });
+        }
+      }
     }
 
-    const out = join(OUT_DIR, `${coverAssetName(motif, shape.name)}.webp`);
-    execFileSync(
-      'img2webp',
-      ['-loop', '0', '-lossy', '-q', '72', '-m', '6', '-d', String(COVER_FRAME_MS), ...framePaths, '-o', out],
-      { stdio: 'pipe' },
-    );
-    rmSync(scratch, { recursive: true, force: true });
-
-    const bytes = readFileSync(out).length;
-    report.push(`${out.padEnd(42)} ${(bytes / 1024).toFixed(0)} KB`);
+    console.log(report.join('\n'));
+    console.log(`\n${report.length} static fallback assets.`);
+  } finally {
+    await browser.close();
+    stopServer(child);
   }
 }
 
-console.log(report.join('\n'));
-console.log(`\n${report.length} assets, ${COVER_FRAMES} frames each, ${COVER_FRAME_MS}ms/frame`);
-gpu.dispose();
+await main();

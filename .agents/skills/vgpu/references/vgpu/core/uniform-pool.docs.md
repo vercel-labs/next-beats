@@ -7,14 +7,14 @@ Dynamic-offset ring allocator for many per-draw uniforms. Allocate a typed `Unif
 ## Import
 
 ```ts
-import { UniformPool } from "vgpu/core";
-import type { UniformPoolOptions, UniformLayout, UniformSlot } from "vgpu/core";
+import { UniformPool } from 'vgpu/core';
+import type { UniformPoolOptions, UniformLayout, UniformSlot } from 'vgpu/core';
 ```
 
 ## Signature
 
 ```ts
-import type { Device } from "vgpu/core";
+import type { Device } from 'vgpu/core';
 
 interface UniformPoolOptions {
   readonly capacityBytes?: number;
@@ -60,21 +60,21 @@ declare class UniformPool {
 
 ## Parameters
 
-| Param | Type | Required | Default | Notes |
-|---|---|---:|---|---|
-| device | `Device` | ✔ | — | Core device. Device limits determine alignment and max binding size. |
-| opts | `UniformPoolOptions` | ✖ | `{}` | Pool capacity options. |
-| opts.capacityBytes | `number` | ✖ | `4 * 1024 * 1024` | CPU mirror and GPU buffer size. |
-| layout.size | `number` | ✔ | — | Logical uniform byte size before stride alignment. Must fit both pool capacity and `maxUniformBufferBindingSize`. |
-| layout.bindings | `readonly GPUBindGroupLayoutEntry[]` | ✖ | Binding `0` uniform, dynamic offset, visibility vertex+fragment | Used only when `layout.bindGroupLayout` is omitted. |
-| layout.bindGroupLayout | `GPUBindGroupLayout` | ✖ | New layout from `layout.bindings` or default binding `0` | Usually `draw.layout(group, { dynamicOffsets: true })` so the draw pipeline and slot agree. |
-| layout.encode | `(value, dst, byteOffset) => void` | ✔ | — | Writes one value into the pool CPU mirror at `byteOffset`. |
-| alloc.layout | `UniformLayout<T>` | ✔ | — | Layout used for one reusable slot. Slot stride is `roundUp(layout.size, minUniformBufferOffsetAlignment)`. |
-| push.slot | `UniformSlot<T>` | ✔ | — | Must be allocated by the same pool. |
-| push.value | `T` | ✔ | — | Encoded into the CPU mirror; returned offset is passed as dynamic offset. |
-| pushBytes.bytes | `ArrayBufferView<ArrayBuffer>` | ✔ | — | Must have byte length exactly equal to `slot.layout.size`. |
-| beginFrame.frameIndex | `number` | ✔ | — | Currently unused marker; call before pushes to reset the ring head to `0`. |
-| assertReadyForSubmit.where | `string` | ✔ | — | Error context if pushes are unflushed. |
+| Param                      | Type                                 | Required | Default                                                         | Notes                                                                                                             |
+| -------------------------- | ------------------------------------ | -------: | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| device                     | `Device`                             |        ✔ | —                                                               | Core device. Device limits determine alignment and max binding size.                                              |
+| opts                       | `UniformPoolOptions`                 |        ✖ | `{}`                                                            | Pool capacity options.                                                                                            |
+| opts.capacityBytes         | `number`                             |        ✖ | `4 * 1024 * 1024`                                               | CPU mirror and GPU buffer size.                                                                                   |
+| layout.size                | `number`                             |        ✔ | —                                                               | Logical uniform byte size before stride alignment. Must fit both pool capacity and `maxUniformBufferBindingSize`. |
+| layout.bindings            | `readonly GPUBindGroupLayoutEntry[]` |        ✖ | Binding `0` uniform, dynamic offset, visibility vertex+fragment | Used only when `layout.bindGroupLayout` is omitted.                                                               |
+| layout.bindGroupLayout     | `GPUBindGroupLayout`                 |        ✖ | New layout from `layout.bindings` or default binding `0`        | Usually `draw.layout(group, { dynamicOffsets: true })` so the draw pipeline and slot agree.                       |
+| layout.encode              | `(value, dst, byteOffset) => void`   |        ✔ | —                                                               | Writes one value into the pool CPU mirror at `byteOffset`.                                                        |
+| alloc.layout               | `UniformLayout<T>`                   |        ✔ | —                                                               | Layout used for one reusable slot. Slot stride is `roundUp(layout.size, minUniformBufferOffsetAlignment)`.        |
+| push.slot                  | `UniformSlot<T>`                     |        ✔ | —                                                               | Must be allocated by the same pool.                                                                               |
+| push.value                 | `T`                                  |        ✔ | —                                                               | Encoded into the CPU mirror; returned offset is passed as dynamic offset.                                         |
+| pushBytes.bytes            | `ArrayBufferView<ArrayBuffer>`       |        ✔ | —                                                               | Must have byte length exactly equal to `slot.layout.size`.                                                        |
+| beginFrame.frameIndex      | `number`                             |        ✔ | —                                                               | Currently unused marker; call before pushes to reset the ring head to `0`.                                        |
+| assertReadyForSubmit.where | `string`                             |        ✔ | —                                                               | Error context if pushes are unflushed.                                                                            |
 
 **Returns:** Constructor returns `UniformPool`; `alloc()` returns `UniformSlot<T>`; `push()` / `pushBytes()` return the dynamic byte offset; `usedBytes` returns current ring head; lifecycle methods return `void`.
 
@@ -83,12 +83,13 @@ declare class UniformPool {
 ## Examples
 
 ```ts
-import { init, clock, draw, frame, target } from "vgpu/mock";
-import { UniformPool, type UniformLayout } from "vgpu/core";
+import { init, clock, draw, frame, target } from 'vgpu/mock';
+import { UniformPool, type UniformLayout } from 'vgpu/core';
 
 const gpu = await init();
 const colorTarget = target(gpu, { size: [32, 32] });
-const drawable = draw(gpu, { shader: `
+const drawable = draw(gpu, {
+  shader: `
   struct Object { model: mat4x4f }
   @group(0) @binding(0) var<uniform> object: Object;
   @vertex fn vs_main(@builtin(vertex_index) vi: u32) -> @builtin(position) vec4f {
@@ -96,7 +97,8 @@ const drawable = draw(gpu, { shader: `
     return object.model * vec4f(p[vi], 0, 1);
   }
   @fragment fn fs_main() -> @location(0) vec4f { return vec4f(1); }
-` });
+`,
+});
 
 type ObjectUniforms = { model: Float32Array };
 const objectLayout: UniformLayout<ObjectUniforms> = {
@@ -113,18 +115,22 @@ drawable.group(0, slot.bindGroup);
 pool.beginFrame(clock(gpu).frameCount);
 const offset = slot.push({ model: new Float32Array(16) });
 pool.endFrame();
-frame(gpu, (currentFrame) => currentFrame.pass({ target: colorTarget }, (pass) => pass.draw(drawable, { offsets: { 0: [offset] } })));
+frame(gpu, currentFrame =>
+  currentFrame.pass({ target: colorTarget }, pass => pass.draw(drawable, { offsets: { 0: [offset] } })),
+);
 ```
 
 ```ts
-import { init } from "vgpu/mock";
-import { UniformPool, type UniformLayout } from "vgpu/core";
+import { init } from 'vgpu/mock';
+import { UniformPool, type UniformLayout } from 'vgpu/core';
 
 const gpu = await init();
 const pool = new UniformPool(gpu.device, { capacityBytes: 1024 });
 const layout: UniformLayout<Float32Array> = {
   size: 16,
-  encode(value, dst, byteOffset) { new Float32Array(dst, byteOffset, 4).set(value); },
+  encode(value, dst, byteOffset) {
+    new Float32Array(dst, byteOffset, 4).set(value);
+  },
 };
 const slot = pool.alloc(layout);
 pool.beginFrame(0);
