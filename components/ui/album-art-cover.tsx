@@ -83,7 +83,6 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
     let visibilityObserver: IntersectionObserver | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
-    let detachPointer: (() => void) | undefined;
     let animationFrame = 0;
 
     void getGpu()
@@ -106,45 +105,10 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
           set: {
             cover: {
               params: [0, kindIndex[kind], motif, metrics().unit],
-              pointer: [0, 0, 0, 0],
               seed: seedValues,
               shape: [metrics().aspect, 0, 0, 0],
             },
           },
-        });
-
-        // The canvas itself takes no pointer events, so the card behind it drives hover.
-        const pointer = { hover: 0, target: 0, x: 0, y: 0 };
-        const host = canvas.parentElement;
-        if (host) {
-          const onMove = (event: PointerEvent) => {
-            const box = canvas.getBoundingClientRect();
-            if (!box.height) return;
-            const { aspect } = metrics();
-            pointer.x = ((event.clientX - box.left) / box.width * 2 - 1) * aspect;
-            pointer.y = (event.clientY - box.top) / box.height * 2 - 1;
-          };
-          const onEnter = (event: PointerEvent) => {
-            onMove(event);
-            pointer.target = 1;
-          };
-          const onLeave = () => {
-            pointer.target = 0;
-          };
-
-          host.addEventListener('pointermove', onMove);
-          host.addEventListener('pointerenter', onEnter);
-          host.addEventListener('pointerleave', onLeave);
-          detachPointer = () => {
-            host.removeEventListener('pointermove', onMove);
-            host.removeEventListener('pointerenter', onEnter);
-            host.removeEventListener('pointerleave', onLeave);
-          };
-        }
-
-        unsubscribeResize = output.onResize(() => {
-          const { aspect, unit } = metrics();
-          cover.set({ cover: { params: [0, kindIndex[kind], motif, unit], shape: [aspect, 0, 0, 0] } });
         });
 
         let visible = true;
@@ -152,14 +116,7 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
         const draw = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
 
-          // Eased so entering and leaving a card ramps the light instead of snapping it.
-          pointer.hover += (pointer.target - pointer.hover) * 0.18;
-          cover.set({
-            cover: {
-              params: [time, kindIndex[kind], motif, metrics().unit],
-              pointer: [pointer.x, pointer.y, pointer.hover, 0],
-            },
-          });
+          cover.set({ cover: { params: [time, kindIndex[kind], motif, metrics().unit] } });
           currentFrame.pass(output, cover);
 
           if (!revealed) {
@@ -199,7 +156,6 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
       cancelAnimationFrame(animationFrame);
       unregisterAnimation?.();
       unsubscribeResize?.();
-      detachPointer?.();
       resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
       output?.dispose();
@@ -211,11 +167,10 @@ export function AlbumArtCover({ seed, label, kind }: Props) {
       ref={canvasRef}
       aria-hidden
       // Transparent until the first frame lands, so the CSS gradient below is the
-      // fallback for free -- including when WebGPU is unavailable. The artwork then
-      // resolves out of a blur rather than popping in.
+      // fallback for free -- including when WebGPU is unavailable.
       className={cn(
-        'pointer-events-none absolute inset-0 z-10 block h-full w-full transition-[opacity,filter,transform] duration-700 ease-out',
-        ready ? 'scale-100 opacity-100 blur-none' : 'scale-[1.06] opacity-0 blur-md',
+        'pointer-events-none absolute inset-0 z-10 block h-full w-full transition-opacity duration-300 ease-out',
+        ready ? 'opacity-100' : 'opacity-0',
       )}
     />
   );

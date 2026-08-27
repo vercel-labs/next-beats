@@ -14,8 +14,6 @@ struct Cover {
   params: vec4f,
   // x: aspect ratio (width / height)
   shape: vec4f,
-  // xy: pointer in the same isotropic space as `point`, z: hover 0..1
-  pointer: vec4f,
 }
 
 @group(0) @binding(0) var<uniform> cover: Cover;
@@ -245,7 +243,6 @@ fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
 
   var art = Artwork(0.0, 0.0, 0.0);
   var sheen = 0.0;
-  let hover = clamp(cover.pointer.z, 0.0, 1.0);
 
   // Slow light drift, which is what gives the flat CSS gradient some volume.
   let lightAt = vec2f(-0.5 * aspect, -0.55) + vec2f(cos(phase * 0.6), sin(phase * 0.8)) * 0.3;
@@ -301,35 +298,21 @@ fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
     art.ink += printed.ink * 0.85;
     art.glow += printed.glow * 0.85;
 
-    // Long grooves sweeping the full width, tying the wide format together.
-    for (var line = 0.0; line < 3.0; line += 1.0) {
-      let at = -0.62 + line * 0.42 + sin(phase * 0.5 + line * 1.7) * 0.03;
-      art.ink += strokeAt(point.y - at, 1.2, 1.0) * 0.16
-        * smoothstep(-aspect, -aspect * 0.2, point.x);
-    }
-
-    art.shade += smoothstep(0.1, 1.0, point.y) * smoothstep(0.3, -0.6, point.x / aspect) * 0.2;
+    // Scrim under the label, which sits at the lower left.
+    art.shade += smoothstep(0.0, 1.0, point.y) * smoothstep(0.35, -0.5, point.x / aspect) * 0.16;
   }
 
   // A sheen travelling across the cover. The motifs move too slowly to read as animation
   // on their own, so this is what makes a still cover look alive.
   let sweepAxis = dot(point, normalize(vec2f(0.85, 0.5)));
   let sweepSpan = aspect + 1.0;
-  let sweepAt = fract(cover.params.x * (0.075 + hover * 0.1) + seed.w) * (sweepSpan * 2.4) - sweepSpan * 1.2;
-  let sweep = exp(-abs(sweepAxis - sweepAt) * (2.6 - hover * 0.8));
-  art.glow += sweep * (0.55 + hover * 0.85);
+  let sweepAt = fract(cover.params.x * 0.075 + seed.w) * (sweepSpan * 2.4) - sweepSpan * 1.2;
+  let sweep = exp(-abs(sweepAxis - sweepAt) * 2.6);
+  art.glow += sweep * 0.55;
   art.ink += art.ink * sweep * 0.3;
 
   // Motif glow breathes, so even the fine line work has a pulse to it.
   art.glow *= 1.0 + sin(phase * 0.9) * 0.16;
-
-  // Hover: light gathers under the pointer and the ink firms up.
-  if (hover > 0.001) {
-    let toPointer = point - cover.pointer.xy;
-    art.glow += exp(-dot(toPointer, toPointer) * 2.2) * hover * 1.5;
-    art.ink *= 1.0 + hover * 0.22;
-    art.shade *= 1.0 - hover * 0.25;
-  }
 
   // Corner falloff, plus paper grain fixed by position so nothing shimmers frame to frame.
   art.shade += smoothstep(0.62, 1.7, length(point / vec2f(aspect, 1.0))) * 0.16;
