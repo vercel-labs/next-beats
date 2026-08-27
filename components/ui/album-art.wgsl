@@ -346,37 +346,38 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
 
   let glowCenter = vec2f((seed.x - 0.5) * 0.25, -0.42 + variant01 * 0.45);
   let glow = exp(-dot(point - glowCenter, point - glowCenter) * 1.35) * (0.075 + variant01 * 0.035);
+  let recordCenter = vec2f(0.12, 0.03);
+  let recordRadius = length(point - recordCenter);
+  let record = sphereHeight(point, recordCenter, 0.5) * 0.26
+    + exp(-pow((recordRadius - 0.35) * 20.0, 2.0)) * 0.1;
   var cue = 0.0;
   if (variant < 0.5) {
     // A record partly visible through the front sleeve.
-    let recordCenter = vec2f(0.18, 0.05 + sin(cycle) * 0.012);
-    let radius = length(point - recordCenter);
-    let disc = sphereHeight(point, recordCenter, 0.48) * 0.12;
-    let groove = exp(-pow((radius - 0.31) * 18.0, 2.0)) * 0.055;
-    let label = sphereHeight(point, recordCenter, 0.105) * 0.2;
-    cue = disc + groove + label;
+    let label = sphereHeight(point, recordCenter, 0.115) * 0.42;
+    cue = record + label;
   } else if (variant < 1.5) {
     // Equaliser bars pressed into the front sleeve.
     for (var bar = 0.0; bar < 5.0; bar += 1.0) {
       let pulse = 0.5 + 0.5 * sin(cycle + bar * 0.82);
       let barHeight = 0.16 + pulse * 0.26;
       let barCenter = vec2f(-0.4 + bar * 0.2, 0.28 - barHeight * 0.5);
-      cue = max(cue, roundedPlate(point - barCenter, vec2f(0.055, barHeight), 0.035, 0.17));
+      cue = max(cue, roundedPlate(point - barCenter, vec2f(0.065, barHeight), 0.04, 0.3));
     }
+    cue += record * 0.52;
   } else if (variant < 2.5) {
     // A rising disc and horizon, kept inside the sleeve like cover printing.
     let sunCenter = vec2f(0.22, -0.08 + sin(cycle) * 0.012);
-    let sun = sphereHeight(point, sunCenter, 0.42) * 0.16;
+    let sun = sphereHeight(point, sunCenter, 0.42) * 0.36;
     let horizon = exp(-pow((point.y - 0.3) * 18.0, 2.0))
-      * (1.0 - smoothstep(0.58, 0.74, abs(point.x))) * 0.09;
-    cue = sun + horizon;
+      * (1.0 - smoothstep(0.58, 0.74, abs(point.x))) * 0.16;
+    cue = max(record * 0.38, sun + horizon);
   } else {
     // A night record with a small terminal-like inset.
     let moonCenter = vec2f(0.28, -0.18);
-    let moon = sphereHeight(point, moonCenter, 0.39) * 0.15;
-    let cutout = sphereHeight(point, moonCenter + vec2f(0.16, -0.08), 0.36) * 0.14;
-    let cursor = roundedPlate(point - vec2f(-0.28, 0.3), vec2f(0.24, 0.035), 0.02, 0.12);
-    cue = max(moon - cutout, 0.0) + cursor;
+    let moon = sphereHeight(point, moonCenter, 0.39) * 0.36;
+    let cutout = sphereHeight(point, moonCenter + vec2f(0.16, -0.08), 0.36) * 0.34;
+    let cursor = roundedPlate(point - vec2f(-0.28, 0.3), vec2f(0.24, 0.04), 0.02, 0.24);
+    cue = max(record * 0.32, max(moon - cutout, 0.0) + cursor);
   }
   return height + glow + cue;
 }
@@ -390,7 +391,7 @@ fn electronicHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     let pulse = 0.5 + 0.5 * sin(cycle + index * 0.72 + seed.x * TAU);
     let local = point - center - vec2f(0.0, pulse * 0.02);
     let activity = select(0.45, 1.0, hash21(vec2f(index, seed.x * 19.0)) > 0.38);
-    height = max(height, roundedPlate(local, vec2f(0.23, 0.22), 0.07, (0.08 + pulse * 0.13) * activity));
+    height = max(height, roundedPlate(local, vec2f(0.23, 0.22), 0.07, (0.12 + pulse * 0.2) * activity));
   }
   let sequencerRail = exp(-pow((point.y - 0.74) * 22.0, 2.0))
     * smoothstep(-0.9, -0.68, point.x)
@@ -453,9 +454,9 @@ fn popHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     let direction = -0.8 + index * 2.15 + seed.y * 0.08 + sin(cycle) * 0.018;
     let radius = 1.35 + index * 0.18;
     let lobeCenter = focus - vec2f(cos(direction), sin(direction)) * radius;
-    height = max(height, sphereHeight(point, lobeCenter, radius + 0.04) * (0.13 + index * 0.018));
+    height = max(height, sphereHeight(point, lobeCenter, radius + 0.04) * (0.19 + index * 0.024));
   }
-  let flare = exp(-dot(point - focus, point - focus) * 26.0) * 0.22;
+  let flare = exp(-dot(point - focus, point - focus) * 24.0) * 0.34;
   return height + flare;
 }
 
