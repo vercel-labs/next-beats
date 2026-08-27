@@ -64,6 +64,13 @@ const genreMotifs: Record<string, number> = {
   'lo-fi': 5,
 };
 
+const playlistMotifs: Record<string, number> = {
+  myplaylist: 0,
+  'high energy': 1,
+  'morning vibes': 2,
+  'late night coding': 3,
+};
+
 // `kind` matches the shader: 0 is a square cover, 3 a genre banner. Thumbnails sample a
 // slightly wider field than the large art so the complete title-specific silhouette has
 // breathing room instead of turning into one cropped edge at 40px.
@@ -102,7 +109,12 @@ export function seedVector(value: string): [number, number, number, number] {
 
 export function artworkVariant(label: string, kind: ArtworkKind, fallback: number) {
   if (kind === 'genre') return genreMotifs[label.toLowerCase()] ?? Math.floor(fallback * 6);
-  if (kind === 'playlist') return Math.min(PLAYLIST_VARIANT_COUNT - 1, Math.floor(fallback * PLAYLIST_VARIANT_COUNT));
+  if (kind === 'playlist') {
+    return (
+      playlistMotifs[label.toLowerCase()] ??
+      Math.min(PLAYLIST_VARIANT_COUNT - 1, Math.floor(fallback * PLAYLIST_VARIANT_COUNT))
+    );
+  }
   return motifForTitle(label, fallback);
 }
 

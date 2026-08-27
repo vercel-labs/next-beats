@@ -314,7 +314,7 @@ fn trackHeight(point: vec2f, cycle: f32, turn: f32, motif: f32, seed: vec4f) -> 
   return protectiveArc(point, cycle, seed);
 }
 
-/** A reusable family of overlapping album sleeves for generated playlists. */
+/** A reusable family of overlapping album sleeves, each with one quiet playlist cue. */
 fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
   let variant01 = variant / 3.0;
   let breathe = sin(cycle) * 0.014;
@@ -324,19 +324,19 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
     let order = layer - 1.0;
     var center = vec2f(-0.18 + order * 0.035, order * -0.28);
     var angle = (seed.z - 0.5) * 0.018;
-    var halfSize = vec2f(1.13, 1.08);
+    var halfSize = vec2f(0.9, 0.92);
     if (variant > 0.5 && variant < 1.5) {
       center = vec2f(order * 0.13, order * -0.12 + 0.12);
       angle = 0.12 + order * 0.17;
-      halfSize = vec2f(1.02, 1.06);
+      halfSize = vec2f(0.86, 0.9);
     } else if (variant > 1.5 && variant < 2.5) {
       center = vec2f(order * -0.1, order * -0.12 + 0.18);
       angle = order * -0.1;
-      halfSize = vec2f(0.96, 1.0);
+      halfSize = vec2f(0.84, 0.88);
     } else if (variant > 2.5) {
       center = vec2f(0.23 + order * 0.08, order * -0.25);
       angle = 0.1 + order * 0.035;
-      halfSize = vec2f(1.12, 1.05);
+      halfSize = vec2f(0.88, 0.9);
     }
     angle += breathe * order;
     let local = rotate(point - center, angle);
@@ -346,7 +346,39 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
 
   let glowCenter = vec2f((seed.x - 0.5) * 0.25, -0.42 + variant01 * 0.45);
   let glow = exp(-dot(point - glowCenter, point - glowCenter) * 1.35) * (0.075 + variant01 * 0.035);
-  return height + glow;
+  var cue = 0.0;
+  if (variant < 0.5) {
+    // A record partly visible through the front sleeve.
+    let recordCenter = vec2f(0.18, 0.05 + sin(cycle) * 0.012);
+    let radius = length(point - recordCenter);
+    let disc = sphereHeight(point, recordCenter, 0.48) * 0.12;
+    let groove = exp(-pow((radius - 0.31) * 18.0, 2.0)) * 0.055;
+    let label = sphereHeight(point, recordCenter, 0.105) * 0.2;
+    cue = disc + groove + label;
+  } else if (variant < 1.5) {
+    // Equaliser bars pressed into the front sleeve.
+    for (var bar = 0.0; bar < 5.0; bar += 1.0) {
+      let pulse = 0.5 + 0.5 * sin(cycle + bar * 0.82);
+      let barHeight = 0.16 + pulse * 0.26;
+      let barCenter = vec2f(-0.4 + bar * 0.2, 0.28 - barHeight * 0.5);
+      cue = max(cue, roundedPlate(point - barCenter, vec2f(0.055, barHeight), 0.035, 0.17));
+    }
+  } else if (variant < 2.5) {
+    // A rising disc and horizon, kept inside the sleeve like cover printing.
+    let sunCenter = vec2f(0.22, -0.08 + sin(cycle) * 0.012);
+    let sun = sphereHeight(point, sunCenter, 0.42) * 0.16;
+    let horizon = exp(-pow((point.y - 0.3) * 18.0, 2.0))
+      * (1.0 - smoothstep(0.58, 0.74, abs(point.x))) * 0.09;
+    cue = sun + horizon;
+  } else {
+    // A night record with a small terminal-like inset.
+    let moonCenter = vec2f(0.28, -0.18);
+    let moon = sphereHeight(point, moonCenter, 0.39) * 0.15;
+    let cutout = sphereHeight(point, moonCenter + vec2f(0.16, -0.08), 0.36) * 0.14;
+    let cursor = roundedPlate(point - vec2f(-0.28, 0.3), vec2f(0.24, 0.035), 0.02, 0.12);
+    cue = max(moon - cutout, 0.0) + cursor;
+  }
+  return height + glow + cue;
 }
 
 fn electronicHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
@@ -360,25 +392,40 @@ fn electronicHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     let activity = select(0.45, 1.0, hash21(vec2f(index, seed.x * 19.0)) > 0.38);
     height = max(height, roundedPlate(local, vec2f(0.23, 0.22), 0.07, (0.08 + pulse * 0.13) * activity));
   }
-  return height;
+  let sequencerRail = exp(-pow((point.y - 0.74) * 22.0, 2.0))
+    * smoothstep(-0.9, -0.68, point.x)
+    * (1.0 - smoothstep(2.28, 2.5, point.x)) * 0.07;
+  return height + sequencerRail;
 }
 
 fn synthwaveHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let center = vec2f(1.3 + (seed.x - 0.5) * 0.3, 0.74 + sin(cycle) * 0.025);
-  let body = sphereHeight(point, center, 1.05 + seed.y * 0.18) * 0.38;
+  let center = vec2f(1.25 + (seed.x - 0.5) * 0.22, 0.72 + sin(cycle) * 0.025);
+  let radius = 0.95 + seed.y * 0.12;
+  let body = sphereHeight(point, center, radius) * 0.36;
   let horizon = (1.0 - smoothstep(0.0, 0.055, abs(point.y - 0.55))) * 0.15;
+  let sunBandA = exp(-pow((point.y - 0.22) * 20.0, 2.0))
+    * (1.0 - smoothstep(radius - 0.12, radius, abs(point.x - center.x))) * 0.045;
+  let sunBandB = exp(-pow((point.y - 0.38) * 22.0, 2.0))
+    * (1.0 - smoothstep(radius - 0.12, radius, abs(point.x - center.x))) * 0.06;
   let depth = smoothstep(1.1, -0.4, point.y) * smoothstep(-0.8, 1.2, point.x) * 0.08;
-  return max(body, horizon) + depth;
+  return max(body, horizon) + sunBandA + sunBandB + depth;
 }
 
 fn hipHopHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   var height = 0.0;
   for (var index = 0.0; index < 3.0; index += 1.0) {
-    let width = 0.42 + index * 0.04;
-    let rise = 0.48 + index * 0.19;
+    let width = 0.38 + index * 0.035;
+    let rise = 0.46 + index * 0.15;
     let bounce = sin(cycle + index * 1.35 + seed.x * TAU) * 0.035;
-    let center = vec2f(0.12 + index * 1.05, 0.82 - rise * 0.28 + bounce);
-    height = max(height, roundedPlate(point - center, vec2f(width, rise), width, 0.14 + index * 0.07));
+    let center = vec2f(0.18 + index * 0.86, 0.68 - rise * 0.28 + bounce);
+    let local = point - center;
+    let outerDistance = roundedBoxDistance(local, vec2f(width, rise), width);
+    let innerDistance = roundedBoxDistance(local - vec2f(0.0, 0.1), vec2f(width * 0.56, rise * 0.67), width * 0.56);
+    let outer = 1.0 - smoothstep(-0.08, 0.045, outerDistance);
+    let inner = 1.0 - smoothstep(-0.07, 0.035, innerDistance);
+    let arch = max(outer - inner * 0.86, 0.0) * (0.16 + index * 0.055);
+    let cone = sphereHeight(point, center + vec2f(0.0, 0.22), width * 0.38) * 0.13;
+    height = max(height, arch + cone);
   }
   return height;
 }
@@ -400,7 +447,7 @@ fn indieHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 }
 
 fn popHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let focus = vec2f(0.45 + (seed.x - 0.5) * 0.12, 0.08);
+  let focus = vec2f(0.78 + (seed.x - 0.5) * 0.12, 0.04);
   var height = 0.0;
   for (var index = 0.0; index < 3.0; index += 1.0) {
     let direction = -0.8 + index * 2.15 + seed.y * 0.08 + sin(cycle) * 0.018;
@@ -413,12 +460,12 @@ fn popHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 }
 
 fn loFiHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let center = vec2f(1.7 + (seed.x - 0.5) * 0.16, 0.82);
+  let center = vec2f(1.42 + (seed.x - 0.5) * 0.16, 0.68);
   let radius = length(point - center);
   let breathe = sin(cycle) * 0.018;
   var height = 0.0;
   for (var index = 0.0; index < 4.0; index += 1.0) {
-    let ringRadius = 0.46 + index * 0.42 + breathe * (index + 1.0);
+    let ringRadius = 0.4 + index * 0.36 + breathe * (index + 1.0);
     let band = exp(-pow(abs(radius - ringRadius) * 5.5, 2.0));
     height = max(height, band * (0.14 + index * 0.028));
   }
