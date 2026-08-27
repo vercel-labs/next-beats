@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { effect, frame, frameLoop, init, surface } from 'vgpu';
+import { motifForTitle } from '@/lib/cover-motif';
 import { resolveCoverGradient } from '@/lib/cover-palette';
 import coverShader from './album-art.wgsl';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
@@ -61,16 +62,6 @@ type ArtworkKind = 'track' | 'album' | 'playlist';
 
 const kindIndex: Record<ArtworkKind, number> = { album: 1, playlist: 2, track: 0 };
 
-// Tracks pick one of three sound prints; a title hints at which one so the artwork
-// nods at the song, and anything unrecognised falls back to the seed.
-function variantForLabel(label: string, fallback: number) {
-  const value = label.toLowerCase();
-  if (/hydrat|water|rain|stream|ripple|socket|wave/.test(value)) return 0.1;
-  if (/pixel|grid|bit|byte|render|crt|terminal|static/.test(value)) return 0.45;
-  if (/loop|thread|echo|sync|signal|flow/.test(value)) return 0.8;
-  return fallback;
-}
-
 type Props = {
   seed: string;
   label: string;
@@ -99,14 +90,14 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
 
         const seedValues = seedVector(seed);
         const gradient = resolveCoverGradient(coverColor);
-        const variant = kind === 'track' ? variantForLabel(label, seedValues[3]) : seedValues[3];
+        const motif = motifForTitle(label, seedValues[3]);
 
         output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
         const cover = effect(gpu, coverShader, {
           label: `album-cover-${seed}`,
           set: {
             cover: {
-              params: [0, kindIndex[kind], variant, 2 / (canvas.clientWidth || 48)],
+              params: [0, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)],
               seed: seedValues,
               stopA: [...gradient.from, 1],
               stopB: [...gradient.to, 1],
@@ -116,7 +107,7 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
 
         // Strokes are specified in CSS pixels, so the shader needs the cover's own size.
         unsubscribeResize = output.onResize(() => {
-          cover.set({ cover: { params: [0, kindIndex[kind], variant, 2 / (canvas.clientWidth || 48)] } });
+          cover.set({ cover: { params: [0, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)] } });
         });
 
         let visible = true;
@@ -124,7 +115,7 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
         const draw = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
 
-          cover.set({ cover: { params: [time, kindIndex[kind], variant, 2 / (canvas.clientWidth || 48)] } });
+          cover.set({ cover: { params: [time, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)] } });
           currentFrame.pass(output, cover);
 
           if (!revealed) {
