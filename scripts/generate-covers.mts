@@ -104,8 +104,14 @@ async function coverCatalog(): Promise<CoverItem[]> {
   }
 }
 
-function shapesFor(kind: ArtworkKind) {
-  const names: CoverShape[] = kind === 'genre' ? ['banner'] : kind === 'playlist' ? ['square'] : ['square', 'thumb'];
+function shapesFor(kind: ArtworkKind, smallOnly: boolean) {
+  const names: CoverShape[] = smallOnly
+    ? kind === 'genre'
+      ? ['banner-thumb']
+      : ['thumb']
+    : kind === 'genre'
+      ? ['banner', 'banner-thumb']
+      : ['square', 'thumb'];
   return COVER_SHAPES.filter(shape => names.includes(shape.name));
 }
 
@@ -120,6 +126,7 @@ function pngBytes(dataUrl: string) {
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required. Add it to .env.local first.');
   const catalog = await coverCatalog();
+  const smallOnly = process.argv.includes('--small');
   const sampleIds = new Set(['t11', 't16', 't17', 't18']);
   const items = process.argv.includes('--sample')
     ? catalog.filter(item => item.kind !== 'track' || sampleIds.has(item.seed))
@@ -149,7 +156,7 @@ async function main() {
 
     const report: string[] = [];
     for (const item of items) {
-      for (const shape of shapesFor(item.kind)) {
+      for (const shape of shapesFor(item.kind, smallOnly)) {
         console.log(`[cover] ${item.kind.padEnd(8)} ${item.label.padEnd(28)} ${shape.name}`);
         const scratch = mkdtempSync(join(tmpdir(), 'next-beats-covers-'));
         try {

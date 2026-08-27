@@ -132,9 +132,7 @@
 .card-play-btn {
   opacity: 1;
   transform: translateY(0);
-  transition:
-    opacity 0.2s,
-    transform 0.2s;
+  transition: transform 0.2s;
 }
 @media (hover: hover) {
   .card-play-btn {

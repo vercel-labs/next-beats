@@ -8,6 +8,14 @@
 import { getAudioContext, getSecondsPerBar, resetAudioContext, scheduleBar } from './music-engine';
 import type { ScheduledNodes } from './music-engine';
 
+type VisualBeatClock = {
+  context: AudioContext;
+  kickTimes: number[];
+  trackId: string;
+};
+
+let visualBeatClock: VisualBeatClock | null = null;
+
 export type AudioRefs = {
   bars: ScheduledNodes[];
   scheduler: ReturnType<typeof setTimeout> | null;
@@ -32,6 +40,20 @@ export function stopAll(refs: AudioRefs) {
     cancelAnimationFrame(refs.progress);
     refs.progress = null;
   }
+  visualBeatClock = null;
+}
+
+/** The decay of the most recent kick that was actually scheduled for this track. */
+export function getPlaybackBeat(trackId: string) {
+  const clock = visualBeatClock;
+  if (!clock || clock.trackId !== trackId || clock.context.state !== 'running') return 0;
+
+  const now = clock.context.currentTime;
+  let sinceKick = Number.POSITIVE_INFINITY;
+  for (const kickTime of clock.kickTimes) {
+    if (kickTime <= now + 0.01) sinceKick = Math.min(sinceKick, Math.max(now - kickTime, 0));
+  }
+  return sinceKick < 0.45 ? Math.exp(-sinceKick * 9) : 0;
 }
 
 function trimScheduledBars(refs: AudioRefs) {
@@ -56,6 +78,7 @@ export function scheduleTrack({ trackId, genre, duration, refs, onProgress, onEn
   const gen = ++refs.gen;
   const ctx = resetAudioContext();
   const secPerBar = getSecondsPerBar(trackId, genre);
+  visualBeatClock = { context: ctx, kickTimes: [], trackId };
   let barIndex = 0;
   let nextBarTime = ctx.currentTime + 0.15;
 
@@ -64,6 +87,7 @@ export function scheduleTrack({ trackId, genre, duration, refs, onProgress, onEn
     while (nextBarTime < ctx.currentTime + secPerBar * 2) {
       const nodes = scheduleBar(trackId, genre, barIndex, nextBarTime, refs.volume);
       refs.bars.push(nodes);
+      visualBeatClock?.kickTimes.push(...nodes.kickTimes);
       barIndex++;
       nextBarTime += secPerBar;
       trimScheduledBars(refs);
@@ -107,6 +131,7 @@ export function resumeTrack(
   const gen = ++refs.gen;
   const ctx = getAudioContext();
   const secPerBar = getSecondsPerBar(trackId, genre);
+  visualBeatClock = { context: ctx, kickTimes: [], trackId };
   let barIndex = Math.floor((currentProgress / 100) * (duration / secPerBar));
   let nextBarTime = ctx.currentTime + 0.15;
 
@@ -115,6 +140,7 @@ export function resumeTrack(
     while (nextBarTime < ctx.currentTime + secPerBar * 2) {
       const nodes = scheduleBar(trackId, genre, barIndex, nextBarTime, refs.volume);
       refs.bars.push(nodes);
+      visualBeatClock?.kickTimes.push(...nodes.kickTimes);
       barIndex++;
       nextBarTime += secPerBar;
       trimScheduledBars(refs);

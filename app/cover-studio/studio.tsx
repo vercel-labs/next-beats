@@ -103,7 +103,7 @@ export function CoverStudio() {
           const cover = covers[options.mode ?? 'final'];
           cover.set({
             cover: {
-              params: [options.turn, kindIndex[options.kind], variant, 2 / options.height],
+              params: [options.turn, kindIndex[options.kind], variant, 0],
               seed: values,
               shape: [options.width / options.height, options.detail, 0, 0],
             },

@@ -2,7 +2,8 @@
 
 import { startTransition, useEffect, useRef, useState } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
-import { artworkVariant, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
+import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
+import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
 import type { ArtworkKind } from '@/lib/cover-motif';
 import { cn } from '@/lib/utils';
 import coverShader from './album-art.wgsl';
@@ -12,7 +13,7 @@ let gpuPromise: Promise<Gpu> | undefined;
 const animatedCovers = new Set<(currentFrame: Frame, time: number) => void>();
 let animationLoop: FrameLoopHandle | undefined;
 
-// All visible large covers share one 15 fps ticker. Each cover remains a separate surface,
+// All visible large covers share one 24 fps ticker. Each cover remains a separate surface,
 // but there is no React state update and no requestAnimationFrame loop per card.
 function registerAnimatedCover(gpu: Gpu, render: (currentFrame: Frame, time: number) => void) {
   animatedCovers.add(render);
@@ -22,7 +23,7 @@ function registerAnimatedCover(gpu: Gpu, render: (currentFrame: Frame, time: num
       const time = performance.now() / 1000;
       animatedCovers.forEach(drawCover => drawCover(currentFrame, time));
     },
-    { fps: 15 },
+    { fps: 24 },
   );
 
   return () => {
@@ -72,7 +73,6 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
       .then(gpu => {
         if (disposed) return;
         let aspect = 1;
-        let unit = 2 / 48;
 
         output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
         const cover = draw(gpu, {
@@ -80,7 +80,7 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
           label: `album-cover-${seed}`,
           set: {
             cover: {
-              params: [0, kindIndex[kind], variant, unit],
+              params: [0, kindIndex[kind], variant, 0],
               seed: seedValues,
               shape: [aspect, 1, 0, 0],
             },
@@ -92,9 +92,10 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
         let revealed = false;
         const render = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
+          const beat = getPlaybackBeat(seed);
           cover.set({
             cover: {
-              params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, unit],
+              params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
               seed: seedValues,
               shape: [aspect, 1, 0, 0],
             },
@@ -108,9 +109,8 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
           }
         };
 
-        unsubscribeResize = output.onResize(({ dpr, height, width }) => {
+        unsubscribeResize = output.onResize(({ height, width }) => {
           aspect = height > 0 ? width / height : 1;
-          unit = 2 / (height / dpr || 48);
         });
         observer = new IntersectionObserver(entries => {
           visible = entries[0]?.isIntersecting ?? true;
@@ -135,7 +135,16 @@ export function AlbumArtCover({ seed, label, kind, small = false }: Props) {
     };
   }, [kind, label, seed, small]);
 
-  if (small) return null;
+  if (small) {
+    const shape = kind === 'genre' ? 'banner-thumb' : 'thumb';
+    return (
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-20 block bg-cover bg-center"
+        style={{ backgroundImage: `url(${coverAssetPath(seed, label, kind, shape, true)})` }}
+      />
+    );
+  }
 
   return (
     <canvas

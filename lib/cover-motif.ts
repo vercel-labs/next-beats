@@ -15,7 +15,19 @@ const motifs = [
   }, // swell
 ] as const;
 
-export const TRACK_MOTIF_COUNT = 8;
+const referenceMotifs = [
+  { index: 13, test: /^pixel perfect$/ },
+  { index: 8, test: /^ship it$/ },
+  { index: 9, test: /^tailwind hearts$/ },
+  { index: 15, test: /^type safe love$/ },
+  { index: 10, test: /^stack overflow flow$/ },
+  { index: 14, test: /^component chemistry$/ },
+  { index: 11, test: /^hot module reload$/ },
+  { index: 12, test: /^3 am push$/ },
+] as const;
+
+const GENERIC_TRACK_MOTIF_COUNT = 8;
+export const TRACK_MOTIF_COUNT = 16;
 export const PLAYLIST_VARIANT_COUNT = 4;
 
 export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
@@ -24,7 +36,24 @@ export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
 export const COVER_LOOP_SECONDS = 12;
 
 // Named for the form each one takes, which is what the shader's height fields build.
-const motifNames = ['swell', 'limb', 'satin', 'panels', 'strata', 'cluster', 'tunnel', 'dunes'] as const;
+const motifNames = [
+  'swell',
+  'limb',
+  'satin',
+  'panels',
+  'strata',
+  'cluster',
+  'tunnel',
+  'dunes',
+  'monolith',
+  'pinch',
+  'folded-edge',
+  'inset-panels',
+  'night-horizon',
+  'pixel-grid',
+  'chemical-cluster',
+  'protective-arc',
+] as const;
 
 const genreMotifs: Record<string, number> = {
   electronic: 0,
@@ -98,8 +127,11 @@ export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, s
 
 export function motifForTitle(title: string, fallback: number) {
   const value = title.toLowerCase();
+  for (const motif of referenceMotifs) {
+    if (motif.test.test(value)) return motif.index;
+  }
   for (const motif of motifs) {
     if (motif.test.test(value)) return motif.index;
   }
-  return Math.min(TRACK_MOTIF_COUNT - 1, Math.floor(fallback * TRACK_MOTIF_COUNT));
+  return Math.min(GENERIC_TRACK_MOTIF_COUNT - 1, Math.floor(fallback * GENERIC_TRACK_MOTIF_COUNT));
 }
