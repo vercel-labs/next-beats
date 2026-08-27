@@ -46,7 +46,7 @@ export function PlayButton({ track, queue, className, size = 'md' }: Props) {
         onClick={handleClick}
         data-playing={isThisPlaying || undefined}
         aria-label={isThisPlaying ? `Pause ${track.title}` : `Play ${track.title}`}
-        className={`flex items-center justify-center rounded-full bg-[#4f6ef7] text-white shadow-xl !transition-transform hover:scale-105 hover:bg-[#4f6ef7] ${sizes[size]} ${className ?? ''}`}
+        className={`z-30 flex items-center justify-center rounded-full bg-[#4f6ef7] text-white shadow-xl !transition-transform hover:scale-105 hover:bg-[#4f6ef7] ${sizes[size]} ${className ?? ''}`}
       >
         {isThisPlaying ? (
           <Equalizer size={size === 'md' ? 'md' : 'sm'} color="bg-white" />

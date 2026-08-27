@@ -14,9 +14,8 @@ struct Cover {
   // x: loop position 0..1, y: kind (0 track, 1 album, 2 playlist, 3 genre), z: motif,
   // w: bass beat strength for the currently playing track
   params: vec4f,
-  // x: aspect ratio (width / height), y: detail scale -- below 1 samples a smaller slice
-  // of the field, so its features come out larger. Small covers need that: downscaling a
-  // 384px composition to 40px just turns it to mush.
+  // x: aspect ratio (width / height), y: detail scale. Thumbnail renders sample a slightly
+  // wider field so the full composition remains readable inside a small square.
   shape: vec4f,
 }
 
@@ -56,6 +55,12 @@ fn roundedPlate(point: vec2f, halfSize: vec2f, radius: f32, lift: f32) -> f32 {
   return body * lift;
 }
 
+fn segmentDistance(point: vec2f, start: vec2f, end: vec2f) -> f32 {
+  let line = end - start;
+  let along = clamp(dot(point - start, line) / dot(line, line), 0.0, 1.0);
+  return length(point - (start + line * along));
+}
+
 // Every field is parameterised by the seed -- frequency, count, radius, offset -- so two
 // items that land on the same form still get their own composition. Nothing here depends
 // on the seed in a way that breaks the loop: only shapes vary, never the harmonics.
@@ -74,15 +79,15 @@ fn limb(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   return sphereHeight(point, center, 1.25 + seed.z * 0.55) * 0.5;
 }
 
-/** Folded satin: one smooth field warped by another. */
+/** Two broad folds meeting in a soft embrace for love and feelings titles. */
 fn satin(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let turned = rotate(point, seed.z * TAU) + seed.xy * 8.0;
-  let frequency = 0.34 + seed.x * 0.24;
-  let warp = vec2f(
-    smoothFlow(turned * frequency + vec2f(3.1, 0.0), cycle, 0.34),
-    smoothFlow(turned * frequency + vec2f(0.0, 5.7), cycle, 0.34),
-  );
-  return smoothFlow(turned * (frequency * 1.2) + warp * (0.4 + seed.y * 0.35), cycle, 0.2) * 1.05;
+  let breathe = sin(cycle) * 0.025;
+  let leftCenter = vec2f(-0.7 - breathe, -0.18 + (seed.y - 0.5) * 0.12);
+  let rightCenter = vec2f(0.7 + breathe, -0.18 - (seed.y - 0.5) * 0.12);
+  let left = sphereHeight(point, leftCenter, 1.02 + seed.x * 0.12) * 0.23;
+  let right = sphereHeight(point, rightCenter, 1.02 + seed.z * 0.12) * 0.23;
+  let meeting = exp(-dot(point - vec2f(0.0, 0.24), point - vec2f(0.0, 0.24)) * 8.0) * 0.07;
+  return max(left, right) + meeting;
 }
 
 /** A grid of translucent panels lit from behind, each breathing on its own offset. */
@@ -112,18 +117,18 @@ fn strata(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   return height;
 }
 
-/** A cluster of translucent spheres. */
+/** Connected nodes with staggered motion for async, thread, and promise titles. */
 fn cluster(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let count = 3.0 + floor(seed.x * 3.0);
-  var height = 0.0;
-  for (var index = 0.0; index < 6.0; index += 1.0) {
-    if (index >= count) { break; }
-    let angle = index * (1.5 + seed.z) + seed.y * TAU;
-    let drift = vec2f(cos(cycle + angle), sin(cycle + angle)) * 0.06;
-    let center = vec2f(cos(angle), sin(angle * 1.3)) * (0.2 + index * (0.08 + seed.w * 0.06)) + drift;
-    height = max(height, sphereHeight(point, center, 0.42 + hash21(vec2f(index, seed.x * 30.0)) * 0.3));
-  }
-  return height * 0.5;
+  let driftA = vec2f(cos(cycle), sin(cycle)) * 0.035;
+  let driftB = vec2f(cos(cycle + 2.1), sin(cycle + 2.1)) * 0.035;
+  let firstCenter = vec2f(-0.42, -0.24) + driftA;
+  let secondCenter = vec2f(0.43, 0.25) + driftB;
+  let first = sphereHeight(point, firstCenter, 0.48 + seed.x * 0.1) * 0.42;
+  let second = sphereHeight(point, secondCenter, 0.55 + seed.y * 0.1) * 0.42;
+  let connection = exp(-pow(segmentDistance(point, firstCenter, secondCenter) * 7.0, 2.0)) * 0.075;
+  let pendingCenter = vec2f(0.55 + seed.z * 0.15, -0.55) - driftA * 0.5;
+  let pending = sphereHeight(point, pendingCenter, 0.2 + seed.w * 0.08) * 0.3;
+  return max(max(first, second), pending) + connection;
 }
 
 /** A receding tunnel of nested frames. */
@@ -143,14 +148,20 @@ fn dunes(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     + point.y * (0.06 + seed.y * 0.12);
 }
 
-/** A single dark sleeve standing upright, with a narrow illuminated edge. */
+/** A dark, sail-like sleeve standing upright, with a narrow illuminated edge. */
 fn monolith(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let sway = sin(cycle) * 0.012;
   let local = rotate(point - vec2f(-0.2 + (seed.x - 0.5) * 0.08, 0.02), -0.025 + sway);
-  let body = roundedPlate(local, vec2f(0.64, 1.16), 0.035, 0.31);
-  let edge = exp(-pow((local.x - 0.64) * 25.0, 2.0))
+  let sailEdge = 0.56 + local.y * 0.24;
+  let taper = 1.0 - smoothstep(sailEdge - 0.025, sailEdge + 0.025, local.x);
+  let body = roundedPlate(local, vec2f(0.7, 1.16), 0.035, 0.31) * taper;
+  let edge = exp(-pow((local.x - sailEdge) * 25.0, 2.0))
     * (1.0 - smoothstep(1.0, 1.14, abs(local.y))) * 0.18;
-  return body + edge;
+  let mast = exp(-pow((local.x + 0.38) * 24.0, 2.0))
+    * (1.0 - smoothstep(0.86, 1.02, abs(local.y))) * 0.045;
+  let hull = roundedPlate(local - vec2f(-0.02, 0.78), vec2f(0.58, 0.075), 0.07, 0.11);
+  let wake = exp(-pow((local.y - 0.86) * 10.0, 2.0)) * smoothstep(0.35, -0.88, local.x) * 0.055;
+  return max(body + edge + mast, hull) + wake;
 }
 
 /** Three broad curved surfaces converging in a soft photographic pinch. */
@@ -169,18 +180,28 @@ fn pinch(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     + (1.0 - smoothstep(secondRadius - 0.09, secondRadius + 0.025, length(point - secondCenter))) * 0.07;
   let third = sphereHeight(point, thirdCenter, thirdRadius) * 0.19
     + (1.0 - smoothstep(thirdRadius - 0.09, thirdRadius + 0.025, length(point - thirdCenter))) * 0.07;
-  return first + second + third;
+  // A faint heart crease gives the title a second read without drawing a standalone icon.
+  let heartPoint = (point - focus - vec2f(0.02, 0.08)) * vec2f(1.3, -1.2);
+  let heartBase = heartPoint.x * heartPoint.x + heartPoint.y * heartPoint.y - 0.28;
+  let heartField = heartBase * heartBase * heartBase
+    - heartPoint.x * heartPoint.x * heartPoint.y * heartPoint.y * heartPoint.y;
+  let heartCrease = exp(-abs(heartField) * 18.0) * smoothstep(0.9, 0.18, length(heartPoint)) * 0.065;
+  return first + second + third + heartCrease;
 }
 
-/** A heavy sheet rolling over a soft, irregular edge. */
+/** Three heavy sheets overflowing over broad, irregular edges. */
 fn foldedEdge(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let local = rotate(point, -0.18 + (seed.z - 0.5) * 0.08);
-  let boundary = 0.08
-    + sin(local.x * 1.65 + seed.x * TAU) * 0.075
-    + smoothFlow(vec2f(local.x * 0.72, seed.y * 2.0), cycle, 0.16) * 0.08;
-  let sheet = 1.0 - smoothstep(-0.045, 0.045, local.y - boundary);
-  let rolledEdge = exp(-pow((local.y - boundary) * 7.0, 2.0)) * 0.17;
-  return sheet * 0.24 + rolledEdge;
+  var height = 0.0;
+  for (var layer = 0.0; layer < 3.0; layer += 1.0) {
+    let boundary = -0.18 + layer * 0.2
+      + sin(local.x * (1.35 + layer * 0.16) + seed.x * TAU + layer) * 0.045
+      + smoothFlow(vec2f(local.x * 0.62, seed.y * 2.0 + layer * 1.8), cycle, 0.14) * 0.05;
+    let sheet = 1.0 - smoothstep(-0.04, 0.04, local.y - boundary);
+    let rolledEdge = exp(-pow((local.y - boundary) * 8.5, 2.0)) * (0.065 + layer * 0.025);
+    height = max(height, sheet * (0.1 + layer * 0.065) + rolledEdge);
+  }
+  return height;
 }
 
 /** Two large translucent sleeves inset into one another. */
@@ -224,15 +245,27 @@ fn pixelGrid(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 
 /** Four soft bodies joined around one centre, matching Component Chemistry. */
 fn chemicalCluster(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  var height = 0.0;
-  for (var index = 0.0; index < 4.0; index += 1.0) {
-    let angle = -0.42 + index * TAU / 4.0 + seed.z * 0.08;
-    let drift = vec2f(cos(cycle + angle), sin(cycle + angle)) * 0.025;
-    let center = vec2f(cos(angle), sin(angle)) * 0.43 + drift;
-    let radius = 0.54 + hash21(vec2f(index, seed.x * 23.0)) * 0.1;
-    height = max(height, sphereHeight(point, center, radius) * 0.48);
-  }
-  return height;
+  let angle = -0.42 + seed.z * 0.08;
+  let drift = vec2f(cos(cycle + angle), sin(cycle + angle)) * 0.02;
+  let firstCenter = vec2f(cos(angle), sin(angle)) * 0.5 + drift;
+  let secondCenter = vec2f(cos(angle + TAU * 0.25), sin(angle + TAU * 0.25)) * 0.5 - drift.yx;
+  let thirdCenter = vec2f(cos(angle + TAU * 0.5), sin(angle + TAU * 0.5)) * 0.5 - drift;
+  let fourthCenter = vec2f(cos(angle + TAU * 0.75), sin(angle + TAU * 0.75)) * 0.5 + drift.yx;
+  let first = sphereHeight(point, firstCenter, 0.43 + seed.x * 0.04) * 0.48;
+  let second = sphereHeight(point, secondCenter, 0.45 + seed.y * 0.04) * 0.48;
+  let third = sphereHeight(point, thirdCenter, 0.42 + seed.z * 0.04) * 0.48;
+  let fourth = sphereHeight(point, fourthCenter, 0.46 + seed.w * 0.04) * 0.48;
+  let bonds = max(
+    max(
+      exp(-pow(segmentDistance(point, firstCenter, secondCenter) * 12.0, 2.0)),
+      exp(-pow(segmentDistance(point, secondCenter, thirdCenter) * 12.0, 2.0)),
+    ),
+    max(
+      exp(-pow(segmentDistance(point, thirdCenter, fourthCenter) * 12.0, 2.0)),
+      exp(-pow(segmentDistance(point, fourthCenter, firstCenter) * 12.0, 2.0)),
+    ),
+  ) * 0.08;
+  return max(max(first, second), max(third, fourth)) + bonds;
 }
 
 /** One broad sheltering fold: the sparse, sweeping Type Safe Love composition. */

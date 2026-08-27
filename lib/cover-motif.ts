@@ -64,14 +64,14 @@ const genreMotifs: Record<string, number> = {
   'lo-fi': 5,
 };
 
-// `kind` matches the shader: 0 is a square cover, 3 a genre banner. `detail` below 1
-// enlarges the field's features, which is how the thumbnail stays legible at 40px instead
-// of being a downscale of the large composition.
+// `kind` matches the shader: 0 is a square cover, 3 a genre banner. Thumbnails sample a
+// slightly wider field than the large art so the complete title-specific silhouette has
+// breathing room instead of turning into one cropped edge at 40px.
 export const COVER_SHAPES = [
-  { detail: 1, height: 320, kind: 0, name: 'square', width: 320 },
-  { detail: 0.55, height: 80, kind: 0, name: 'thumb', width: 80 },
+  { detail: 1.06, height: 320, kind: 0, name: 'square', width: 320 },
+  { detail: 1.08, height: 80, kind: 0, name: 'thumb', width: 80 },
   { detail: 1, height: 192, kind: 3, name: 'banner', width: 640 },
-  { detail: 0.72, height: 96, kind: 3, name: 'banner-thumb', width: 320 },
+  { detail: 1.08, height: 96, kind: 3, name: 'banner-thumb', width: 320 },
 ] as const;
 
 /** Covers at or below this CSS height use the thumbnail composition. */
