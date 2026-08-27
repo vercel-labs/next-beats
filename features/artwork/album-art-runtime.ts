@@ -1,8 +1,8 @@
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
-import { artworkVariant, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
-import type { ArtworkKind } from '@/lib/cover-motif';
 import coverShader from './album-art.wgsl';
+import { artworkVariant, COVER_LOOP_SECONDS, seedVector } from './cover-motif';
+import type { ArtworkKind } from './cover-motif';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
 
 const PREWARM_MARGIN = '256px 0px';

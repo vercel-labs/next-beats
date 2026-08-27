@@ -1,6 +1,6 @@
 import { Heart, Home, Library, Music, Pause, Play, Search, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import { AlbumArt } from '@/components/ui/album-art';
 import { MusicNote } from '@/components/ui/music-note';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 
 const recentTracks = [
   { title: 'Async Await', artist: 'Neon Pulse', tone: 'from-blue-500 to-indigo-600' },

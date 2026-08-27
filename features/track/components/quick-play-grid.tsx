@@ -1,7 +1,7 @@
 import { Music } from 'lucide-react';
 import { ViewTransition } from 'react';
-import { AlbumArt } from '@/components/ui/album-art';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { TrackPlayRow, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';
 import { getRecentlyPlayed } from '@/features/track/track-queries';
 

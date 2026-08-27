@@ -1,6 +1,6 @@
-import { AlbumArtCover } from '@/components/ui/album-art-cover';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArtCover } from '@/features/artwork/components/album-art-cover';
 import type { GenreSummary } from '@/types/genre';
 
 const genreColors: Record<string, string> = {

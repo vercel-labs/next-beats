@@ -1,6 +1,6 @@
-import { AlbumArt } from '@/components/ui/album-art';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { DeletePlaylistButton } from '@/features/playlist/components/playlist-interactions';
 import { PlaylistTrackList } from '@/features/playlist/components/playlist-track-list';
 import { getPlaylist } from '@/features/playlist/playlist-queries';

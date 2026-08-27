@@ -1,6 +1,6 @@
-import { AlbumArt } from '@/components/ui/album-art';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { PlayButton } from '@/features/track/components/play-button';
 import { NowPlayingTrackTitle } from '@/features/track/components/track-interactions';
 import type { Track } from '@/types/track';

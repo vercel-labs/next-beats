@@ -16,8 +16,8 @@ import {
   coverAssetPath,
   PLAYLIST_VARIANT_COUNT,
   seedVector,
-} from '../lib/cover-motif.ts';
-import type { ArtworkKind, CoverShape } from '../lib/cover-motif.ts';
+} from '../features/artwork/cover-motif.ts';
+import type { ArtworkKind, CoverShape } from '../features/artwork/cover-motif.ts';
 import type { ChildProcess } from 'node:child_process';
 
 config({ path: '.env.local' });

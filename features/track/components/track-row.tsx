@@ -1,7 +1,7 @@
 import { ViewTransition } from 'react';
-import { AlbumArt } from '@/components/ui/album-art';
 import { Collapsible } from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { AddToPlaylistMenu } from '@/features/playlist/components/add-to-playlist-menu';
 import { getPlaylistMenuItems } from '@/features/playlist/playlist-queries';
 import { FavoriteButton, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';

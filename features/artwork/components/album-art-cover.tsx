@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
-import { coverAssetPath } from '@/lib/cover-motif';
-import type { ArtworkKind } from '@/lib/cover-motif';
-import { mountLiveAlbumArt } from './album-art-runtime';
+import { mountLiveAlbumArt } from '@/features/artwork/album-art-runtime';
+import { coverAssetPath } from '@/features/artwork/cover-motif';
+import type { ArtworkKind } from '@/features/artwork/cover-motif';
 
 type Props = {
   seed: string;

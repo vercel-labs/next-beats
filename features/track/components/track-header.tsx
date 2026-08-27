@@ -1,5 +1,5 @@
-import { AlbumArt } from '@/components/ui/album-art';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { GenrePill } from '@/features/genre/components/genre-card';
 import { getTrack } from '@/features/track/track-queries';
 import { formatDuration, formatCount } from '@/lib/utils';
