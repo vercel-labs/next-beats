@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { startTransition, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { startTransition, Suspense, useEffect, useRef, useState } from 'react';
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
 import { artworkVariant, coverAssetPath, COVER_LOOP_SECONDS, seedVector } from '@/lib/cover-motif';
@@ -53,32 +54,36 @@ type Props = {
 
 const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
-export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ready, setReady] = useState(false);
+function StaticAlbumArtCover({ seed, label, kind, small = false, hidden = false }: Props & { hidden?: boolean }) {
   const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
-  const staticCover = (
+
+  return (
     <Image
       alt=""
       decoding="sync"
       fill
       loading="eager"
-      sizes={
-        small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
-      }
+      sizes={small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'}
       src={coverAssetPath(seed, label, kind, staticShape, true)}
       unoptimized
       className="pointer-events-none absolute inset-0 z-10 block object-cover"
       style={{
-        opacity: !small && ready ? 0 : 1,
+        opacity: hidden ? 0 : 1,
         transition: 'opacity 160ms ease-out',
         willChange: 'opacity',
       }}
     />
   );
+}
+
+function LiveAlbumArtCover({ seed, label, kind, beatTrackIds }: Props) {
+  const pathname = usePathname();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const coverKey = `${pathname}\0${kind}\0${seed}\0${label}`;
+  const [readyKey, setReadyKey] = useState<string>();
+  const ready = readyKey === coverKey;
 
   useEffect(() => {
-    if (small) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -125,7 +130,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
-              if (!disposed) startTransition(() => setReady(true));
+              if (!disposed) startTransition(() => setReadyKey(coverKey));
             });
           }
         };
@@ -154,15 +159,11 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [beatTrackIds, kind, label, seed, small]);
-
-  if (small) {
-    return staticCover;
-  }
+  }, [beatTrackIds, coverKey, kind, label, seed]);
 
   return (
     <>
-      {staticCover}
+      <StaticAlbumArtCover seed={seed} label={label} kind={kind} hidden={ready} />
       <canvas
         ref={canvasRef}
         aria-hidden
@@ -170,5 +171,17 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
       />
     </>
+  );
+}
+
+export function AlbumArtCover(props: Props) {
+  if (props.small) {
+    return <StaticAlbumArtCover {...props} />;
+  }
+
+  return (
+    <Suspense fallback={<StaticAlbumArtCover {...props} />}>
+      <LiveAlbumArtCover {...props} />
+    </Suspense>
   );
 }
