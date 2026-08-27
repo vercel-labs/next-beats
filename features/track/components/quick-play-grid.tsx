@@ -18,7 +18,12 @@ export async function QuickPlayGrid() {
           <TrackPlayRow track={track}>
             <div className="bg-card/60 hover:bg-card dark:bg-card-dark/60 dark:hover:bg-card-dark group/quick flex items-center gap-3 rounded-md px-3 py-2 transition-colors">
               <TrackIndexCell trackId={track.id} />
-              <AlbumArt coverColor={track.coverColor} size="sm" className="!h-10 !w-10 !rounded-md" />
+              <AlbumArt
+                coverColor={track.coverColor}
+                coverSeed={track.id}
+                size="sm"
+                className="!h-10 !w-10 !rounded-md"
+              />
               <div className="flex min-w-0 flex-1 flex-col">
                 <NowPlayingTrackLink trackId={track.id} href={`/track/${track.id}`}>
                   {track.title}

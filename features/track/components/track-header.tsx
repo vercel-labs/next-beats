@@ -11,6 +11,7 @@ export async function TrackHeader({ id }: { id: string }) {
     <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
       <AlbumArt
         coverColor={track.coverColor}
+        coverSeed={track.id}
         size="lg"
         className="!h-40 !w-40 shrink-0 !rounded-md shadow-2xl lg:!h-48 lg:!w-48"
       />

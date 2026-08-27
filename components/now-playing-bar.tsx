@@ -22,7 +22,12 @@ export function NowPlayingBar() {
             className="border-divider dark:border-divider-dark shrink-0 border-t bg-white px-4 py-2 sm:hidden dark:bg-[#181818]"
           >
             <div className="flex items-center gap-3">
-              <AlbumArt coverColor={track.coverColor} size="sm" className="!h-12 !w-12 !rounded-sm" />
+              <AlbumArt
+                coverColor={track.coverColor}
+                coverSeed={track.id}
+                size="sm"
+                className="!h-12 !w-12 !rounded-sm"
+              />
               <div className="flex min-w-0 flex-1 flex-col">
                 <TrackInfo title={track.title} subtitle={track.artist} />
               </div>
@@ -58,6 +63,7 @@ export function NowPlayingBar() {
               <div className="hidden items-center gap-3 lg:flex">
                 <AlbumArt
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
+                  coverSeed={track?.id}
                   size="sm"
                   className="!h-14 !w-14 !rounded-sm"
                 />
@@ -69,6 +75,7 @@ export function NowPlayingBar() {
               <div className="flex items-center gap-3 lg:hidden">
                 <AlbumArt
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
+                  coverSeed={track?.id}
                   size="sm"
                   className="!h-10 !w-10 !rounded-sm"
                 />

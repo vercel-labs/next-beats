@@ -49,6 +49,8 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vgpu/wgsl": "0.3.0",
+    "@webgpu/types": "0.1.72",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.1-canary.26",
