@@ -128,27 +128,16 @@
   }
 }
 
-/* Keep the type-colour artwork visible while WebGPU warms up, then reveal the
-   live cover from its center. The feathered final mask lets the shader inherit
-   the underlying cover at its perimeter instead of arriving as a hard tile. */
+/* Keep the pre-rendered artwork visible while WebGPU warms up, then crossfade
+   the complete live cover in as one layer. */
 .album-art-shader {
   opacity: 0;
-  filter: blur(2px);
-  mask-image: radial-gradient(ellipse at center, #000 50%, rgb(0 0 0 / 90%) 72%, transparent 100%);
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: 88% 118%;
-  transition:
-    opacity 220ms ease-out,
-    filter 260ms ease-out,
-    mask-size 300ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, filter, mask-size;
+  transition: opacity 160ms ease-out;
+  will-change: opacity;
 }
 
 .album-art-shader[data-ready] {
   opacity: 1;
-  filter: blur(0);
-  mask-size: 140% 140%;
 }
 
 /* hover-reveals on desktop; always shown on touch (else the first tap is eaten) */

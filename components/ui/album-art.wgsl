@@ -957,7 +957,6 @@ fn surfaceAt(uv: vec2f) -> SurfaceSample {
   let cycle = turn * TAU;
   let motif = cover.params.z;
   let kind = cover.params.y;
-  let banner = step(2.5, kind);
   let bass = cover.params.w;
 
   // Surface normal from the height field. Three samples is the whole cost of making a
@@ -989,7 +988,6 @@ fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
   let turn = fract(cover.params.x);
   let kind = cover.params.y;
   let motif = cover.params.z;
-  let banner = step(2.5, kind);
   let bass = cover.params.w;
 
   let toLight = normalize(vec3f(-0.5, -0.72, 0.52));
@@ -1033,16 +1031,10 @@ fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
   let sweep = (beam.r + beam.g + beam.b) / 3.0;
   glow += sweep * (0.04 + specular * 0.22);
 
-  // Banners carry a label at the lower left, so that corner gets a scrim.
-  shade += banner * smoothstep(0.0, 1.0, point.y) * smoothstep(0.35, -0.5, point.x / aspect) * 0.18;
-
-  // The original covers had a lifted centre and darker perimeter. Keep that depth in the
-  // pixels themselves so the art sits above the card without a separate UI glow.
+  // A subtle centre lift keeps the relief dimensional without adding a dark perimeter
+  // that can read as a separate layer while the live canvas appears.
   let centredPoint = point / vec2f(aspect, 1.0);
-  let edgeDistance = max(abs(centredPoint.x), abs(centredPoint.y));
-  let edgeVignette = smoothstep(0.52, 1.02, edgeDistance);
   let centreLift = 1.0 - smoothstep(0.0, 0.9, length(centredPoint));
-  shade += edgeVignette * 0.2;
   glow += centreLift * 0.035 + bass * centreLift * 0.025;
 
   // Fold it into one premultiplied source-over sample: highlight lifts the gradient,
