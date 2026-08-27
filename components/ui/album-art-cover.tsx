@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { startTransition, useEffect, useRef, useState } from 'react';
 import { effect, frame, frameLoop, init, surface } from 'vgpu';
 import { motifForTitle } from '@/lib/cover-motif';
-import { resolveCoverGradient } from '@/lib/cover-palette';
+import { cn } from '@/lib/utils';
 import coverShader from './album-art.wgsl';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
 
@@ -11,7 +11,8 @@ let gpuPromise: Promise<Gpu> | undefined;
 const animatedCovers = new Set<(currentFrame: Frame, time: number) => void>();
 let animationLoop: FrameLoopHandle | undefined;
 
-// One shared loop for every cover on screen, so a page of covers is still one submission per tick.
+// One shared loop for every cover on screen, so a page full of covers still costs one
+// frame submission per tick rather than one per cover.
 function registerAnimatedCover(gpu: Gpu, render: (currentFrame: Frame, time: number) => void) {
   animatedCovers.add(render);
 
@@ -58,19 +59,19 @@ function seedVector(value: string): [number, number, number, number] {
   return [a, b, c, d].map(number => (number >>> 0) / 4294967295) as [number, number, number, number];
 }
 
-type ArtworkKind = 'track' | 'album' | 'playlist';
+export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
 
-const kindIndex: Record<ArtworkKind, number> = { album: 1, playlist: 2, track: 0 };
+const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
 type Props = {
   seed: string;
   label: string;
   kind: ArtworkKind;
-  coverColor: string;
 };
 
-export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
+export function AlbumArtCover({ seed, label, kind }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,6 +83,7 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
     let visibilityObserver: IntersectionObserver | undefined;
     let unregisterAnimation: (() => void) | undefined;
     let unsubscribeResize: (() => void) | undefined;
+    let detachPointer: (() => void) | undefined;
     let animationFrame = 0;
 
     void getGpu()
@@ -89,25 +91,60 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
         if (disposed) return;
 
         const seedValues = seedVector(seed);
-        const gradient = resolveCoverGradient(coverColor);
         const motif = motifForTitle(label, seedValues[3]);
+
+        // Strokes are given in CSS pixels and shapes stay circular, so the shader needs
+        // the element's own height and aspect ratio.
+        const metrics = () => {
+          const height = canvas.clientHeight || 48;
+          return { aspect: (canvas.clientWidth || height) / height, unit: 2 / height };
+        };
 
         output = surface(gpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
         const cover = effect(gpu, coverShader, {
           label: `album-cover-${seed}`,
           set: {
             cover: {
-              params: [0, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)],
+              params: [0, kindIndex[kind], motif, metrics().unit],
+              pointer: [0, 0, 0, 0],
               seed: seedValues,
-              stopA: [...gradient.from, 1],
-              stopB: [...gradient.to, 1],
+              shape: [metrics().aspect, 0, 0, 0],
             },
           },
         });
 
-        // Strokes are specified in CSS pixels, so the shader needs the cover's own size.
+        // The canvas itself takes no pointer events, so the card behind it drives hover.
+        const pointer = { hover: 0, target: 0, x: 0, y: 0 };
+        const host = canvas.parentElement;
+        if (host) {
+          const onMove = (event: PointerEvent) => {
+            const box = canvas.getBoundingClientRect();
+            if (!box.height) return;
+            const { aspect } = metrics();
+            pointer.x = ((event.clientX - box.left) / box.width * 2 - 1) * aspect;
+            pointer.y = (event.clientY - box.top) / box.height * 2 - 1;
+          };
+          const onEnter = (event: PointerEvent) => {
+            onMove(event);
+            pointer.target = 1;
+          };
+          const onLeave = () => {
+            pointer.target = 0;
+          };
+
+          host.addEventListener('pointermove', onMove);
+          host.addEventListener('pointerenter', onEnter);
+          host.addEventListener('pointerleave', onLeave);
+          detachPointer = () => {
+            host.removeEventListener('pointermove', onMove);
+            host.removeEventListener('pointerenter', onEnter);
+            host.removeEventListener('pointerleave', onLeave);
+          };
+        }
+
         unsubscribeResize = output.onResize(() => {
-          cover.set({ cover: { params: [0, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)] } });
+          const { aspect, unit } = metrics();
+          cover.set({ cover: { params: [0, kindIndex[kind], motif, unit], shape: [aspect, 0, 0, 0] } });
         });
 
         let visible = true;
@@ -115,13 +152,20 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
         const draw = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
 
-          cover.set({ cover: { params: [time, kindIndex[kind], motif, 2 / (canvas.clientWidth || 48)] } });
+          // Eased so entering and leaving a card ramps the light instead of snapping it.
+          pointer.hover += (pointer.target - pointer.hover) * 0.18;
+          cover.set({
+            cover: {
+              params: [time, kindIndex[kind], motif, metrics().unit],
+              pointer: [pointer.x, pointer.y, pointer.hover, 0],
+            },
+          });
           currentFrame.pass(output, cover);
 
           if (!revealed) {
             revealed = true;
             void currentFrame.done.then(() => {
-              if (!disposed) canvas.style.opacity = '1';
+              if (!disposed) startTransition(() => setReady(true));
             });
           }
         };
@@ -147,7 +191,7 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
         }
       })
       .catch(() => {
-        // The CSS gradient below the transparent canvas remains the fallback.
+        // The CSS gradient stays visible on its own; nothing else is needed.
       });
 
     return () => {
@@ -155,17 +199,24 @@ export function AlbumArtCover({ seed, label, kind, coverColor }: Props) {
       cancelAnimationFrame(animationFrame);
       unregisterAnimation?.();
       unsubscribeResize?.();
+      detachPointer?.();
       resizeObserver?.disconnect();
       visibilityObserver?.disconnect();
       output?.dispose();
     };
-  }, [coverColor, kind, label, seed]);
+  }, [kind, label, seed]);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-10 block h-full w-full opacity-0 transition-opacity duration-300"
+      // Transparent until the first frame lands, so the CSS gradient below is the
+      // fallback for free -- including when WebGPU is unavailable. The artwork then
+      // resolves out of a blur rather than popping in.
+      className={cn(
+        'pointer-events-none absolute inset-0 z-10 block h-full w-full transition-[opacity,filter,transform] duration-700 ease-out',
+        ready ? 'scale-100 opacity-100 blur-none' : 'scale-[1.06] opacity-0 blur-md',
+      )}
     />
   );
 }
