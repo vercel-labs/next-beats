@@ -1,15 +1,15 @@
-// Picks the artwork motif from an item's title so a cover is about its song. First
-// match wins, so the ordering matters: "WebSocket Sunset" should be a horizon, not a
-// ripple, and "Console Calm" should be a moon, not a terminal grid.
+// Picks which form a cover takes from its title, so the artwork is about the song. First
+// match wins, so ordering matters: "WebSocket Sunset" should be a limb, not a swell, and
+// "Console Calm" should be dunes, not panels.
 const motifs = [
-  { index: 2, test: /love|crush|heart|feeling|romance|kiss|\bpop\b/ }, // heart
-  { index: 1, test: /sunset|sunrise|synth|morning|midnight|dawn|dusk|night|dream|lullaby|sunday/ }, // horizon
-  { index: 7, test: /sleep|calm|idle|slow|soft|quiet|rest|dark|lo-?fi/ }, // crescent
-  { index: 3, test: /pixel|crt|terminal|bios|compil|console|retro|neon|paint|chrome|glow|render/ }, // grid
-  { index: 6, test: /merge|conflict|stack|trace|overflow|deadlock|pointer|commit|cache|approv|reset|branch|diff/ }, // paths
-  { index: 5, test: /async|await|chemistr|component|thread|race|condition|atom|orbit|cycle|promise|indie/ }, // orbit
-  { index: 4, test: /energ|electro|push|force|ship|deploy|boot|monday|vibe|beat|drop|bass|fast/ }, // spectrum
-  { index: 0, test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/ }, // ripple
+  { index: 2, test: /love|crush|heart|feeling|romance|kiss|\bpop\b/ }, // satin
+  { index: 1, test: /sunset|sunrise|synth|morning|midnight|dawn|dusk|night|dream|lullaby|sunday/ }, // limb
+  { index: 7, test: /sleep|calm|idle|slow|soft|quiet|rest|dark|lo-?fi/ }, // dunes
+  { index: 3, test: /pixel|crt|terminal|bios|compil|console|retro|neon|paint|chrome|glow|render/ }, // panels
+  { index: 6, test: /merge|conflict|stack|trace|overflow|deadlock|pointer|commit|cache|approv|reset|branch|diff/ }, // tunnel
+  { index: 5, test: /async|await|chemistr|component|thread|race|condition|atom|orbit|cycle|promise|indie/ }, // cluster
+  { index: 4, test: /energ|electro|push|force|ship|deploy|boot|monday|vibe|beat|drop|bass|fast/ }, // strata
+  { index: 0, test: /hydrat|water|ripple|backpressure|socket|stream|wave|flow|handshake|reload|hot|echo|pulse|hip-?hop/ }, // swell
 ] as const;
 
 export const MOTIF_COUNT = 8;
@@ -19,7 +19,8 @@ export const COVER_FRAMES = 48;
 export const COVER_FRAME_MS = 250;
 export const COVER_LOOP_SECONDS = (COVER_FRAMES * COVER_FRAME_MS) / 1000;
 
-const motifNames = ['ripple', 'horizon', 'heart', 'grid', 'spectrum', 'orbit', 'paths', 'crescent'] as const;
+// Named for the form each one takes, which is what the shader's height fields build.
+const motifNames = ['swell', 'limb', 'satin', 'panels', 'strata', 'cluster', 'tunnel', 'dunes'] as const;
 
 // `kind` matches the shader: square covers print the motif bare, banners set it beside
 // the label. Sizes are the largest the artwork is displayed at, times a little headroom.

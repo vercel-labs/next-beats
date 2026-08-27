@@ -50,6 +50,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vgpu/wgsl": "0.3.0",
+    "@vgpu/wgsl-std": "0.3.0",
     "@webgpu/types": "0.1.72",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
