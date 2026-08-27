@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import { Suspense, useState } from 'react';
+import { preload } from 'react-dom';
 import { Boundary } from '@/components/demo/boundary';
 import { usePrefetchDefault } from '@/components/demo/use-prefetch-default';
 import type { Route } from 'next';
@@ -13,6 +14,7 @@ type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 
   // than firing it eagerly when the link enters the viewport. Use for unbounded
   // lists (e.g. the playlist sidebar) so N links don't each wake a server on load.
   hoverPrefetch?: boolean;
+  preloadImages?: readonly string[];
 };
 
 // `useSelectedLayoutSegments` is dynamic under `cacheComponents`, so the
@@ -40,6 +42,7 @@ function NavLinkShell<T extends string>({
   href,
   isActive,
   hoverPrefetch = false,
+  preloadImages,
   onMouseEnter,
   onFocus,
   ...rest
@@ -49,6 +52,9 @@ function NavLinkShell<T extends string>({
   // `prefetch` is already `true` or `null` (App Shell only) from the demo toggle.
   // Hover-gated links stay at `null` until intent, then upgrade to the full prefetch.
   const resolvedPrefetch = !prefetch ? null : hoverPrefetch ? (intent ? true : null) : true;
+  if (resolvedPrefetch) {
+    preloadImages?.forEach(src => preload(src, { as: 'image', fetchPriority: 'low' }));
+  }
   const showIntent = () => setIntent(true);
   return (
     <Link

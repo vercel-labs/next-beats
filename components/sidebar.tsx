@@ -12,6 +12,7 @@ import { getPlaylists } from '@/features/playlist/playlist-queries';
 import { CurrentUserAvatar, CurrentUserAvatarSkeleton } from '@/features/user/components/current-user-avatar';
 import { LogOutButton } from '@/features/user/components/log-out-button';
 import { signOut } from '@/features/user/user-actions';
+import { coverAssetPath } from '@/lib/cover-motif';
 import type { Route } from 'next';
 
 const sidebarLink =
@@ -104,6 +105,7 @@ async function SidebarPlaylists() {
           key={pl.id}
           hoverPrefetch
           href={`/playlist/${pl.id}` as Route}
+          preloadImages={pl.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true))}
           aria-label={pl.name}
           className={sidebarLink}
         >
