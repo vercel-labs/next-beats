@@ -138,6 +138,15 @@
   opacity: 1;
 }
 
+.album-art-fallback {
+  opacity: 1;
+  transition: opacity 160ms ease-out;
+}
+
+.album-art-shader[data-ready] ~ .album-art-fallback {
+  opacity: 0;
+}
+
 /* hover-reveals on desktop; always shown on touch (else the first tap is eaten) */
 .card-play-btn {
   opacity: 1;
