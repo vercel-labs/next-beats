@@ -23,6 +23,10 @@ struct Cover {
 
 const TAU = 6.28318530718;
 
+fn squareValue(value: f32) -> f32 {
+  return value * value;
+}
+
 fn hash21(point: vec2f) -> f32 {
   return fract(sin(dot(point, vec2f(127.1, 311.7))) * 43758.5453);
 }
@@ -136,7 +140,7 @@ fn cluster(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let secondCenter = vec2f(0.43, 0.25) + driftB;
   let first = sphereHeight(point, firstCenter, 0.48 + seed.x * 0.1) * 0.42;
   let second = sphereHeight(point, secondCenter, 0.55 + seed.y * 0.1) * 0.42;
-  let connection = exp(-pow(segmentDistance(point, firstCenter, secondCenter) * 7.0, 2.0)) * 0.075;
+  let connection = exp(-squareValue(segmentDistance(point, firstCenter, secondCenter) * 7.0)) * 0.075;
   let pendingCenter = vec2f(0.55 + seed.z * 0.15, -0.55) - driftA * 0.5;
   let pending = sphereHeight(point, pendingCenter, 0.2 + seed.w * 0.08) * 0.3;
   return max(max(first, second), pending) + connection;
@@ -173,16 +177,16 @@ fn monolith(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     * (1.0 - smoothstep(sailEdge - 0.04, sailEdge + 0.04, local.x))
     * vertical;
   let sail = inside * (0.24 + (sailEdge - local.x) * 0.055);
-  let leadingEdge = exp(-pow((local.x - sailEdge) * 28.0, 2.0)) * vertical * 0.18;
-  let mast = exp(-pow((local.x - mastX) * 30.0, 2.0))
+  let leadingEdge = exp(-squareValue((local.x - sailEdge) * 28.0)) * vertical * 0.18;
+  let mast = exp(-squareValue((local.x - mastX) * 30.0))
     * smoothstep(top - 0.08, top, local.y)
     * (1.0 - smoothstep(0.72, 0.8, local.y)) * 0.09;
-  let boom = exp(-pow((local.y - 0.53) * 26.0, 2.0))
+  let boom = exp(-squareValue((local.y - 0.53) * 26.0))
     * smoothstep(mastX - 0.05, mastX + 0.05, local.x)
     * (1.0 - smoothstep(0.43, 0.5, local.x)) * 0.1;
   let hullLocal = local - vec2f(-0.02, 0.66);
   let hull = roundedPlate(hullLocal, vec2f(0.62, 0.09), 0.08, 0.17);
-  let wake = exp(-pow((local.y - 0.82) * 13.0, 2.0))
+  let wake = exp(-squareValue((local.y - 0.82) * 13.0))
     * smoothstep(0.55, -0.82, local.x) * 0.075;
   return max(max(sail + leadingEdge, mast + boom), hull) + wake;
 }
@@ -195,9 +199,9 @@ fn pinch(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   // The source SDF points upward; map its cusp to the lower edge of this cover.
   let distance = heartDistance(vec2f(local.x, 0.68 - local.y) / 1.17) * 1.17;
   let body = 1.0 - smoothstep(-0.025, 0.025, distance);
-  let edge = exp(-pow(distance * 19.0, 2.0));
+  let edge = exp(-squareValue(distance * 19.0));
   let paperPlane = body * (0.145 + local.x * 0.018 - local.y * 0.008);
-  let fold = exp(-pow(segmentDistance(local, vec2f(-0.42, -0.12), vec2f(0.08, 0.54)) * 18.0, 2.0));
+  let fold = exp(-squareValue(segmentDistance(local, vec2f(-0.42, -0.12), vec2f(0.08, 0.54)) * 18.0));
   return paperPlane + edge * 0.075 + body * fold * 0.022;
 }
 
@@ -210,7 +214,7 @@ fn foldedEdge(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
       + sin(local.x * (1.35 + layer * 0.16) + seed.x * TAU + layer) * 0.045
       + smoothFlow(vec2f(local.x * 0.62, seed.y * 2.0 + layer * 1.8), cycle, 0.14) * 0.05;
     let sheet = 1.0 - smoothstep(-0.04, 0.04, local.y - boundary);
-    let rolledEdge = exp(-pow((local.y - boundary) * 8.5, 2.0)) * (0.065 + layer * 0.025);
+    let rolledEdge = exp(-squareValue((local.y - boundary) * 8.5)) * (0.065 + layer * 0.025);
     height = max(height, sheet * (0.1 + layer * 0.065) + rolledEdge);
   }
   return height;
@@ -224,9 +228,9 @@ fn insetPanels(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let backDistance = roundedBoxDistance(backLocal, vec2f(0.75, 0.78), 0.09);
   let frontDistance = roundedBoxDistance(frontLocal, vec2f(0.58, 0.61), 0.1);
   let back = (1.0 - smoothstep(-0.1, 0.055, backDistance)) * 0.16
-    + exp(-pow(backDistance * 18.0, 2.0)) * 0.075;
+    + exp(-squareValue(backDistance * 18.0)) * 0.075;
   let front = (1.0 - smoothstep(-0.1, 0.055, frontDistance)) * 0.3
-    + exp(-pow(frontDistance * 19.0, 2.0)) * 0.12;
+    + exp(-squareValue(frontDistance * 19.0)) * 0.12;
   let centre = exp(-dot(point - vec2f(0.25, -0.18), point - vec2f(0.25, -0.18)) * 3.8) * 0.07;
   return max(back, front) + centre;
 }
@@ -235,7 +239,7 @@ fn insetPanels(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 fn nightHorizon(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let local = rotate(point, -0.66 + (seed.z - 0.5) * 0.04);
   let horizon = 1.0 - smoothstep(-0.035, 0.035, local.y + 0.12);
-  let horizonEdge = exp(-pow((local.y + 0.12) * 18.0, 2.0)) * 0.09;
+  let horizonEdge = exp(-squareValue((local.y + 0.12) * 18.0)) * 0.09;
   let starAt = vec2f(0.48 + sin(cycle) * 0.012, -0.32);
   let star = exp(-dot(point - starAt, point - starAt) * 190.0) * 0.27;
   let starRay = exp(-abs(point.x - starAt.x) * 75.0) * exp(-abs(point.y - starAt.y) * 5.0) * 0.045;
@@ -267,12 +271,12 @@ fn chemicalCluster(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let fourth = sphereHeight(point, fourthCenter, 0.46 + seed.w * 0.04) * 0.48;
   let bonds = max(
     max(
-      exp(-pow(segmentDistance(point, firstCenter, secondCenter) * 12.0, 2.0)),
-      exp(-pow(segmentDistance(point, secondCenter, thirdCenter) * 12.0, 2.0)),
+      exp(-squareValue(segmentDistance(point, firstCenter, secondCenter) * 12.0)),
+      exp(-squareValue(segmentDistance(point, secondCenter, thirdCenter) * 12.0)),
     ),
     max(
-      exp(-pow(segmentDistance(point, thirdCenter, fourthCenter) * 12.0, 2.0)),
-      exp(-pow(segmentDistance(point, fourthCenter, firstCenter) * 12.0, 2.0)),
+      exp(-squareValue(segmentDistance(point, thirdCenter, fourthCenter) * 12.0)),
+      exp(-squareValue(segmentDistance(point, fourthCenter, firstCenter) * 12.0)),
     ),
   ) * 0.08;
   return max(max(first, second), max(third, fourth)) + bonds;
@@ -287,7 +291,7 @@ fn protectiveArc(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let radius = 1.79;
   let distance = length(point - center) - radius;
   let sheet = sphereHeight(point, center, radius) * 0.18;
-  let litFold = exp(-pow(distance * 12.0, 2.0)) * 0.13;
+  let litFold = exp(-squareValue(distance * 12.0)) * 0.13;
 
   // A second, quieter body meets that fold at one point. It reads as an embrace at album
   // scale, while the two-body silhouette stays unmistakably different from Tailwind's
@@ -296,28 +300,28 @@ fn protectiveArc(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let heldRadius = 1.2;
   let heldDistance = length(point - heldCenter) - heldRadius;
   let held = sphereHeight(point, heldCenter, heldRadius) * 0.13;
-  let heldEdge = exp(-pow(heldDistance * 13.0, 2.0)) * 0.075;
+  let heldEdge = exp(-squareValue(heldDistance * 13.0)) * 0.075;
   return max(sheet, held) + litFold + heldEdge;
 }
 
 fn ringRelief(point: vec2f, center: vec2f, radius: f32, width: f32, lift: f32) -> f32 {
-  return exp(-pow((length(point - center) - radius) / width, 2.0)) * lift;
+  return exp(-squareValue((length(point - center) - radius) / width)) * lift;
 }
 
 fn lineRelief(point: vec2f, start: vec2f, end: vec2f, width: f32, lift: f32) -> f32 {
-  return exp(-pow(segmentDistance(point, start, end) / width, 2.0)) * lift;
+  return exp(-squareValue(segmentDistance(point, start, end) / width)) * lift;
 }
 
 fn boxRelief(point: vec2f, center: vec2f, halfSize: vec2f, radius: f32, lift: f32) -> f32 {
   let distance = roundedBoxDistance(point - center, halfSize, radius);
-  return exp(-pow(distance / 0.045, 2.0)) * lift;
+  return exp(-squareValue(distance / 0.045)) * lift;
 }
 
 fn signalWave(point: vec2f, y: f32, frequency: f32, phase: f32, lift: f32) -> f32 {
   // Idle motion rocks the waveform in place instead of scrolling it across the cover.
   // Playback bass supplies the pronounced movement later in surfaceAt().
   let waveY = y + sin(point.x * frequency + sin(phase) * 0.12) * 0.13;
-  return exp(-pow((point.y - waveY) * 22.0, 2.0)) * lift;
+  return exp(-squareValue((point.y - waveY) * 22.0)) * lift;
 }
 
 fn asyncAwaitArt(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
@@ -765,7 +769,7 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
   let recordCenter = vec2f(0.12, 0.03);
   let recordRadius = length(point - recordCenter);
   let record = sphereHeight(point, recordCenter, 0.5) * 0.26
-    + exp(-pow((recordRadius - 0.35) * 20.0, 2.0)) * 0.1;
+    + exp(-squareValue((recordRadius - 0.35) * 20.0)) * 0.1;
   var cue = 0.0;
   if (variant < 0.5) {
     // A record partly visible through the front sleeve.
@@ -784,7 +788,7 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
     // A rising disc and horizon, kept inside the sleeve like cover printing.
     let sunCenter = vec2f(0.22, -0.08 + sin(cycle) * 0.012);
     let sun = sphereHeight(point, sunCenter, 0.42) * 0.36;
-    let horizon = exp(-pow((point.y - 0.3) * 18.0, 2.0))
+    let horizon = exp(-squareValue((point.y - 0.3) * 18.0))
       * (1.0 - smoothstep(0.58, 0.74, abs(point.x))) * 0.16;
     cue = max(record * 0.38, sun + horizon);
   } else {
@@ -810,10 +814,10 @@ fn electronicHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     height = max(height, roundedPlate(local, vec2f(0.19, 0.17), 0.055, (0.12 + pulse * 0.2) * activity));
   }
   let signalY = 0.58 + sin(point.x * 5.2 + cycle) * 0.08 + sin(point.x * 9.0 - cycle) * 0.035;
-  let signal = exp(-pow((point.y - signalY) * 24.0, 2.0))
+  let signal = exp(-squareValue((point.y - signalY) * 24.0))
     * smoothstep(0.18, 0.34, point.x)
     * (1.0 - smoothstep(2.25, 2.42, point.x)) * 0.15;
-  let rail = exp(-pow((point.y - 0.76) * 25.0, 2.0))
+  let rail = exp(-squareValue((point.y - 0.76) * 25.0))
     * smoothstep(0.12, 0.3, point.x)
     * (1.0 - smoothstep(2.3, 2.48, point.x)) * 0.06;
   return height + signal + rail;
@@ -824,23 +828,23 @@ fn synthwaveHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let radius = 0.72 + seed.y * 0.08;
   let sun = sphereHeight(point, center, radius) * 0.38;
   let horizonY = 0.46;
-  let horizon = exp(-pow((point.y - horizonY) * 24.0, 2.0))
+  let horizon = exp(-squareValue((point.y - horizonY) * 24.0))
     * smoothstep(0.05, 0.25, point.x)
     * (1.0 - smoothstep(2.48, 2.68, point.x)) * 0.17;
   var scanBands = 0.0;
   for (var band = 0.0; band < 4.0; band += 1.0) {
     let y = -0.1 + band * 0.16;
     let insideSun = 1.0 - smoothstep(radius - 0.08, radius + 0.02, length(point - center));
-    scanBands += exp(-pow((point.y - y) * 32.0, 2.0)) * insideSun * 0.055;
+    scanBands += exp(-squareValue((point.y - y) * 32.0)) * insideSun * 0.055;
   }
   var grid = 0.0;
   for (var ray = 0.0; ray < 5.0; ray += 1.0) {
     let end = vec2f(0.15 + ray * 0.62, 1.05);
-    grid = max(grid, exp(-pow(segmentDistance(point, vec2f(1.35, horizonY), end) * 22.0, 2.0)) * 0.055);
+    grid = max(grid, exp(-squareValue(segmentDistance(point, vec2f(1.35, horizonY), end) * 22.0)) * 0.055);
   }
   for (var row = 0.0; row < 3.0; row += 1.0) {
     let y = horizonY + 0.13 + row * row * 0.075;
-    grid = max(grid, exp(-pow((point.y - y) * 28.0, 2.0)) * 0.045);
+    grid = max(grid, exp(-squareValue((point.y - y) * 28.0)) * 0.045);
   }
   grid *= smoothstep(horizonY - 0.02, horizonY + 0.08, point.y);
   return sun + horizon + scanBands + grid;
@@ -858,8 +862,8 @@ fn hipHopHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let rightRadius = 0.62;
   let leftCone = sphereHeight(point, leftCenter, leftRadius) * 0.34;
   let rightCone = sphereHeight(point, rightCenter, rightRadius) * 0.38;
-  let leftRing = exp(-pow((length(point - leftCenter) - leftRadius * 0.72) * 18.0, 2.0)) * 0.12;
-  let rightRing = exp(-pow((length(point - rightCenter) - rightRadius * 0.72) * 18.0, 2.0)) * 0.14;
+  let leftRing = exp(-squareValue((length(point - leftCenter) - leftRadius * 0.72) * 18.0)) * 0.12;
+  let rightRing = exp(-squareValue((length(point - rightCenter) - rightRadius * 0.72) * 18.0)) * 0.14;
   let bridge = roundedPlate(point - vec2f(1.34, 0.67), vec2f(1.1, 0.09), 0.07, 0.1);
   return body + handle + max(leftCone + leftRing, rightCone + rightRing) + bridge;
 }
@@ -876,7 +880,7 @@ fn indieHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
     let insideX = 1.0 - smoothstep(0.54, 0.62, abs(local.x));
     let top = smoothstep(-0.68, -0.61, local.y);
     let sheet = top * (1.0 - smoothstep(-0.045, 0.045, local.y - tornEdge)) * insideX;
-    let paperEdge = exp(-pow((local.y - tornEdge) * 14.0, 2.0)) * insideX * 0.09;
+    let paperEdge = exp(-squareValue((local.y - tornEdge) * 14.0)) * insideX * 0.09;
     height = max(height, sheet * (0.14 + index * 0.075) + paperEdge);
   }
   let tapeA = roundedPlate(rotate(point - vec2f(0.62, -0.57), -0.18), vec2f(0.24, 0.07), 0.025, 0.24);
@@ -910,7 +914,7 @@ fn loFiHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let leftHub = sphereHeight(point, leftCenter, 0.09) * 0.5;
   let rightHub = sphereHeight(point, rightCenter, 0.09) * 0.5;
   let tapeWindow = roundedPlate(point - (bodyCenter + vec2f(0.0, 0.38)), vec2f(0.55, 0.09), 0.045, 0.28);
-  let tape = exp(-pow(segmentDistance(point, leftCenter, rightCenter) * 20.0, 2.0)) * 0.075;
+  let tape = exp(-squareValue(segmentDistance(point, leftCenter, rightCenter) * 20.0)) * 0.075;
   return body + max(leftReel + leftHub, rightReel + rightHub) + tapeWindow + tape;
 }
 
