@@ -111,7 +111,10 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
             void currentFrame.done.then(() => {
               if (disposed) return;
               revealFrame = requestAnimationFrame(() => {
-                if (!disposed) setReadyKey(coverKey);
+                if (disposed) return;
+                revealFrame = requestAnimationFrame(() => {
+                  if (!disposed) setReadyKey(coverKey);
+                });
               });
             });
           }
