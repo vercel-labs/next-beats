@@ -78,7 +78,7 @@ async function coverCatalog(): Promise<CoverItem[]> {
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
   try {
     const tracks = await prisma.track.findMany({ orderBy: { id: 'asc' }, select: { id: true, title: true } });
-    if (tracks.length === 0) throw new Error('No tracks found. Seed the database before running pnpm covers.');
+    if (tracks.length === 0) throw new Error('No tracks found. Seed the database before running pnpm covers:icons.');
 
     const trackItems: CoverItem[] = tracks.map(track => ({ kind: 'track', label: track.title, seed: track.id }));
     const genreItems: CoverItem[] = ['electronic', 'synthwave', 'hip-hop', 'indie', 'pop', 'lo-fi'].map(genre => ({

@@ -384,93 +384,114 @@ fn playlistHeight(point: vec2f, cycle: f32, variant: f32, seed: vec4f) -> f32 {
 
 fn electronicHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   var height = 0.0;
-  for (var index = 0.0; index < 15.0; index += 1.0) {
-    let column = index - floor(index / 5.0) * 5.0;
-    let row = floor(index / 5.0);
-    let center = vec2f(-0.55 + column * 0.68, -0.58 + row * 0.58);
+  for (var index = 0.0; index < 12.0; index += 1.0) {
+    let column = index - floor(index / 4.0) * 4.0;
+    let row = floor(index / 4.0);
+    let center = vec2f(0.45 + column * 0.52, -0.48 + row * 0.45);
     let pulse = 0.5 + 0.5 * sin(cycle + index * 0.72 + seed.x * TAU);
     let local = point - center - vec2f(0.0, pulse * 0.02);
     let activity = select(0.45, 1.0, hash21(vec2f(index, seed.x * 19.0)) > 0.38);
-    height = max(height, roundedPlate(local, vec2f(0.23, 0.22), 0.07, (0.12 + pulse * 0.2) * activity));
+    height = max(height, roundedPlate(local, vec2f(0.19, 0.17), 0.055, (0.12 + pulse * 0.2) * activity));
   }
-  let sequencerRail = exp(-pow((point.y - 0.74) * 22.0, 2.0))
-    * smoothstep(-0.9, -0.68, point.x)
-    * (1.0 - smoothstep(2.28, 2.5, point.x)) * 0.07;
-  return height + sequencerRail;
+  let signalY = 0.58 + sin(point.x * 5.2 + cycle) * 0.08 + sin(point.x * 9.0 - cycle) * 0.035;
+  let signal = exp(-pow((point.y - signalY) * 24.0, 2.0))
+    * smoothstep(0.18, 0.34, point.x)
+    * (1.0 - smoothstep(2.25, 2.42, point.x)) * 0.15;
+  let rail = exp(-pow((point.y - 0.76) * 25.0, 2.0))
+    * smoothstep(0.12, 0.3, point.x)
+    * (1.0 - smoothstep(2.3, 2.48, point.x)) * 0.06;
+  return height + signal + rail;
 }
 
 fn synthwaveHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let center = vec2f(1.25 + (seed.x - 0.5) * 0.22, 0.72 + sin(cycle) * 0.025);
-  let radius = 0.95 + seed.y * 0.12;
-  let body = sphereHeight(point, center, radius) * 0.36;
-  let horizon = (1.0 - smoothstep(0.0, 0.055, abs(point.y - 0.55))) * 0.15;
-  let sunBandA = exp(-pow((point.y - 0.22) * 20.0, 2.0))
-    * (1.0 - smoothstep(radius - 0.12, radius, abs(point.x - center.x))) * 0.045;
-  let sunBandB = exp(-pow((point.y - 0.38) * 22.0, 2.0))
-    * (1.0 - smoothstep(radius - 0.12, radius, abs(point.x - center.x))) * 0.06;
-  let depth = smoothstep(1.1, -0.4, point.y) * smoothstep(-0.8, 1.2, point.x) * 0.08;
-  return max(body, horizon) + sunBandA + sunBandB + depth;
+  let center = vec2f(1.35 + (seed.x - 0.5) * 0.16, 0.16 + sin(cycle) * 0.018);
+  let radius = 0.72 + seed.y * 0.08;
+  let sun = sphereHeight(point, center, radius) * 0.38;
+  let horizonY = 0.46;
+  let horizon = exp(-pow((point.y - horizonY) * 24.0, 2.0))
+    * smoothstep(0.05, 0.25, point.x)
+    * (1.0 - smoothstep(2.48, 2.68, point.x)) * 0.17;
+  var scanBands = 0.0;
+  for (var band = 0.0; band < 4.0; band += 1.0) {
+    let y = -0.1 + band * 0.16;
+    let insideSun = 1.0 - smoothstep(radius - 0.08, radius + 0.02, length(point - center));
+    scanBands += exp(-pow((point.y - y) * 32.0, 2.0)) * insideSun * 0.055;
+  }
+  var grid = 0.0;
+  for (var ray = 0.0; ray < 5.0; ray += 1.0) {
+    let end = vec2f(0.15 + ray * 0.62, 1.05);
+    grid = max(grid, exp(-pow(segmentDistance(point, vec2f(1.35, horizonY), end) * 22.0, 2.0)) * 0.055);
+  }
+  for (var row = 0.0; row < 3.0; row += 1.0) {
+    let y = horizonY + 0.13 + row * row * 0.075;
+    grid = max(grid, exp(-pow((point.y - y) * 28.0, 2.0)) * 0.045);
+  }
+  grid *= smoothstep(horizonY - 0.02, horizonY + 0.08, point.y);
+  return sun + horizon + scanBands + grid;
 }
 
 fn hipHopHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  var height = 0.0;
-  for (var index = 0.0; index < 3.0; index += 1.0) {
-    let width = 0.38 + index * 0.035;
-    let rise = 0.46 + index * 0.15;
-    let bounce = sin(cycle + index * 1.35 + seed.x * TAU) * 0.035;
-    let center = vec2f(0.18 + index * 0.86, 0.68 - rise * 0.28 + bounce);
-    let local = point - center;
-    let outerDistance = roundedBoxDistance(local, vec2f(width, rise), width);
-    let innerDistance = roundedBoxDistance(local - vec2f(0.0, 0.1), vec2f(width * 0.56, rise * 0.67), width * 0.56);
-    let outer = 1.0 - smoothstep(-0.08, 0.045, outerDistance);
-    let inner = 1.0 - smoothstep(-0.07, 0.035, innerDistance);
-    let arch = max(outer - inner * 0.86, 0.0) * (0.16 + index * 0.055);
-    let cone = sphereHeight(point, center + vec2f(0.0, 0.22), width * 0.38) * 0.13;
-    height = max(height, arch + cone);
-  }
-  return height;
+  let bounce = sin(cycle) * 0.025;
+  let leftCenter = vec2f(0.82, 0.12 + bounce);
+  let rightCenter = vec2f(1.86, 0.04 - bounce);
+  let leftRadius = 0.5;
+  let rightRadius = 0.62;
+  let leftCone = sphereHeight(point, leftCenter, leftRadius) * 0.34;
+  let rightCone = sphereHeight(point, rightCenter, rightRadius) * 0.38;
+  let leftRing = exp(-pow((length(point - leftCenter) - leftRadius * 0.72) * 18.0, 2.0)) * 0.12;
+  let rightRing = exp(-pow((length(point - rightCenter) - rightRadius * 0.72) * 18.0, 2.0)) * 0.14;
+  let bridge = roundedPlate(point - vec2f(1.34, 0.67), vec2f(1.1, 0.09), 0.07, 0.1);
+  return max(leftCone + leftRing, rightCone + rightRing) + bridge;
 }
 
 fn indieHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   var height = 0.0;
   for (var index = 0.0; index < 3.0; index += 1.0) {
-    let center = vec2f(0.55 + index * 0.43, -0.42 + index * 0.1);
-    let angle = -0.31 + index * 0.16 + sin(cycle) * (index - 1.0) * 0.008;
+    let center = vec2f(0.65 + index * 0.48, -0.02 + index * 0.05);
+    let angle = -0.24 + index * 0.18 + sin(cycle) * (index - 1.0) * 0.01;
     let local = rotate(point - center, angle);
-    let tornEdge = 0.28 + index * 0.17
+    let tornEdge = 0.58
       + sin(local.x * (2.2 + index * 0.35) + seed.x * TAU) * 0.035
       + simplex2d(vec2f(local.x * 2.6, index * 4.1 + seed.y * 5.0)) * 0.055;
-    let insideX = 1.0 - smoothstep(1.25, 1.35, abs(local.x));
-    let sheet = (1.0 - smoothstep(-0.045, 0.045, local.y - tornEdge)) * insideX;
-    height = max(height, sheet * (0.13 + index * 0.085));
+    let insideX = 1.0 - smoothstep(0.54, 0.62, abs(local.x));
+    let top = smoothstep(-0.68, -0.61, local.y);
+    let sheet = top * (1.0 - smoothstep(-0.045, 0.045, local.y - tornEdge)) * insideX;
+    let paperEdge = exp(-pow((local.y - tornEdge) * 14.0, 2.0)) * insideX * 0.09;
+    height = max(height, sheet * (0.14 + index * 0.075) + paperEdge);
   }
+  let tapeA = roundedPlate(rotate(point - vec2f(0.62, -0.57), -0.18), vec2f(0.24, 0.07), 0.025, 0.24);
+  let tapeB = roundedPlate(rotate(point - vec2f(1.92, -0.5), 0.22), vec2f(0.23, 0.07), 0.025, 0.22);
+  height = max(height, max(tapeA, tapeB));
   return height;
 }
 
 fn popHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let focus = vec2f(0.78 + (seed.x - 0.5) * 0.12, 0.04);
-  var height = 0.0;
-  for (var index = 0.0; index < 3.0; index += 1.0) {
-    let direction = -0.8 + index * 2.15 + seed.y * 0.08 + sin(cycle) * 0.018;
-    let radius = 1.35 + index * 0.18;
-    let lobeCenter = focus - vec2f(cos(direction), sin(direction)) * radius;
-    height = max(height, sphereHeight(point, lobeCenter, radius + 0.04) * (0.19 + index * 0.024));
+  let focus = vec2f(1.35 + (seed.x - 0.5) * 0.1, 0.03);
+  var bubbleStar = sphereHeight(point, focus, 0.42) * 0.34;
+  for (var index = 0.0; index < 5.0; index += 1.0) {
+    let direction = index * TAU / 5.0 - 0.3 + sin(cycle) * 0.012;
+    let lobeCenter = focus + vec2f(cos(direction), sin(direction)) * 0.46;
+    bubbleStar = max(bubbleStar, sphereHeight(point, lobeCenter, 0.38) * 0.34);
   }
-  let flare = exp(-dot(point - focus, point - focus) * 24.0) * 0.34;
-  return height + flare;
+  let sparkleCenter = focus + vec2f(0.92, -0.5);
+  let sparkle = exp(-abs(point.x - sparkleCenter.x) * 45.0) * exp(-abs(point.y - sparkleCenter.y) * 7.0)
+    + exp(-abs(point.y - sparkleCenter.y) * 45.0) * exp(-abs(point.x - sparkleCenter.x) * 7.0);
+  return bubbleStar + sparkle * 0.12;
 }
 
 fn loFiHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
-  let center = vec2f(1.42 + (seed.x - 0.5) * 0.16, 0.68);
-  let radius = length(point - center);
-  let breathe = sin(cycle) * 0.018;
-  var height = 0.0;
-  for (var index = 0.0; index < 4.0; index += 1.0) {
-    let ringRadius = 0.4 + index * 0.36 + breathe * (index + 1.0);
-    let band = exp(-pow(abs(radius - ringRadius) * 5.5, 2.0));
-    height = max(height, band * (0.14 + index * 0.028));
-  }
-  return height;
+  let bodyCenter = vec2f(1.35, 0.03);
+  let body = roundedPlate(point - bodyCenter, vec2f(1.08, 0.7), 0.13, 0.2);
+  let leftCenter = bodyCenter + vec2f(-0.43, -0.08);
+  let rightCenter = bodyCenter + vec2f(0.43, -0.08);
+  let spin = sin(cycle) * 0.01;
+  let leftReel = sphereHeight(point, leftCenter, 0.29 + spin) * 0.36;
+  let rightReel = sphereHeight(point, rightCenter, 0.29 - spin) * 0.36;
+  let leftHub = sphereHeight(point, leftCenter, 0.09) * 0.5;
+  let rightHub = sphereHeight(point, rightCenter, 0.09) * 0.5;
+  let tapeWindow = roundedPlate(point - (bodyCenter + vec2f(0.0, 0.38)), vec2f(0.55, 0.09), 0.045, 0.28);
+  let tape = exp(-pow(segmentDistance(point, leftCenter, rightCenter) * 20.0, 2.0)) * 0.075;
+  return body + max(leftReel + leftHub, rightReel + rightHub) + tapeWindow + tape;
 }
 
 fn genreHeight(point: vec2f, cycle: f32, motif: f32, seed: vec4f) -> f32 {
