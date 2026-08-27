@@ -432,6 +432,10 @@ fn synthwaveHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
 
 fn hipHopHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let bounce = sin(cycle) * 0.025;
+  let body = roundedPlate(point - vec2f(1.35, 0.12), vec2f(1.18, 0.68), 0.14, 0.13);
+  let handleOuter = roundedPlate(point - vec2f(1.35, -0.65), vec2f(0.48, 0.18), 0.12, 0.13);
+  let handleInner = roundedPlate(point - vec2f(1.35, -0.62), vec2f(0.32, 0.12), 0.09, 0.12);
+  let handle = max(handleOuter - handleInner, 0.0);
   let leftCenter = vec2f(0.82, 0.12 + bounce);
   let rightCenter = vec2f(1.86, 0.04 - bounce);
   let leftRadius = 0.5;
@@ -441,7 +445,7 @@ fn hipHopHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
   let leftRing = exp(-pow((length(point - leftCenter) - leftRadius * 0.72) * 18.0, 2.0)) * 0.12;
   let rightRing = exp(-pow((length(point - rightCenter) - rightRadius * 0.72) * 18.0, 2.0)) * 0.14;
   let bridge = roundedPlate(point - vec2f(1.34, 0.67), vec2f(1.1, 0.09), 0.07, 0.1);
-  return max(leftCone + leftRing, rightCone + rightRing) + bridge;
+  return body + handle + max(leftCone + leftRing, rightCone + rightRing) + bridge;
 }
 
 fn indieHeight(point: vec2f, cycle: f32, seed: vec4f) -> f32 {
