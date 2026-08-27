@@ -59,8 +59,9 @@ struct Artwork {
 fn soundPrint(point: vec2f, phase: f32, variant: f32) -> Artwork {
   var art = Artwork(0.0, 0.0, 0.0);
   let breathe = 1.0 + sin(phase * 1.6) * 0.02;
+  let pick = floor(variant * 3.0);
 
-  if (variant < 1.0) {
+  if (pick < 1.0) {
     // Ripple: concentric rings, the outer ones fading like a decaying signal.
     let radius = length(point) / breathe;
     for (var ring = 0; ring < 4; ring += 1) {
@@ -68,7 +69,7 @@ fn soundPrint(point: vec2f, phase: f32, variant: f32) -> Artwork {
       art.ink += stroke(radius - ringRadius, 1.5 - f32(ring) * 0.18) * (1.0 - f32(ring) * 0.18);
     }
     art.ink += fillMask(length(point) - 0.055) * 0.85;
-  } else if (variant < 2.0) {
+  } else if (pick < 2.0) {
     // Spectrum: bars mirrored around the centre line, each with its own drift.
     let columns = 9.0;
     let column = floor((point.x * 0.5 + 0.5) * columns);

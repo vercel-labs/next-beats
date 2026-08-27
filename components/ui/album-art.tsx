@@ -26,7 +26,7 @@ export function AlbumArt({ coverColor, coverSeed, label, kind = 'track', size = 
         className,
       )}
     >
-      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} />}
+      {coverSeed && <AlbumArtCover seed={coverSeed} label={label ?? coverSeed} kind={kind} coverColor={coverColor} />}
       <svg
         className="h-1/3 w-1/3 text-white/60 drop-shadow-md"
         viewBox="0 0 24 24"
