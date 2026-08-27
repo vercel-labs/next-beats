@@ -55,15 +55,10 @@ const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2
 
 export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const beatTrackIdsRef = useRef(beatTrackIds);
   const coverKey = `${kind}\0${seed}\0${label}`;
   const [readyKey, setReadyKey] = useState<string>();
   const ready = !small && readyKey === coverKey;
   const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
-
-  useEffect(() => {
-    beatTrackIdsRef.current = beatTrackIds;
-  }, [beatTrackIds]);
 
   useEffect(() => {
     if (small) return;
@@ -101,7 +96,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         let revealed = false;
         const render = (currentFrame: Frame, time: number) => {
           if (disposed || !visible || !output) return;
-          const beat = getPlaybackBeat(seed, beatTrackIdsRef.current);
+          const beat = getPlaybackBeat(seed, beatTrackIds);
           cover.set({
             cover: {
               params: [time / COVER_LOOP_SECONDS, kindIndex[kind], variant, beat],
@@ -142,7 +137,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       unsubscribeResize?.();
       output?.dispose();
     };
-  }, [coverKey, kind, label, seed, small]);
+  }, [beatTrackIds, coverKey, kind, label, seed, small]);
 
   return (
     <>
