@@ -102,6 +102,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.2.15)
+      '@vgpu/wgsl':
+        specifier: 0.3.0
+        version: 0.3.0(@vgpu/adapter-node@0.3.0)
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
