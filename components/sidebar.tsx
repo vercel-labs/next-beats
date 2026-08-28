@@ -8,7 +8,7 @@ import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-but
 import { MusicNote } from '@/components/ui/music-note';
 import { NavLink } from '@/components/ui/nav-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { coverAssetPath } from '@/features/artwork/cover-motif';
+import { coverAssetPath } from '@/features/artwork/artwork-motif';
 import { getPlaylists } from '@/features/playlist/playlist-queries';
 import { CurrentUserAvatar, CurrentUserAvatarSkeleton } from '@/features/user/components/current-user-avatar';
 import { LogOutButton } from '@/features/user/components/log-out-button';

@@ -16,8 +16,8 @@ import {
   coverAssetPath,
   PLAYLIST_VARIANT_COUNT,
   seedVector,
-} from '../features/artwork/cover-motif.ts';
-import type { ArtworkKind, CoverShape } from '../features/artwork/cover-motif.ts';
+} from '../features/artwork/artwork-motif.ts';
+import type { ArtworkKind, CoverShape } from '../features/artwork/artwork-motif.ts';
 import type { ChildProcess } from 'node:child_process';
 
 config({ path: '.env.local' });
@@ -51,7 +51,7 @@ async function studioServer() {
   if (configured) return { child: undefined, url: configured };
 
   const child = spawn('pnpm', ['dev', '--hostname', '127.0.0.1', '--port', String(STUDIO_PORT)], {
-    env: { ...process.env, COVER_STUDIO: '1', NEXT_DIST_DIR: '.next-cover-studio' },
+    env: { ...process.env, COVER_STUDIO: '1' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let logs = '';

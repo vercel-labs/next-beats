@@ -1,8 +1,8 @@
 import { ViewTransition } from 'react';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { coverAssetPath } from '@/features/artwork/artwork-motif';
 import { AlbumArt } from '@/features/artwork/components/album-art';
-import { coverAssetPath } from '@/features/artwork/cover-motif';
 import { PlayButton } from '@/features/track/components/play-button';
 import type { PlaylistWithTracks } from '@/types/playlist';
 

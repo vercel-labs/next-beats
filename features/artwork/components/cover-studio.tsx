@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { draw, initFromDevice, target } from 'vgpu';
-import coverShader from '@/features/artwork/album-art.wgsl';
-import { artworkVariant, seedVector } from '@/features/artwork/cover-motif';
-import type { ArtworkKind } from '@/features/artwork/cover-motif';
+import { artworkVariant, seedVector } from '@/features/artwork/artwork-motif';
+import type { ArtworkKind } from '@/features/artwork/artwork-motif';
+import coverShader from '@/features/artwork/artwork.wgsl';
 import type { Draw, Gpu, Target } from 'vgpu';
 
 type RenderOptions = {
