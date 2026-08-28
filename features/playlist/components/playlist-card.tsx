@@ -1,7 +1,7 @@
 import { ViewTransition } from 'react';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { coverAssetPath } from '@/features/artwork/artwork-motif';
+import { coverAsset } from '@/features/artwork/artwork-motif';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 import { PlayButton } from '@/features/track/components/play-button';
 import type { PlaylistWithTracks } from '@/types/playlist';
@@ -10,8 +10,8 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
   const prefetchedCovers = [
-    coverAssetPath(playlist.id, playlist.name, 'playlist', 'square'),
-    ...playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb')),
+    coverAsset(playlist.id, playlist.name, 'playlist', 'square'),
+    ...playlist.tracks.map(track => coverAsset(track.id, track.title, 'track', 'thumb')),
   ];
 
   return (

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
-import { coverAssetPath } from '@/features/artwork/artwork-motif';
+import { coverAsset } from '@/features/artwork/artwork-motif';
 import type { ArtworkKind } from '@/features/artwork/artwork-motif';
 import { mountLiveAlbumArt } from '@/features/artwork/artwork-runtime';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ type Props = {
 export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const staticShape = kind === 'genre' ? (small ? 'banner-thumb' : 'banner') : small ? 'thumb' : 'square';
+  const staticAsset = coverAsset(seed, label, kind, staticShape);
   const beatTrackIdsKey = beatTrackIds?.join('\0');
 
   useEffect(() => {
@@ -46,11 +47,8 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         alt=""
         fill
         loading="eager"
-        sizes={
-          small ? (staticShape === 'banner-thumb' ? '320px' : '80px') : staticShape === 'banner' ? '960px' : '512px'
-        }
-        src={coverAssetPath(seed, label, kind, staticShape)}
-        unoptimized
+        sizes={staticAsset.sizes}
+        src={staticAsset.src}
         className={cn(
           'album-art-fallback pointer-events-none absolute inset-0 z-10 block',
           kind === 'genre' ? 'object-fill' : 'object-cover',

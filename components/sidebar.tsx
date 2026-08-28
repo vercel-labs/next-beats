@@ -8,7 +8,7 @@ import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-but
 import { MusicNote } from '@/components/ui/music-note';
 import { NavLink } from '@/components/ui/nav-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { coverAssetPath } from '@/features/artwork/artwork-motif';
+import { coverAsset } from '@/features/artwork/artwork-motif';
 import { getPlaylists } from '@/features/playlist/playlist-queries';
 import { CurrentUserAvatar, CurrentUserAvatarSkeleton } from '@/features/user/components/current-user-avatar';
 import { LogOutButton } from '@/features/user/components/log-out-button';
@@ -106,8 +106,8 @@ async function SidebarPlaylists() {
           hoverPrefetch
           href={`/playlist/${pl.id}` as Route}
           preloadImageSources={[
-            coverAssetPath(pl.id, pl.name, 'playlist', 'square'),
-            ...pl.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb')),
+            coverAsset(pl.id, pl.name, 'playlist', 'square'),
+            ...pl.tracks.map(track => coverAsset(track.id, track.title, 'track', 'thumb')),
           ]}
           aria-label={pl.name}
           className={sidebarLink}

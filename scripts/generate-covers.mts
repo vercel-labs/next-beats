@@ -13,7 +13,7 @@ import { normalizeDatabaseUrl } from '../lib/database-url.ts';
 import {
   artworkVariant,
   COVER_SHAPES,
-  coverAssetPath,
+  coverAsset,
   PLAYLIST_VARIANT_COUNT,
   seedVector,
 } from '../features/artwork/artwork-motif.ts';
@@ -106,7 +106,7 @@ function shapesFor(kind: ArtworkKind) {
 }
 
 function outputPath(item: CoverItem, shape: CoverShape) {
-  return join('public', coverAssetPath(item.seed, item.label, item.kind, shape).slice(1));
+  return join('public', coverAsset(item.seed, item.label, item.kind, shape).src.slice(1));
 }
 
 function pngBytes(dataUrl: string) {

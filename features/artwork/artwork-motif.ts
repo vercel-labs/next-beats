@@ -135,13 +135,17 @@ function assetKey(value: string) {
   );
 }
 
-export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
-  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
-  if (kind === 'playlist') {
+export function coverAsset(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
+  let src: string;
+  if (kind === 'genre') src = `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
+  else if (kind === 'playlist') {
     const variant = artworkVariant(label, kind, seedVector(seed)[3]);
-    return `/covers/playlists/${variant}-${shape}.static.webp`;
-  }
-  return `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
+    src = `/covers/playlists/${variant}-${shape}.static.webp`;
+  } else src = `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
+
+  const sizes =
+    shape === 'banner' ? '960px' : shape === 'banner-thumb' ? '320px' : shape === 'square' ? '512px' : '80px';
+  return { sizes, src };
 }
 
 export function motifForTitle(title: string, fallback: number) {
