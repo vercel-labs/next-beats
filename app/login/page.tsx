@@ -1,11 +1,9 @@
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { MusicNote } from '@/components/ui/music-note';
 import { LoginMusicPreview } from '@/features/user/components/login-music-preview';
 import { SignInForm } from '@/features/user/components/sign-in-form';
-
-const SESSION_COOKIE = 'beats-user';
+import { getCurrentUser } from '@/features/user/user-queries';
 
 export default function LoginPage() {
   return (
@@ -29,7 +27,6 @@ export default function LoginPage() {
 }
 
 async function RedirectIfAuthed() {
-  const store = await cookies();
-  if (store.has(SESSION_COOKIE)) redirect('/');
+  if (await getCurrentUser()) redirect('/');
   return null;
 }
