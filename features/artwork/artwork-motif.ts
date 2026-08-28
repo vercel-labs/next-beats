@@ -1,5 +1,3 @@
-import { COVER_ASSET_VERSION } from './generated-cover-version';
-
 // Every seeded track has an art-directed composition. Keyword matching is only the
 // fallback for tracks added after the bundled catalog.
 const trackMotifs: Record<string, number> = {
@@ -87,18 +85,6 @@ const playlistMotifs: Record<string, number> = {
   'late night coding': 3,
 };
 
-// `kind` matches the shader: 0 is a square cover, 3 a genre banner. Thumbnails sample a
-// slightly wider field than the large art so the complete title-specific silhouette has
-// breathing room instead of turning into one cropped edge at 40px.
-export const COVER_SHAPES = [
-  { detail: 1, height: 512, name: 'square', width: 512 },
-  { detail: 1.08, height: 80, name: 'thumb', width: 80 },
-  { detail: 1, height: 288, name: 'banner', width: 960 },
-  { detail: 1.08, height: 96, name: 'banner-thumb', width: 320 },
-] as const;
-
-export type CoverShape = (typeof COVER_SHAPES)[number]['name'];
-
 export function seedVector(value: string): [number, number, number, number] {
   let a = 0x9e3779b9;
   let b = 0x243f6a88;
@@ -125,36 +111,6 @@ export function artworkVariant(label: string, kind: ArtworkKind, fallback: numbe
     );
   }
   return motifForTitle(label, fallback);
-}
-
-function assetKey(value: string) {
-  return (
-    value
-      .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, '-')
-      .replace(/^-|-$/g, '') || 'cover'
-  );
-}
-
-export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
-  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
-  if (kind === 'playlist') {
-    const variant = artworkVariant(label, kind, seedVector(seed)[3]);
-    return `/covers/playlists/${variant}-${shape}.static.webp`;
-  }
-  return `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
-}
-
-export function coverAsset(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
-  const dimensions = COVER_SHAPES.find(candidate => candidate.name === shape)!;
-  const sizes = shape === 'square' ? '512px' : shape === 'thumb' ? '80px' : `${dimensions.width}px`;
-  const path = coverAssetPath(seed, label, kind, shape);
-  return {
-    height: dimensions.height,
-    sizes,
-    src: `${path}?v=${COVER_ASSET_VERSION}`,
-    width: dimensions.width,
-  };
 }
 
 export function motifForTitle(title: string, fallback: number) {

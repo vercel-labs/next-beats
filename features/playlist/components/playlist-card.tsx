@@ -1,23 +1,18 @@
 import { ViewTransition } from 'react';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { coverAsset } from '@/features/artwork/artwork-motif';
 import { AlbumArt } from '@/features/artwork/components/album-art';
+import { playlistCoverPreloads } from '@/features/artwork/cover-assets';
 import { PlayButton } from '@/features/track/components/play-button';
 import type { PlaylistWithTracks } from '@/types/playlist';
 
 export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
-  const prefetchedCovers = [
-    coverAsset(playlist.id, playlist.name, 'playlist', 'square'),
-    ...playlist.tracks.map(track => coverAsset(track.id, track.title, 'track', 'thumb')),
-  ];
-
   return (
     <PrefetchLink
       href={`/playlist/${playlist.id}`}
-      preloadImageSources={prefetchedCovers}
+      preloadImageSources={playlistCoverPreloads(playlist)}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
       <div className="relative">

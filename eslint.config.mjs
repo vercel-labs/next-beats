@@ -7,7 +7,6 @@ const eslintConfig = [
       '**/next-env.d.ts',
       'wgsl-env.d.ts',
       '.next/**',
-      '.next-cover-studio/**',
       'node_modules/**',
       'generated/**',
     ],

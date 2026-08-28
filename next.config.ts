@@ -1,9 +1,6 @@
 import type { NextConfig } from 'next';
 
-const coverStudio = process.env.COVER_STUDIO === '1';
-
 const nextConfig: NextConfig = {
-  ...(coverStudio ? { distDir: '.next-cover-studio', typescript: { tsconfigPath: 'tsconfig.cover-studio.json' } } : {}),
   cacheComponents: true,
   async headers() {
     return [

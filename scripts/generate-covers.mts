@@ -1,69 +1,33 @@
-// Pre-generates WebP first frames through vGPU in Chrome. Large artwork animates live
-// after hydration; these stills make its first paint and compact thumbnails immediate.
-import { execFileSync, spawn } from 'node:child_process';
+// Pre-generates WebP first frames through vGPU. Large artwork animates live after
+// hydration; these stills make its first paint and compact thumbnails immediate.
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { setTimeout as delay } from 'node:timers/promises';
+import { fileURLToPath } from 'node:url';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { chromium } from '@playwright/test';
+import { resolveShader } from '@vgpu/wgsl/runtime';
 import { config } from 'dotenv';
+import { PNG } from 'pngjs';
+import { draw, init, target } from 'vgpu/node';
 import { PrismaClient } from '../generated/prisma/client.ts';
 import { normalizeDatabaseUrl } from '../lib/database-url.ts';
+import { COVER_SHAPES, coverAssetPath } from '../features/artwork/cover-assets.ts';
+import type { CoverShape } from '../features/artwork/cover-assets.ts';
 import {
   artworkVariant,
-  COVER_SHAPES,
-  coverAssetPath,
   PLAYLIST_VARIANT_COUNT,
   seedVector,
 } from '../features/artwork/artwork-motif.ts';
-import type { ArtworkKind, CoverShape } from '../features/artwork/artwork-motif.ts';
-import type { CoverStudioOptions, CoverStudioWindow } from '../features/artwork/cover-studio-types.ts';
-import type { ChildProcess } from 'node:child_process';
+import type { ArtworkKind } from '../features/artwork/artwork-motif.ts';
+import type { Draw, Gpu } from 'vgpu';
 
 config({ path: '.env.local' });
 
 type CoverItem = { kind: ArtworkKind; label: string; seed: string };
-const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const STUDIO_PORT = Number(process.env.COVER_STUDIO_PORT ?? 3217);
-const STUDIO_FALLBACK_URL = `http://127.0.0.1:${STUDIO_PORT}/cover-studio`;
 const COVER_VERSION_PATH = 'features/artwork/generated-cover-version.ts';
-
-async function isReachable(url: string) {
-  try {
-    const response = await fetch(url, { signal: AbortSignal.timeout(1_500) });
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
-async function studioServer() {
-  const configured = process.env.COVER_STUDIO_URL;
-  if (configured) return { child: undefined, url: configured };
-
-  const child = spawn('pnpm', ['dev', '--hostname', '127.0.0.1', '--port', String(STUDIO_PORT)], {
-    env: { ...process.env, COVER_STUDIO: '1' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-  let logs = '';
-  child.stdout?.on('data', chunk => (logs += String(chunk)));
-  child.stderr?.on('data', chunk => (logs += String(chunk)));
-
-  for (let attempt = 0; attempt < 90; attempt += 1) {
-    if (child.exitCode !== null) throw new Error(`Cover studio exited early.\n${logs}`);
-    if (await isReachable(STUDIO_FALLBACK_URL)) return { child, url: STUDIO_FALLBACK_URL };
-    await delay(1_000);
-  }
-
-  child.kill('SIGTERM');
-  throw new Error(`Timed out starting the cover studio.\n${logs}`);
-}
-
-function stopServer(child: ChildProcess | undefined) {
-  if (child?.exitCode === null) child.kill('SIGTERM');
-}
+const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
 async function coverCatalog(): Promise<CoverItem[]> {
   const connectionString = normalizeDatabaseUrl(process.env.DATABASE_URL!);
@@ -112,38 +76,51 @@ function updateCoverVersion(paths: readonly string[]) {
   }
 }
 
-function pngBytes(dataUrl: string) {
-  return Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64');
+function unpremultiply(pixels: Uint8Array) {
+  for (let index = 0; index < pixels.length; index += 4) {
+    const alpha = pixels[index + 3];
+    if (alpha === 0 || alpha === 255) continue;
+    const scale = 255 / alpha;
+    pixels[index] = Math.min(255, Math.round(pixels[index] * scale));
+    pixels[index + 1] = Math.min(255, Math.round(pixels[index + 1] * scale));
+    pixels[index + 2] = Math.min(255, Math.round(pixels[index + 2] * scale));
+  }
+  return pixels;
+}
+
+async function writeCoverFrame(gpu: Gpu, cover: Draw, item: CoverItem, shape: (typeof COVER_SHAPES)[number], path: string) {
+  const output = target(gpu, { label: `cover-${item.kind}-${item.seed}-${shape.name}`, size: [shape.width, shape.height] });
+  const values = seedVector(item.seed);
+  const variant = artworkVariant(item.label, item.kind, values[3]);
+  cover.set({
+    cover: {
+      params: [0, kindIndex[item.kind], variant, 0],
+      seed: values,
+      shape: [shape.width / shape.height, shape.detail, 0, 0],
+    },
+  });
+  cover.draw(output);
+
+  const png = new PNG({ height: shape.height, width: shape.width });
+  png.data.set(unpremultiply(await output.read()));
+  writeFileSync(path, PNG.sync.write(png));
+  output.color.destroy();
 }
 
 async function main() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required. Add it to .env.local first.');
   const catalog = await coverCatalog();
-  const { child, url } = await studioServer();
-  const browser = await chromium.launch({
-    args: ['--disable-gpu-sandbox', '--enable-unsafe-webgpu'],
-    executablePath: existsSync(CHROME_PATH) ? CHROME_PATH : undefined,
-    headless: process.env.COVER_HEADLESS === '1',
+  const resolved = await resolveShader({
+    entry: fileURLToPath(new URL('../features/artwork/artwork.wgsl', import.meta.url)),
   });
+  const gpu = await init({ powerPreference: 'low-power' });
 
   try {
-    const page = await browser.newPage();
-    page.on('console', message => console.log(`[cover-studio:${message.type()}] ${message.text()}`));
-    page.on('pageerror', error => console.error(`[cover-studio:error] ${error.message}`));
-    await page.context().addCookies([{ name: 'beats-user', value: 'cover-studio', url: new URL(url).origin }]);
-    await page.goto(url, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(3_000);
-    console.log(`[cover-studio:status] ${await page.locator('[data-cover-studio-status]').innerText()}`);
-    await page.waitForFunction(
-      () => {
-        const studioWindow = window as CoverStudioWindow;
-        return studioWindow.__coverStudioReady === true || typeof studioWindow.__coverStudioError === 'string';
-      },
-      undefined,
-      { timeout: 60_000 },
-    );
-    const studioError = await page.evaluate(() => (window as CoverStudioWindow).__coverStudioError);
-    if (studioError) throw new Error(`Cover studio failed: ${studioError}`);
+    const cover = draw(gpu, {
+      entry: { fragment: 'fs_main' },
+      label: 'cover-generator',
+      shader: resolved.wgsl,
+    });
 
     const generatedPaths: string[] = [];
     const report: string[] = [];
@@ -152,22 +129,8 @@ async function main() {
         console.log(`[cover] ${item.kind.padEnd(8)} ${item.label.padEnd(28)} ${shape.name}`);
         const scratch = mkdtempSync(join(tmpdir(), 'next-beats-covers-'));
         try {
-          const options: CoverStudioOptions = {
-            detail: shape.detail,
-            height: shape.height,
-            kind: item.kind,
-            label: item.label,
-            seed: item.seed,
-            turn: 0,
-            width: shape.width,
-          };
-          const dataUrl = await page.evaluate(async value => {
-            const studioWindow = window as CoverStudioWindow;
-            if (!studioWindow.__renderCoverFrame) throw new Error('Cover studio renderer is unavailable.');
-            return studioWindow.__renderCoverFrame(value);
-          }, options);
           const framePath = join(scratch, 'cover.png');
-          writeFileSync(framePath, pngBytes(dataUrl));
+          await writeCoverFrame(gpu, cover, item, shape, framePath);
 
           const still = outputPath(item, shape.name);
           mkdirSync(dirname(still), { recursive: true });
@@ -184,8 +147,8 @@ async function main() {
     console.log(report.join('\n'));
     console.log(`\n${report.length} static fallback assets.`);
   } finally {
-    await browser.close();
-    stopServer(child);
+    await gpu.settled();
+    gpu.dispose();
   }
 }
 
