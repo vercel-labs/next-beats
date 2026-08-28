@@ -45,6 +45,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       {kind === 'genre' ? (
         <Image
           alt=""
+          decoding="sync"
           width={staticAsset.width}
           height={staticAsset.height}
           loading="eager"
@@ -55,6 +56,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
       ) : (
         <Image
           alt=""
+          decoding="sync"
           fill
           loading="eager"
           sizes={staticAsset.sizes}
