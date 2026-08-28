@@ -17,6 +17,7 @@ playwright-report
 
 # next.js
 /.next/
+/.next-cover-studio/
 /out/
 
 # production

@@ -188,6 +188,7 @@ function scheduleDrum(ctx: AudioContext, dest: AudioNode, hit: DrumHit, time: nu
 export type ScheduledNodes = {
   stopAll: (immediate?: boolean) => void;
   masterGain: GainNode;
+  kickTimes: number[];
 };
 
 /**
@@ -247,6 +248,7 @@ export function scheduleBar(
   const stepsPerBar = 16;
   const secPerStep = 60 / bpm / 4;
   const nodesToStop: { stop: (t?: number) => void }[] = [];
+  const kickTimes: number[] = [];
 
   const masterGain = ctx.createGain();
   masterGain.gain.value = (volume / 100) * 0.15;
@@ -402,13 +404,16 @@ export function scheduleBar(
         if ((isInPattern && !drop) || addGhost) {
           const humanize = (drumRand() - 0.5) * 0.01;
           const ghostVol = addGhost ? (volume / 100) * 0.5 : volume / 100;
-          scheduleDrum(ctx, dryGain, hit, t + humanize, ghostVol);
+          const hitTime = t + humanize;
+          scheduleDrum(ctx, dryGain, hit, hitTime, ghostVol);
+          if (hit === 'kick') kickTimes.push(hitTime);
         }
       }
     }
   }
 
   return {
+    kickTimes,
     stopAll: (immediate = false) => {
       if (immediate) {
         nodesToStop.forEach(n => {

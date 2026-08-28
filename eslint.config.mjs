@@ -3,7 +3,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 
 const eslintConfig = [
   {
-    ignores: ['**/next-env.d.ts', '.next/**', 'node_modules/**', 'generated/**'],
+    ignores: ['**/next-env.d.ts', 'wgsl-env.d.ts', '.next/**', 'node_modules/**', 'generated/**'],
   },
   ...nextConfig,
   eslintConfigPrettier,

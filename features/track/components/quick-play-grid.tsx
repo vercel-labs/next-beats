@@ -1,7 +1,7 @@
 import { Music } from 'lucide-react';
 import { ViewTransition } from 'react';
-import { AlbumArt } from '@/components/ui/album-art';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { TrackPlayRow, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';
 import { getRecentlyPlayed } from '@/features/track/track-queries';
 
@@ -18,7 +18,13 @@ export async function QuickPlayGrid() {
           <TrackPlayRow track={track}>
             <div className="bg-card/60 hover:bg-card dark:bg-card-dark/60 dark:hover:bg-card-dark group/quick flex items-center gap-3 rounded-md px-3 py-2 transition-colors">
               <TrackIndexCell trackId={track.id} />
-              <AlbumArt coverColor={track.coverColor} size="sm" className="!h-10 !w-10 !rounded-md" />
+              <AlbumArt
+                coverColor={track.coverColor}
+                coverSeed={track.id}
+                label={track.title}
+                size="sm"
+                className="!h-10 !w-10 !rounded-md"
+              />
               <div className="flex min-w-0 flex-1 flex-col">
                 <NowPlayingTrackLink trackId={track.id} href={`/track/${track.id}`}>
                   {track.title}

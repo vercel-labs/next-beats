@@ -132,9 +132,7 @@
 .card-play-btn {
   opacity: 1;
   transform: translateY(0);
-  transition:
-    opacity 0.2s,
-    transform 0.2s;
+  transition: transform 0.2s;
 }
 @media (hover: hover) {
   .card-play-btn {
@@ -355,4 +353,24 @@
 html.boundary-mode :is([data-component], [data-sonner-toast]) {
   outline: 2px solid #4f6ef7;
   outline-offset: -2px;
+}
+
+/* Album covers use a pre-generated image like a video poster, then hand off to
+   the live WebGPU canvas after its first frame has finished rendering. */
+.album-art-shader {
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.album-art-shader[data-ready] {
+  opacity: 1;
+}
+
+.album-art-fallback {
+  opacity: 1;
+  transition: opacity 160ms ease-out;
+}
+
+.album-art-shader[data-ready] ~ .album-art-fallback {
+  opacity: 0;
 }

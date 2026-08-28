@@ -1,6 +1,6 @@
-import { AlbumArt } from '@/components/ui/album-art';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { DeletePlaylistButton } from '@/features/playlist/components/playlist-interactions';
 import { PlaylistTrackList } from '@/features/playlist/components/playlist-track-list';
 import { getPlaylist } from '@/features/playlist/playlist-queries';
@@ -14,6 +14,10 @@ export async function PlaylistDetail({ id }: { id: string }) {
       <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
         <AlbumArt
           coverColor={playlist.coverColor}
+          coverSeed={playlist.id}
+          label={playlist.name}
+          kind="playlist"
+          beatTrackIds={playlist.tracks.map(track => track.id)}
           size="lg"
           className="!h-40 !w-40 !rounded-md shadow-2xl sm:!h-48 sm:!w-48"
         />

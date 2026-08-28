@@ -21,6 +21,7 @@ A [Next.js 16.3](https://nextjs.org/blog/next-16-3) music player demo showcasing
 - **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** animate content updates and route changes as you move through the player.
 - **[Async React](https://github.com/rickhanlonii/async-react)** keeps the UI interactive during server work with `Suspense`, `useOptimistic`, `useTransition`, `useActionState`, `useFormStatus`, and `use`.
+- **[vGPU](https://github.com/vercel-labs/vgpu) cover art** pairs theme-matched, beat-reactive shaders with instant pre-rendered fallbacks.
 
 ## Getting started
 
@@ -31,6 +32,12 @@ pnpm install
 pnpm run prisma.push
 pnpm run prisma.seed
 pnpm run dev
+```
+
+To regenerate a compact track, playlist, and genre cover from the current database:
+
+```bash
+pnpm covers:icons
 ```
 
 <details>
@@ -58,6 +65,7 @@ pnpm test:e2e
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, View Transitions, `useOptimistic`
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
 - **[Prisma 7](https://www.prisma.io/)** on PostgreSQL
+- **[vGPU](https://github.com/vercel-labs/vgpu)** for animated WebGPU cover art and pre-rendered first frames
 - **[Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)** for procedural per-genre synthesis
 
 ## License

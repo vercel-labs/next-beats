@@ -1,5 +1,5 @@
-import { AlbumArt } from '@/components/ui/album-art';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { GenrePill } from '@/features/genre/components/genre-card';
 import { getTrack } from '@/features/track/track-queries';
 import { formatDuration, formatCount } from '@/lib/utils';
@@ -11,6 +11,9 @@ export async function TrackHeader({ id }: { id: string }) {
     <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
       <AlbumArt
         coverColor={track.coverColor}
+        coverSeed={track.id}
+        label={track.title}
+        kind="album"
         size="lg"
         className="!h-40 !w-40 shrink-0 !rounded-md shadow-2xl lg:!h-48 lg:!w-48"
       />

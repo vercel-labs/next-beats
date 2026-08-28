@@ -1,7 +1,7 @@
 import { ViewTransition } from 'react';
-import { AlbumArt } from '@/components/ui/album-art';
 import { Collapsible } from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArt } from '@/features/artwork/components/album-art';
 import { AddToPlaylistMenu } from '@/features/playlist/components/add-to-playlist-menu';
 import { getPlaylistMenuItems } from '@/features/playlist/playlist-queries';
 import { FavoriteButton, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';
@@ -23,7 +23,7 @@ export async function TrackRow({ track, index, showAlbum = true, queue }: Props 
     <TrackPlayRow track={track} queue={queue}>
       <div className="flex items-center gap-3 px-3 py-2">
         <TrackIndexCell trackId={track.id} index={index} />
-        <AlbumArt coverColor={track.coverColor} size="sm" />
+        <AlbumArt coverColor={track.coverColor} coverSeed={track.id} label={track.title} size="sm" />
         <div className="flex min-w-0 flex-1 flex-col">
           <NowPlayingTrackLink trackId={track.id} href={`/track/${track.id}`}>
             {track.title}

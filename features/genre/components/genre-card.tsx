@@ -1,5 +1,6 @@
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlbumArtCover } from '@/features/artwork/components/album-art-cover';
 import type { GenreSummary } from '@/types/genre';
 
 const genreColors: Record<string, string> = {
@@ -29,8 +30,9 @@ export function GenreCard({ genre }: { genre: GenreSummary }) {
       href={`/genre/${genre.genre}`}
       className="group relative overflow-hidden rounded-lg transition-transform hover:scale-[1.02]"
     >
-      <div className={`flex h-28 items-end bg-gradient-to-br p-4 ${gradient}`}>
-        <div>
+      <div className={`relative flex h-28 items-end bg-gradient-to-br p-4 ${gradient}`}>
+        <AlbumArtCover seed={genre.genre} label={genre.genre} kind="genre" />
+        <div className="relative z-20">
           <span className="text-lg font-bold text-white capitalize drop-shadow-md">{genre.genre}</span>
           <p className="text-xs text-white/70">{genre.count} tracks</p>
         </div>
