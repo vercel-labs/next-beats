@@ -10,8 +10,8 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
   const prefetchedCovers = [
-    coverAssetPath(playlist.id, playlist.name, 'playlist', 'square', true),
-    ...playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb', true)),
+    coverAssetPath(playlist.id, playlist.name, 'playlist', 'square'),
+    ...playlist.tracks.map(track => coverAssetPath(track.id, track.title, 'track', 'thumb')),
   ];
 
   return (

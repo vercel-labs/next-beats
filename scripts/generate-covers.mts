@@ -106,7 +106,7 @@ function shapesFor(kind: ArtworkKind) {
 }
 
 function outputPath(item: CoverItem, shape: CoverShape) {
-  return join('public', coverAssetPath(item.seed, item.label, item.kind, shape, true).slice(1));
+  return join('public', coverAssetPath(item.seed, item.label, item.kind, shape).slice(1));
 }
 
 function pngBytes(dataUrl: string) {

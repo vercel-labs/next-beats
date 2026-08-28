@@ -68,6 +68,7 @@ export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
 
 /** Every movement is constructed to return to its origin over this live loop. */
 export const COVER_LOOP_SECONDS = 12;
+export const GENRE_COVER_ASPECT = 10 / 3;
 
 const genreMotifs: Record<string, number> = {
   electronic: 0,
@@ -134,14 +135,13 @@ function assetKey(value: string) {
   );
 }
 
-export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape, still = false) {
-  const suffix = still ? '.static.webp' : '.webp';
-  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}${suffix}`;
+export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
+  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
   if (kind === 'playlist') {
     const variant = artworkVariant(label, kind, seedVector(seed)[3]);
-    return `/covers/playlists/${variant}-${shape}${suffix}`;
+    return `/covers/playlists/${variant}-${shape}.static.webp`;
   }
-  return `/covers/tracks/${assetKey(seed)}-${shape}${suffix}`;
+  return `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
 }
 
 export function motifForTitle(title: string, fallback: number) {
