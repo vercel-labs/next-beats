@@ -355,22 +355,16 @@ html.boundary-mode :is([data-component], [data-sonner-toast]) {
   outline-offset: -2px;
 }
 
-/* Album covers use a pre-generated image like a video poster, then hand off to
-   the live WebGPU canvas after its first frame has finished rendering. */
+/* Album covers use a pre-generated image like a video poster. Swap it for the
+   live WebGPU canvas only after the first frame has finished rendering. */
 .album-art-shader {
-  opacity: 0;
-  transition: opacity 160ms ease-out;
+  visibility: hidden;
 }
 
 .album-art-shader[data-ready] {
-  opacity: 1;
-}
-
-.album-art-fallback {
-  opacity: 1;
-  transition: opacity 160ms ease-out;
+  visibility: visible;
 }
 
 .album-art-shader[data-ready] ~ .album-art-fallback {
-  opacity: 0;
+  visibility: hidden;
 }
