@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { draw, initFromDevice, target } from 'vgpu';
 import { artworkVariant, seedVector } from '@/features/artwork/artwork-motif';
 import coverShader from '@/features/artwork/artwork.wgsl';
+import type { ArtworkKind } from '@/features/artwork/artwork-motif';
 import type { CoverStudioWindow } from '@/features/artwork/cover-studio-types';
 import type { Draw, Gpu, Target } from 'vgpu';
 

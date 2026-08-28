@@ -42,14 +42,27 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
           className="album-art-shader pointer-events-none absolute inset-0 z-20 block h-full w-full"
         />
       )}
-      <Image
-        alt=""
-        fill
-        loading="eager"
-        sizes={staticAsset.sizes}
-        src={staticAsset.src}
-        className="album-art-fallback pointer-events-none absolute inset-0 z-10 block object-cover"
-      />
+      {kind === 'genre' ? (
+        <Image
+          alt=""
+          width={staticAsset.width}
+          height={staticAsset.height}
+          loading="eager"
+          src={staticAsset.src}
+          unoptimized
+          className="album-art-fallback pointer-events-none absolute top-0 left-1/2 z-10 block h-full w-auto max-w-none -translate-x-1/2"
+        />
+      ) : (
+        <Image
+          alt=""
+          fill
+          loading="eager"
+          sizes={staticAsset.sizes}
+          src={staticAsset.src}
+          unoptimized
+          className="album-art-fallback pointer-events-none absolute inset-0 z-10 block object-cover"
+        />
+      )}
     </>
   );
 }

@@ -142,9 +142,9 @@ export function coverAsset(seed: string, label: string, kind: ArtworkKind, shape
     src = `/covers/playlists/${variant}-${shape}.static.webp`;
   } else src = `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
 
-  const sizes =
-    shape === 'banner' ? '960px' : shape === 'banner-thumb' ? '320px' : shape === 'square' ? '512px' : '80px';
-  return { sizes, src };
+  const dimensions = COVER_SHAPES.find(candidate => candidate.name === shape)!;
+  const sizes = shape === 'square' ? '512px' : shape === 'thumb' ? '80px' : `${dimensions.width}px`;
+  return { height: dimensions.height, sizes, src, width: dimensions.width };
 }
 
 export function motifForTitle(title: string, fallback: number) {
