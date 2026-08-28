@@ -6,6 +6,7 @@ import type { ArtworkKind } from './artwork-motif';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
 
 const PREWARM_MARGIN = '256px 0px';
+const FALLBACK_TIME = 0;
 const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
 let gpuPromise: Promise<Gpu> | undefined;
@@ -75,9 +76,13 @@ export function mountLiveAlbumArt({ canvas, seed, label, kind, beatTrackIds }: L
   function startRendering() {
     if (!gpu || !renderCover || !visible) return;
     if (reducedMotion) {
-      void frame(gpu, currentFrame => renderCover?.(currentFrame, seedValues[3] * COVER_LOOP_SECONDS)).done;
+      void frame(gpu, currentFrame => renderCover?.(currentFrame, FALLBACK_TIME)).done;
     } else {
-      unregisterAnimation ??= registerAnimatedCover(gpu, renderCover);
+      let firstFrameTime: number | undefined;
+      unregisterAnimation ??= registerAnimatedCover(gpu, (currentFrame, time) => {
+        firstFrameTime ??= time;
+        renderCover?.(currentFrame, FALLBACK_TIME + time - firstFrameTime);
+      });
     }
   }
 

@@ -151,7 +151,7 @@ async function main() {
             kind: item.kind,
             label: item.label,
             seed: item.seed,
-            turn: seedVector(item.seed)[3],
+            turn: 0,
             width: shape.width,
           };
           const dataUrl = await page.evaluate(async value => {
