@@ -15,11 +15,7 @@ import { PrismaClient } from '../generated/prisma/client.ts';
 import { normalizeDatabaseUrl } from '../lib/database-url.ts';
 import { COVER_SHAPES, coverAssetPath } from '../features/artwork/cover-assets.ts';
 import type { CoverShape } from '../features/artwork/cover-assets.ts';
-import {
-  artworkVariant,
-  PLAYLIST_VARIANT_COUNT,
-  seedVector,
-} from '../features/artwork/artwork-motif.ts';
+import { artworkVariant, PLAYLIST_VARIANT_COUNT, seedVector } from '../features/artwork/artwork-motif.ts';
 import type { ArtworkKind } from '../features/artwork/artwork-motif.ts';
 import type { Draw, Gpu } from 'vgpu';
 
@@ -88,8 +84,17 @@ function unpremultiply(pixels: Uint8Array) {
   return pixels;
 }
 
-async function writeCoverFrame(gpu: Gpu, cover: Draw, item: CoverItem, shape: (typeof COVER_SHAPES)[number], path: string) {
-  const output = target(gpu, { label: `cover-${item.kind}-${item.seed}-${shape.name}`, size: [shape.width, shape.height] });
+async function writeCoverFrame(
+  gpu: Gpu,
+  cover: Draw,
+  item: CoverItem,
+  shape: (typeof COVER_SHAPES)[number],
+  path: string,
+) {
+  const output = target(gpu, {
+    label: `cover-${item.kind}-${item.seed}-${shape.name}`,
+    size: [shape.width, shape.height],
+  });
   const values = seedVector(item.seed);
   const variant = artworkVariant(item.label, item.kind, values[3]);
   cover.set({
