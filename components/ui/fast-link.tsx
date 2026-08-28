@@ -1,9 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef } from 'react';
+import { startTransition, useRef } from 'react';
 
-export function FastLink({ onClick, onMouseDown, ...props }: React.ComponentProps<typeof Link>) {
+type Props = React.ComponentProps<typeof Link> & {
+  onPressNavigate?: () => void;
+};
+
+export function FastLink({ onClick, onMouseDown, onPressNavigate, ...props }: Props) {
   const navigatedOnMouseDown = useRef(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -26,12 +30,15 @@ export function FastLink({ onClick, onMouseDown, ...props }: React.ComponentProp
           return;
         }
 
-        event.currentTarget.click();
-        navigatedOnMouseDown.current = true;
-        clearTimeout(resetTimer.current);
-        resetTimer.current = setTimeout(() => {
-          navigatedOnMouseDown.current = false;
-        }, 500);
+        startTransition(() => {
+          onPressNavigate?.();
+          event.currentTarget.click();
+          navigatedOnMouseDown.current = true;
+          clearTimeout(resetTimer.current);
+          resetTimer.current = setTimeout(() => {
+            navigatedOnMouseDown.current = false;
+          }, 500);
+        });
         event.preventDefault();
         onMouseDown?.(event);
       }}
