@@ -1,8 +1,8 @@
 import { Heart, Home, Library, Plus, Search, Music } from 'lucide-react';
-import Link from 'next/link';
 import { Suspense } from 'react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import ErrorBoundary from '@/components/ui/error-boundary';
+import { FastLink } from '@/components/ui/fast-link';
 import { GitHubIcon } from '@/components/ui/github-icon';
 import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-button-link';
 import { MusicNote } from '@/components/ui/music-note';
@@ -23,14 +23,14 @@ export function Sidebar() {
     <aside className="hidden w-[4.5rem] flex-col gap-2 p-2 sm:flex lg:w-[17.5rem]">
       <div className="bg-card dark:bg-card-dark rounded-lg p-3 lg:p-4">
         <div className="mb-4 hidden items-center justify-between lg:flex">
-          <Link
+          <FastLink
             href="/"
             className="text-accent inline-flex items-center gap-2 px-1 text-xl font-bold tracking-tight"
             aria-label="NextBeats home"
           >
             <MusicNote size={24} className="text-accent" />
             <span>NextBeats</span>
-          </Link>
+          </FastLink>
           <a
             href="https://github.com/vercel-labs/next-beats"
             target="_blank"

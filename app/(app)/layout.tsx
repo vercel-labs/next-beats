@@ -9,7 +9,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <PlayerProvider>
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto overscroll-contain pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-24 pl-[env(safe-area-inset-left)] sm:pb-0">
+        <main className="min-w-0 flex-1 overflow-y-auto overscroll-y-contain pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-24 pl-[env(safe-area-inset-left)] sm:pb-0">
           {children}
         </main>
       </div>

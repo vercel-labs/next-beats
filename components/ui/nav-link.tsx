@@ -1,13 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { Boundary } from '@/components/demo/boundary';
 import { usePrefetchDefault } from '@/components/demo/use-prefetch-default';
+import { FastLink } from '@/components/ui/fast-link';
 import { preloadImages } from '@/lib/preload-images';
 import type { PreloadImageSource } from '@/lib/preload-images';
 import type { Route } from 'next';
+import type Link from 'next/link';
 
 type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 'href' | 'prefetch'> & {
   href: Route<T> | URL;
@@ -56,7 +57,7 @@ function NavLinkShell<T extends string>({
   if (resolvedPrefetch) preloadImages(preloadImageSources);
   const showIntent = () => setIntent(true);
   return (
-    <Link
+    <FastLink
       prefetch={resolvedPrefetch}
       {...rest}
       href={href as Route}
