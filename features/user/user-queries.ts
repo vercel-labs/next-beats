@@ -4,7 +4,6 @@ import { cacheLife } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
-import type { Route } from 'next';
 
 const SESSION_COOKIE = 'beats-user';
 
@@ -28,7 +27,7 @@ export async function getCurrentUserName() {
 export async function verifyAuth() {
   const userId = await getCurrentUser();
   if (!userId) {
-    redirect('/logout' as Route);
+    redirect('/login');
   }
   return userId;
 }
