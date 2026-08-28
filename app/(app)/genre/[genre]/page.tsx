@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: PageProps<'/genre/[genre]'>):
 
 export default function GenreDetailPage({ params }: PageProps<'/genre/[genre]'>) {
   return (
-    <>
+    <div>
       <Suspense
         fallback={
           <>
@@ -34,6 +34,6 @@ export default function GenreDetailPage({ params }: PageProps<'/genre/[genre]'>)
           })}
         </Crossfade>
       </Suspense>
-    </>
+    </div>
   );
 }
