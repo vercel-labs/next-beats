@@ -1,3 +1,5 @@
+import { COVER_ASSET_VERSION } from './generated-cover-version';
+
 // Every seeded track has an art-directed composition. Keyword matching is only the
 // fallback for tracks added after the bundled catalog.
 const trackMotifs: Record<string, number> = {
@@ -134,17 +136,25 @@ function assetKey(value: string) {
   );
 }
 
-export function coverAsset(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
-  let src: string;
-  if (kind === 'genre') src = `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
-  else if (kind === 'playlist') {
+export function coverAssetPath(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
+  if (kind === 'genre') return `/covers/genres/${assetKey(label)}-${shape}.static.webp`;
+  if (kind === 'playlist') {
     const variant = artworkVariant(label, kind, seedVector(seed)[3]);
-    src = `/covers/playlists/${variant}-${shape}.static.webp`;
-  } else src = `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
+    return `/covers/playlists/${variant}-${shape}.static.webp`;
+  }
+  return `/covers/tracks/${assetKey(seed)}-${shape}.static.webp`;
+}
 
+export function coverAsset(seed: string, label: string, kind: ArtworkKind, shape: CoverShape) {
   const dimensions = COVER_SHAPES.find(candidate => candidate.name === shape)!;
   const sizes = shape === 'square' ? '512px' : shape === 'thumb' ? '80px' : `${dimensions.width}px`;
-  return { height: dimensions.height, sizes, src, width: dimensions.width };
+  const path = coverAssetPath(seed, label, kind, shape);
+  return {
+    height: dimensions.height,
+    sizes,
+    src: `${path}?v=${COVER_ASSET_VERSION}`,
+    width: dimensions.width,
+  };
 }
 
 export function motifForTitle(title: string, fallback: number) {

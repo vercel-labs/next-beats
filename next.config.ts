@@ -5,6 +5,14 @@ const coverStudio = process.env.COVER_STUDIO === '1';
 const nextConfig: NextConfig = {
   ...(coverStudio ? { distDir: '.next-cover-studio', typescript: { tsconfigPath: 'tsconfig.cover-studio.json' } } : {}),
   cacheComponents: true,
+  async headers() {
+    return [
+      {
+        source: '/covers/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+    ];
+  },
   reactCompiler: true,
   partialPrefetching: true,
   turbopack: {

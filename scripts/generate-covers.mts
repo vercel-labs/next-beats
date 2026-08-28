@@ -1,6 +1,7 @@
 // Pre-generates WebP first frames through vGPU in Chrome. Large artwork animates live
 // after hydration; these stills make its first paint and compact thumbnails immediate.
 import { execFileSync, spawn } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -13,7 +14,7 @@ import { normalizeDatabaseUrl } from '../lib/database-url.ts';
 import {
   artworkVariant,
   COVER_SHAPES,
-  coverAsset,
+  coverAssetPath,
   PLAYLIST_VARIANT_COUNT,
   seedVector,
 } from '../features/artwork/artwork-motif.ts';
@@ -27,6 +28,7 @@ type CoverItem = { kind: ArtworkKind; label: string; seed: string };
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const STUDIO_PORT = Number(process.env.COVER_STUDIO_PORT ?? 3217);
 const STUDIO_FALLBACK_URL = `http://127.0.0.1:${STUDIO_PORT}/cover-studio`;
+const COVER_VERSION_PATH = 'features/artwork/generated-cover-version.ts';
 
 async function isReachable(url: string) {
   try {
@@ -97,7 +99,17 @@ function shapesFor(kind: ArtworkKind) {
 }
 
 function outputPath(item: CoverItem, shape: CoverShape) {
-  return join('public', coverAsset(item.seed, item.label, item.kind, shape).src.slice(1));
+  return join('public', coverAssetPath(item.seed, item.label, item.kind, shape).slice(1));
+}
+
+function updateCoverVersion(paths: readonly string[]) {
+  const hash = createHash('sha256');
+  for (const path of [...paths].sort()) hash.update(path).update(readFileSync(path));
+  const version = hash.digest('hex').slice(0, 12);
+  const source = `// Updated by \`pnpm covers:icons\` whenever the generated WebPs change.\nexport const COVER_ASSET_VERSION = '${version}';\n`;
+  if (!existsSync(COVER_VERSION_PATH) || readFileSync(COVER_VERSION_PATH, 'utf8') !== source) {
+    writeFileSync(COVER_VERSION_PATH, source);
+  }
 }
 
 function pngBytes(dataUrl: string) {
@@ -133,6 +145,7 @@ async function main() {
     const studioError = await page.evaluate(() => (window as CoverStudioWindow).__coverStudioError);
     if (studioError) throw new Error(`Cover studio failed: ${studioError}`);
 
+    const generatedPaths: string[] = [];
     const report: string[] = [];
     for (const item of catalog) {
       for (const shape of shapesFor(item.kind)) {
@@ -159,6 +172,7 @@ async function main() {
           const still = outputPath(item, shape.name);
           mkdirSync(dirname(still), { recursive: true });
           execFileSync('img2webp', ['-lossy', '-q', '78', '-m', '3', framePath, '-o', still], { stdio: 'pipe' });
+          generatedPaths.push(still);
           report.push(`${still.padEnd(62)} ${(readFileSync(still).length / 1024).toFixed(0)} KB`);
         } finally {
           rmSync(scratch, { force: true, recursive: true });
@@ -166,6 +180,7 @@ async function main() {
       }
     }
 
+    updateCoverVersion(generatedPaths);
     console.log(report.join('\n'));
     console.log(`\n${report.length} static fallback assets.`);
   } finally {
