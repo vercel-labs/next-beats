@@ -18,21 +18,12 @@ import {
   seedVector,
 } from '../features/artwork/artwork-motif.ts';
 import type { ArtworkKind, CoverShape } from '../features/artwork/artwork-motif.ts';
+import type { CoverStudioOptions, CoverStudioWindow } from '../features/artwork/cover-studio-types.ts';
 import type { ChildProcess } from 'node:child_process';
 
 config({ path: '.env.local' });
 
 type CoverItem = { kind: ArtworkKind; label: string; seed: string };
-type StudioOptions = {
-  detail: number;
-  height: number;
-  kind: ArtworkKind;
-  label: string;
-  seed: string;
-  turn: number;
-  width: number;
-};
-
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const STUDIO_PORT = Number(process.env.COVER_STUDIO_PORT ?? 3217);
 const STUDIO_FALLBACK_URL = `http://127.0.0.1:${STUDIO_PORT}/cover-studio`;
@@ -132,11 +123,14 @@ async function main() {
     await page.waitForTimeout(3_000);
     console.log(`[cover-studio:status] ${await page.locator('[data-cover-studio-status]').innerText()}`);
     await page.waitForFunction(
-      () => window.__coverStudioReady === true || typeof window.__coverStudioError === 'string',
+      () => {
+        const studioWindow = window as CoverStudioWindow;
+        return studioWindow.__coverStudioReady === true || typeof studioWindow.__coverStudioError === 'string';
+      },
       undefined,
       { timeout: 60_000 },
     );
-    const studioError = await page.evaluate(() => window.__coverStudioError);
+    const studioError = await page.evaluate(() => (window as CoverStudioWindow).__coverStudioError);
     if (studioError) throw new Error(`Cover studio failed: ${studioError}`);
 
     const report: string[] = [];
@@ -145,7 +139,7 @@ async function main() {
         console.log(`[cover] ${item.kind.padEnd(8)} ${item.label.padEnd(28)} ${shape.name}`);
         const scratch = mkdtempSync(join(tmpdir(), 'next-beats-covers-'));
         try {
-          const options: StudioOptions = {
+          const options: CoverStudioOptions = {
             detail: shape.detail,
             height: shape.height,
             kind: item.kind,
@@ -155,8 +149,9 @@ async function main() {
             width: shape.width,
           };
           const dataUrl = await page.evaluate(async value => {
-            if (!window.__renderCoverFrame) throw new Error('Cover studio renderer is unavailable.');
-            return window.__renderCoverFrame(value);
+            const studioWindow = window as CoverStudioWindow;
+            if (!studioWindow.__renderCoverFrame) throw new Error('Cover studio renderer is unavailable.');
+            return studioWindow.__renderCoverFrame(value);
           }, options);
           const framePath = join(scratch, 'cover.png');
           writeFileSync(framePath, pngBytes(dataUrl));

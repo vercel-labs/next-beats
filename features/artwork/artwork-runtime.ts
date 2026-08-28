@@ -1,6 +1,6 @@
 import { draw, frame, frameLoop, init, surface } from 'vgpu';
 import { getPlaybackBeat } from '@/lib/audio/audio-scheduler';
-import { artworkVariant, COVER_LOOP_SECONDS, GENRE_COVER_ASPECT, seedVector } from './artwork-motif';
+import { artworkVariant, COVER_LOOP_SECONDS, seedVector } from './artwork-motif';
 import coverShader from './artwork.wgsl';
 import type { ArtworkKind } from './artwork-motif';
 import type { Frame, FrameLoopHandle, Gpu, Surface } from 'vgpu';
@@ -59,11 +59,9 @@ export function mountLiveAlbumArt({ canvas, seed, label, kind, beatTrackIds }: L
   let revealFrame: number | undefined;
   let renderCover: ((currentFrame: Frame, time: number) => void) | undefined;
   let unregisterAnimation: (() => void) | undefined;
+  let unsubscribeResize: (() => void) | undefined;
   const seedValues = seedVector(seed);
   const variant = artworkVariant(label, kind, seedValues[3]);
-  // The fallback and live canvas use one composition aspect, then stretch together with
-  // the responsive banner. Otherwise object-cover crops the fallback but not the shader.
-  const aspect = kind === 'genre' ? GENRE_COVER_ASPECT : 1;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function hideLiveCover() {
@@ -96,6 +94,7 @@ export function mountLiveAlbumArt({ canvas, seed, label, kind, beatTrackIds }: L
       .then(initializedGpu => {
         if (disposed) return;
         gpu = initializedGpu;
+        let aspect = 1;
 
         output = surface(initializedGpu, canvas, { dpr: [1, 2], label: `album-cover-${seed}` });
         const cover = draw(initializedGpu, {
@@ -124,6 +123,10 @@ export function mountLiveAlbumArt({ canvas, seed, label, kind, beatTrackIds }: L
           currentFrame.pass(output, cover);
           if (!revealed) revealAfterFrame(currentFrame);
         };
+
+        unsubscribeResize = output.onResize(({ height, width }) => {
+          aspect = height > 0 ? width / height : 1;
+        });
 
         startRendering();
       })
@@ -166,6 +169,7 @@ export function mountLiveAlbumArt({ canvas, seed, label, kind, beatTrackIds }: L
     disposed = true;
     hideLiveCover();
     observer.disconnect();
+    unsubscribeResize?.();
     output?.dispose();
   };
 }

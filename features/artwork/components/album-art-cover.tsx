@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react';
 import { coverAsset } from '@/features/artwork/artwork-motif';
 import type { ArtworkKind } from '@/features/artwork/artwork-motif';
 import { mountLiveAlbumArt } from '@/features/artwork/artwork-runtime';
-import { cn } from '@/lib/utils';
 
 type Props = {
   seed: string;
@@ -49,10 +48,7 @@ export function AlbumArtCover({ seed, label, kind, beatTrackIds, small = false }
         loading="eager"
         sizes={staticAsset.sizes}
         src={staticAsset.src}
-        className={cn(
-          'album-art-fallback pointer-events-none absolute inset-0 z-10 block',
-          kind === 'genre' ? 'object-fill' : 'object-cover',
-        )}
+        className="album-art-fallback pointer-events-none absolute inset-0 z-10 block object-cover"
       />
     </>
   );

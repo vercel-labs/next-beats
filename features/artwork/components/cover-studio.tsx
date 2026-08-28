@@ -3,27 +3,9 @@
 import { useEffect, useState } from 'react';
 import { draw, initFromDevice, target } from 'vgpu';
 import { artworkVariant, seedVector } from '@/features/artwork/artwork-motif';
-import type { ArtworkKind } from '@/features/artwork/artwork-motif';
 import coverShader from '@/features/artwork/artwork.wgsl';
+import type { CoverStudioWindow } from '@/features/artwork/cover-studio-types';
 import type { Draw, Gpu, Target } from 'vgpu';
-
-type RenderOptions = {
-  detail: number;
-  height: number;
-  kind: ArtworkKind;
-  label: string;
-  seed: string;
-  turn: number;
-  width: number;
-};
-
-declare global {
-  interface Window {
-    __coverStudioError?: string;
-    __coverStudioReady?: boolean;
-    __renderCoverFrame?: (options: RenderOptions) => Promise<string>;
-  }
-}
 
 const kindIndex: Record<ArtworkKind, number> = { album: 1, genre: 3, playlist: 2, track: 0 };
 
@@ -56,6 +38,7 @@ export function CoverStudio() {
     let disposed = false;
     let gpu: Gpu | undefined;
     const targets = new Map<string, Target>();
+    const studioWindow = window as CoverStudioWindow;
 
     void (async () => {
       setStatus('Requesting WebGPU adapter…');
@@ -75,7 +58,7 @@ export function CoverStudio() {
           shader: coverShader,
         });
 
-        window.__renderCoverFrame = async options => {
+        studioWindow.__renderCoverFrame = async options => {
           const key = `${options.width}x${options.height}`;
           let output = targets.get(key);
           if (!output) {
@@ -96,20 +79,20 @@ export function CoverStudio() {
           const pixels = unpremultiply(await output.read());
           return pngDataUrl(options.width, options.height, pixels);
         };
-        window.__coverStudioReady = true;
+        studioWindow.__coverStudioReady = true;
         setStatus('Ready');
       })
       .catch(error => {
         const message = error instanceof Error ? error.message : String(error);
-        window.__coverStudioError = message;
+        studioWindow.__coverStudioError = message;
         setStatus(message);
       });
 
     return () => {
       disposed = true;
-      delete window.__coverStudioReady;
-      delete window.__coverStudioError;
-      delete window.__renderCoverFrame;
+      delete studioWindow.__coverStudioReady;
+      delete studioWindow.__coverStudioError;
+      delete studioWindow.__renderCoverFrame;
       for (const output of targets.values()) output.color.destroy();
       gpu?.dispose();
     };

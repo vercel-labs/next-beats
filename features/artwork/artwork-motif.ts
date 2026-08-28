@@ -68,7 +68,6 @@ export type ArtworkKind = 'track' | 'album' | 'playlist' | 'genre';
 
 /** Every movement is constructed to return to its origin over this live loop. */
 export const COVER_LOOP_SECONDS = 12;
-export const GENRE_COVER_ASPECT = 10 / 3;
 
 const genreMotifs: Record<string, number> = {
   electronic: 0,
