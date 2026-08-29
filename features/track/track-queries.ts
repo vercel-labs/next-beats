@@ -73,10 +73,6 @@ export async function getRecentlyPlayed(limit: number = 8) {
 }
 
 async function getRecentlyPlayedForUser(userId: string, limit: number, slow: boolean) {
-  'use cache';
-  cacheTag(`recently-played:${userId}`);
-  cacheLife('minutes');
-
   await delay(500, slow);
   const rows = await prisma.userTrackPlay.findMany({
     where: { userId },
@@ -112,9 +108,6 @@ export async function getMostPlayed(limit: number = 8) {
 }
 
 async function getMostPlayedCached(limit: number, slow: boolean) {
-  'use cache';
-  cacheTag('tracks');
-
   await delay(700, slow);
   const rows = await prisma.track.findMany({
     orderBy: { playCount: 'desc' },

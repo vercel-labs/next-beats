@@ -14,9 +14,6 @@ export async function getPlaylists() {
 }
 
 async function getPlaylistsForUser(userId: string, slow: boolean) {
-  'use cache';
-  cacheTag(`playlists:${userId}`);
-
   await delay(500, slow);
   const rows = await prisma.playlist.findMany({
     include: {

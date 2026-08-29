@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { refresh } from 'next/cache';
 import { z } from 'zod';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { SEED_PLAYLIST_IDS } from '@/features/playlist/playlist-constants';
@@ -38,7 +38,7 @@ export async function createPlaylist(formData: FormData) {
       userId,
     },
   });
-  updateTag(`playlists:${userId}`);
+  refresh();
   return { ok: true as const, playlist };
 }
 
@@ -78,8 +78,7 @@ export async function addToPlaylist(playlistId: string, trackId: string) {
     }
     throw error;
   }
-  updateTag(`playlist-${parsedPlaylistId}`);
-  updateTag(`playlists:${userId}`);
+  refresh();
   return { ok: true as const };
 }
 
@@ -97,8 +96,7 @@ export async function removeFromPlaylist(playlistId: string, trackId: string) {
   await prisma.playlistTrack.deleteMany({
     where: { playlistId: parsedPlaylistId, trackId: parsedTrackId },
   });
-  updateTag(`playlist-${parsedPlaylistId}`);
-  updateTag(`playlists:${userId}`);
+  refresh();
   return { ok: true as const };
 }
 
@@ -109,8 +107,7 @@ export async function deletePlaylist(playlistId: string) {
   await delay(300, await isSlowEnabled());
   const result = await prisma.playlist.deleteMany({ where: { id, userId } });
   if (result.count === 0) return { error: 'Playlist not found', ok: false as const };
-  updateTag(`playlists:${userId}`);
-  updateTag(`playlist-${id}`);
+  refresh();
   return { ok: true as const };
 }
 
