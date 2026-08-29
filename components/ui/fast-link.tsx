@@ -16,7 +16,12 @@ export function FastLink({ onClick, onMouseDown, onPressNavigate, ...props }: Pr
       {...props}
       onMouseDown={event => {
         const target = event.currentTarget.getAttribute('target');
+        const interactiveTarget =
+          event.target instanceof Element
+            ? event.target.closest('button, input, select, textarea, [contenteditable="true"], [role="button"]')
+            : null;
         const shouldNavigate =
+          !interactiveTarget &&
           (!target || target === '_self') &&
           !event.metaKey &&
           !event.ctrlKey &&
