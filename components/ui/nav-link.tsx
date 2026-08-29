@@ -1,13 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { createContext, Suspense, useContext, useOptimistic, useState } from 'react';
 import { Boundary } from '@/components/demo/boundary';
 import { usePrefetchDefault } from '@/components/demo/use-prefetch-default';
+import { FastLink } from '@/components/ui/fast-link';
 import { preloadImages } from '@/lib/preload-images';
 import type { PreloadImageSource } from '@/lib/preload-images';
 import type { Route } from 'next';
+import type Link from 'next/link';
 
 type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 'href' | 'prefetch'> & {
   href: Route<T> | URL;
@@ -17,6 +18,23 @@ type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 
   hoverPrefetch?: boolean;
   preloadImageSources?: readonly PreloadImageSource[];
 };
+
+type OptimisticNavigation = {
+  destination: string | null;
+  navigate: (destination: string) => void;
+};
+
+const OptimisticNavigationContext = createContext<OptimisticNavigation | null>(null);
+
+export function OptimisticNavigationProvider({ children }: { children: React.ReactNode }) {
+  const [destination, navigate] = useOptimistic<string | null>(null);
+
+  return (
+    <OptimisticNavigationContext value={{ destination, navigate }}>
+      {children}
+    </OptimisticNavigationContext>
+  );
+}
 
 // `useSelectedLayoutSegments` is dynamic under `cacheComponents`, so the
 // active-state computation has to live behind a Suspense boundary. The
@@ -34,7 +52,7 @@ export function NavLink<T extends string>(props: Props<T>) {
 
 function ActiveLink<T extends string>(props: Props<T>) {
   const segments = useSelectedLayoutSegments();
-  const want = props.href.toString().split('?')[0].split('#')[0].split('/').filter(Boolean);
+  const want = pathname(props.href).split('/').filter(Boolean);
   const isActive = want.length === segments.length && want.every((s, i) => s === segments[i]);
   return <NavLinkShell {...props} isActive={isActive} />;
 }
@@ -49,17 +67,23 @@ function NavLinkShell<T extends string>({
   ...rest
 }: Props<T> & { isActive: boolean }) {
   const [intent, setIntent] = useState(false);
+  const optimisticNavigation = useContext(OptimisticNavigationContext);
   const prefetch = usePrefetchDefault();
   // `prefetch` is already `true` or `null` (App Shell only) from the demo toggle.
   // Hover-gated links stay at `null` until intent, then upgrade to the full prefetch.
   const resolvedPrefetch = !prefetch ? null : hoverPrefetch ? (intent ? true : null) : true;
   if (resolvedPrefetch) preloadImages(preloadImageSources);
   const showIntent = () => setIntent(true);
+  const destination = pathname(href);
+  const resolvedActive = optimisticNavigation?.destination
+    ? optimisticNavigation.destination === destination
+    : isActive;
   return (
-    <Link
+    <FastLink
       prefetch={resolvedPrefetch}
       {...rest}
       href={href as Route}
+      onPressNavigate={() => optimisticNavigation?.navigate(destination)}
       onMouseEnter={e => {
         if (hoverPrefetch) showIntent();
         onMouseEnter?.(e);
@@ -69,8 +93,12 @@ function NavLinkShell<T extends string>({
         onFocus?.(e);
       }}
       data-nav-link
-      aria-current={isActive ? 'page' : undefined}
+      aria-current={resolvedActive ? 'page' : undefined}
       suppressHydrationWarning
     />
   );
+}
+
+function pathname(href: string | URL) {
+  return href.toString().split('?')[0].split('#')[0];
 }
