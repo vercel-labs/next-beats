@@ -56,7 +56,7 @@ async function searchPlaylistsForUser(userId: string, query: string, slow: boole
     orderBy: { createdAt: 'desc' },
     where: {
       OR: [{ userId }, { userId: null }],
-      name: { contains: query, mode: 'insensitive' },
+      name: { contains: query },
     },
   });
   return rows.map(r => ({

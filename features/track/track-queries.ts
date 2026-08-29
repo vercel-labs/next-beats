@@ -189,9 +189,9 @@ async function searchTracksCached(query: string, slow: boolean) {
     take: 30,
     where: {
       OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        { artist: { contains: query, mode: 'insensitive' } },
-        { album: { contains: query, mode: 'insensitive' } },
+        { title: { contains: query } },
+        { artist: { contains: query } },
+        { album: { contains: query } },
       ],
     },
   });
