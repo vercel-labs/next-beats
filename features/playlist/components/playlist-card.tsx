@@ -1,8 +1,7 @@
 import { ViewTransition } from 'react';
-import { PrefetchLink } from '@/components/ui/prefetch-link';
+import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArt } from '@/features/artwork/components/album-art';
-import { playlistCoverPreloads } from '@/features/artwork/cover-assets';
 import { PlayButton } from '@/features/track/components/play-button';
 import type { PlaylistWithTracks } from '@/types/playlist';
 
@@ -10,9 +9,8 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const firstTrack = playlist.tracks[0];
   const trackIds = playlist.tracks.map(track => track.id);
   return (
-    <PrefetchLink
+    <Link
       href={`/playlist/${playlist.id}`}
-      preloadImageSources={playlistCoverPreloads(playlist)}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
       <div className="relative">
@@ -35,7 +33,7 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
           {playlist.trackCount} {playlist.trackCount === 1 ? 'track' : 'tracks'}
         </span>
       </div>
-    </PrefetchLink>
+    </Link>
   );
 }
 

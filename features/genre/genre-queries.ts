@@ -1,12 +1,11 @@
 import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
 export async function getGenres() {
-  return getGenresCached(await isSlowEnabled());
+  return getGenresCached(true);
 }
 
 async function getGenresCached(slow: boolean) {

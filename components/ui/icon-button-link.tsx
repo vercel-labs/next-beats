@@ -1,4 +1,4 @@
-import { PrefetchLink } from '@/components/ui/prefetch-link';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { Route } from 'next';
 import type { ReactNode } from 'react';
@@ -15,7 +15,7 @@ export function IconButtonLink({
   children: ReactNode;
 }) {
   return (
-    <PrefetchLink
+    <Link
       href={href as Route}
       className={cn(
         'text-gray rounded-full p-1 transition-colors hover:bg-black/10 hover:text-black dark:hover:bg-white/10 dark:hover:text-white',
@@ -25,7 +25,7 @@ export function IconButtonLink({
       title={label}
     >
       {children}
-    </PrefetchLink>
+    </Link>
   );
 }
 

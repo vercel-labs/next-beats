@@ -2,7 +2,6 @@
 
 import { revalidateTag, updateTag } from 'next/cache';
 import { z } from 'zod';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
 import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/db';
@@ -12,7 +11,7 @@ const trackIdSchema = z.string().min(1);
 
 export async function toggleFavorite(trackId: string) {
   const userId = await verifyAuth();
-  await delay(200, await isSlowEnabled());
+  await delay(200);
   const id = trackIdSchema.parse(trackId);
 
   const existing = await prisma.userFavorite.findUnique({

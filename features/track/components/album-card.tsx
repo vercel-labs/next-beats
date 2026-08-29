@@ -1,4 +1,4 @@
-import { PrefetchLink } from '@/components/ui/prefetch-link';
+import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 import { PlayButton } from '@/features/track/components/play-button';
@@ -7,7 +7,7 @@ import type { Track } from '@/types/track';
 
 export function AlbumCard({ track }: { track: Track }) {
   return (
-    <PrefetchLink
+    <Link
       href={`/track/${track.id}`}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
@@ -25,7 +25,7 @@ export function AlbumCard({ track }: { track: Track }) {
         <NowPlayingTrackTitle trackId={track.id}>{track.title}</NowPlayingTrackTitle>
         <span className="text-muted truncate text-xs">{track.artist}</span>
       </div>
-    </PrefetchLink>
+    </Link>
   );
 }
 

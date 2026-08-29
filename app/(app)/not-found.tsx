@@ -1,6 +1,6 @@
 import { Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { FastLink } from '@/components/ui/fast-link';
+import Link from 'next/link';
 
 export default function NotFound() {
   return (
@@ -8,9 +8,9 @@ export default function NotFound() {
       <Music className="text-gray h-8 w-8" />
       <p className="text-sm font-medium text-black dark:text-white">Page not found</p>
       <p className="text-gray max-w-xs text-sm">The page you&apos;re looking for doesn&apos;t exist.</p>
-      <FastLink href="/">
+      <Link href="/">
         <Button variant="secondary">Go home</Button>
-      </FastLink>
+      </Link>
     </div>
   );
 }

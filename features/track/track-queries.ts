@@ -2,7 +2,6 @@ import 'server-only';
 
 import { cacheLife, cacheTag, unstable_navigation as navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
@@ -11,7 +10,7 @@ import { toTrack } from '@/types/track';
 const LIBRARY_PAGE_SIZE = 100;
 
 export async function getLibrary(page: number = 1) {
-  return getLibraryCached(page, await isSlowEnabled());
+  return getLibraryCached(page, true);
 }
 
 async function getLibraryCached(page: number, slow: boolean) {
@@ -35,7 +34,7 @@ async function getLibraryCached(page: number, slow: boolean) {
 
 export async function getFavorites() {
   const userId = await verifyAuth();
-  return getFavoritesForUser(userId, await isSlowEnabled());
+  return getFavoritesForUser(userId, true);
 }
 
 async function getFavoritesForUser(userId: string, slow: boolean) {
@@ -69,7 +68,7 @@ async function getUserFavoriteIdsForUser(userId: string) {
 
 export async function getRecentlyPlayed(limit: number = 8) {
   const userId = await verifyAuth();
-  return getRecentlyPlayedForUser(userId, limit, await isSlowEnabled());
+  return getRecentlyPlayedForUser(userId, limit, true);
 }
 
 async function getRecentlyPlayedForUser(userId: string, limit: number, slow: boolean) {
@@ -85,7 +84,7 @@ async function getRecentlyPlayedForUser(userId: string, limit: number, slow: boo
 
 export async function getTrack(id: string) {
   const userId = await verifyAuth();
-  return getTrackForUser(id, userId, await isSlowEnabled());
+  return getTrackForUser(id, userId, true);
 }
 
 async function getTrackForUser(id: string, userId: string, slow: boolean) {
@@ -104,7 +103,7 @@ async function getTrackForUser(id: string, userId: string, slow: boolean) {
 }
 
 export async function getMostPlayed(limit: number = 8) {
-  return getMostPlayedCached(limit, await isSlowEnabled());
+  return getMostPlayedCached(limit, true);
 }
 
 async function getMostPlayedCached(limit: number, slow: boolean) {
@@ -119,7 +118,7 @@ async function getMostPlayedCached(limit: number, slow: boolean) {
 
 export async function getDiscover(limit: number = 8) {
   const userId = await verifyAuth();
-  return getDiscoverForUser(userId, limit, await isSlowEnabled());
+  return getDiscoverForUser(userId, limit, true);
 }
 
 async function getDiscoverForUser(userId: string, limit: number, slow: boolean) {
@@ -138,7 +137,7 @@ async function getDiscoverForUser(userId: string, limit: number, slow: boolean) 
 }
 
 export async function getTracksByGenre(genre: string) {
-  return getTracksByGenreCached(genre, await isSlowEnabled());
+  return getTracksByGenreCached(genre, true);
 }
 
 async function getTracksByGenreCached(genre: string, slow: boolean) {
@@ -156,7 +155,7 @@ async function getTracksByGenreCached(genre: string, slow: boolean) {
 export async function getRecommendedTracks(excludeTrackId: string, limit: number = 5) {
   await navigation();
   const userId = await verifyAuth();
-  return getRecommendedTracksForUser(excludeTrackId, userId, limit, await isSlowEnabled());
+  return getRecommendedTracksForUser(excludeTrackId, userId, limit, true);
 }
 
 async function getRecommendedTracksForUser(excludeTrackId: string, userId: string, limit: number, slow: boolean) {
@@ -176,7 +175,7 @@ async function getRecommendedTracksForUser(excludeTrackId: string, userId: strin
 }
 
 export async function searchTracks(query: string) {
-  return searchTracksCached(query, await isSlowEnabled());
+  return searchTracksCached(query, true);
 }
 
 async function searchTracksCached(query: string, slow: boolean) {

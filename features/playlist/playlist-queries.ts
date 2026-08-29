@@ -2,7 +2,6 @@ import 'server-only';
 
 import { cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
@@ -10,7 +9,7 @@ import { toTrack } from '@/types/track';
 
 export async function getPlaylists() {
   const userId = await verifyAuth();
-  return getPlaylistsForUser(userId, await isSlowEnabled());
+  return getPlaylistsForUser(userId, true);
 }
 
 async function getPlaylistsForUser(userId: string, slow: boolean) {
@@ -38,7 +37,7 @@ async function getPlaylistsForUser(userId: string, slow: boolean) {
 
 export async function searchPlaylists(query: string) {
   const userId = await verifyAuth();
-  return searchPlaylistsForUser(userId, query, await isSlowEnabled());
+  return searchPlaylistsForUser(userId, query, true);
 }
 
 async function searchPlaylistsForUser(userId: string, query: string, slow: boolean) {
@@ -72,7 +71,7 @@ async function searchPlaylistsForUser(userId: string, query: string, slow: boole
 
 export async function getPlaylist(id: string) {
   const userId = await verifyAuth();
-  return getPlaylistForUser(id, userId, await isSlowEnabled());
+  return getPlaylistForUser(id, userId, true);
 }
 
 async function getPlaylistForUser(id: string, userId: string, slow: boolean) {

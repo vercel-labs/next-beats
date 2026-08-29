@@ -1,4 +1,4 @@
-import { PrefetchLink } from '@/components/ui/prefetch-link';
+import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArtCover } from '@/features/artwork/components/album-art-cover';
 import type { GenreSummary } from '@/types/genre';
@@ -14,19 +14,19 @@ const genreColors: Record<string, string> = {
 
 export function GenrePill({ genre }: { genre: string }) {
   return (
-    <PrefetchLink
+    <Link
       href={`/genre/${genre}`}
       className="bg-accent/10 text-accent hover:bg-accent/20 rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors"
     >
       {genre}
-    </PrefetchLink>
+    </Link>
   );
 }
 
 export function GenreCard({ genre }: { genre: GenreSummary }) {
   const gradient = genreColors[genre.genre] ?? 'from-gray-500 to-gray-700';
   return (
-    <PrefetchLink
+    <Link
       href={`/genre/${genre.genre}`}
       className="group relative overflow-hidden rounded-lg transition-transform hover:scale-[1.02]"
     >
@@ -37,7 +37,7 @@ export function GenreCard({ genre }: { genre: GenreSummary }) {
           <p className="text-xs text-white/70">{genre.count} tracks</p>
         </div>
       </div>
-    </PrefetchLink>
+    </Link>
   );
 }
 
