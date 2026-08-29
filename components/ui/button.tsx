@@ -43,7 +43,7 @@ export function Button({
   const isDisabled = disabled || (isSubmit && pending);
 
   return (
-        <button
+    <button
       type={type}
       disabled={isDisabled}
       className={cn(base, sizes[size], variants[variant], className)}

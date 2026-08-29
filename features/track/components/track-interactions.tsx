@@ -1,9 +1,9 @@
 'use client';
 
 import { Heart, Play } from 'lucide-react';
+import Link from 'next/link';
 import { useOptimistic, useTransition } from 'react';
 import { Equalizer } from '@/components/ui/equalizer';
-import Link from 'next/link';
 import { toggleFavorite } from '@/features/track/track-actions';
 import { cn } from '@/lib/utils';
 import { usePlayer } from '@/providers/player-provider';
@@ -26,7 +26,7 @@ export function TrackPlayRow({ track, queue, children }: { track: Track; queue?:
   }
 
   return (
-        <article
+    <article
       role="button"
       tabIndex={0}
       onClick={handleClick}
@@ -178,7 +178,7 @@ export function FavoriteButton({
   }
 
   return (
-        <button
+    <button
       type="button"
       onClick={handleToggle}
       data-removing={removing || undefined}
@@ -186,9 +186,7 @@ export function FavoriteButton({
       className={cn(
         'rounded-full transition-colors',
         size === 'lg' ? 'p-1.5' : 'p-1.5',
-        optimisticFavorite
-          ? 'text-accent hover:text-accent-hover'
-          : 'text-gray hover:text-black dark:hover:text-white',
+        optimisticFavorite ? 'text-accent hover:text-accent-hover' : 'text-gray hover:text-black dark:hover:text-white',
       )}
     >
       <Heart className={cn(size === 'lg' ? 'h-5 w-5' : 'h-4 w-4', optimisticFavorite && 'fill-current')} />

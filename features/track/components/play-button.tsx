@@ -39,7 +39,7 @@ export function PlayButton({ track, queue, className, size = 'md' }: Props) {
   }
 
   return (
-        <button
+    <button
       type="button"
       onClick={handleClick}
       data-playing={isThisPlaying || undefined}

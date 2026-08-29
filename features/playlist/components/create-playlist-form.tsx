@@ -15,7 +15,7 @@ export function CreatePlaylistForm() {
   }
 
   return (
-        <form action={createPlaylistAction} className="flex gap-2">
+    <form action={createPlaylistAction} className="flex gap-2">
       <input
         name="name"
         placeholder="New playlist name…"

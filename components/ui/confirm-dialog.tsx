@@ -43,7 +43,7 @@ export function ConfirmDialog({
   }
 
   return (
-        <Ariakit.Dialog
+    <Ariakit.Dialog
       store={store}
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
       backdrop={

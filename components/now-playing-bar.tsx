@@ -15,7 +15,7 @@ export function NowPlayingBar() {
   return (
     <>
       {track ? (
-                <div
+        <div
           style={{ viewTransitionName: 'player-bar' }}
           className="border-divider dark:border-divider-dark shrink-0 border-t bg-white px-4 py-2 sm:hidden dark:bg-[#181818]"
         >
@@ -51,7 +51,7 @@ export function NowPlayingBar() {
         </div>
       ) : null}
 
-            <div
+      <div
         style={{ viewTransitionName: 'player-bar-desktop' }}
         className="border-divider dark:border-divider-dark hidden shrink-0 border-t bg-white px-4 py-2 sm:block dark:bg-[#181818]"
       >

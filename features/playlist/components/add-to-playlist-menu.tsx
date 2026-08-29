@@ -21,7 +21,7 @@ export function AddToPlaylistMenu({
 
   return (
     <>
-            <Ariakit.MenuButton
+      <Ariakit.MenuButton
         store={menu}
         aria-label="Add to playlist"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -37,7 +37,7 @@ export function AddToPlaylistMenu({
         gutter={8}
         unmountOnHide
       >
-                <p className="text-muted mb-1 px-3 py-1 text-xs font-semibold">Add to Playlist</p>
+        <p className="text-muted mb-1 px-3 py-1 text-xs font-semibold">Add to Playlist</p>
         <Suspense
           fallback={
             <div className="flex flex-col gap-0.5">

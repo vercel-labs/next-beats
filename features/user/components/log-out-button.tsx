@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 export function LogOutButton() {
   const { pending } = useFormStatus();
   return (
-        <button
+    <button
       type="submit"
       disabled={pending}
       aria-label="Sign out"

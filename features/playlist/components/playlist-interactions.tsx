@@ -32,7 +32,7 @@ export function DeletePlaylistButton({ playlistId, size = 'sm' }: { playlistId: 
 
   return (
     <>
-            <button
+      <button
         type="button"
         onClick={e => {
           e.stopPropagation();
@@ -66,7 +66,7 @@ export function RemoveFromPlaylistButton({ playlistId, trackId }: { playlistId: 
   }
 
   return (
-        <button
+    <button
       type="button"
       onClick={handleRemove}
       disabled={isPending}
@@ -132,7 +132,7 @@ export function NewPlaylistDialog({ store, trackId }: { store: Ariakit.DialogSto
   }
 
   return (
-        <Ariakit.Dialog
+    <Ariakit.Dialog
       store={store}
       onClick={(e: React.MouseEvent) => e.stopPropagation()}
       backdrop={

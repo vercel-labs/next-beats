@@ -27,7 +27,7 @@ export function ThemeToggle({ variant = 'pill' }: Props) {
       : 'border-divider dark:border-divider-dark inline-flex items-center rounded-full border p-0.5';
 
   return (
-        <div style={{ viewTransitionName: 'theme-toggle' }} className={wrapperClass}>
+    <div style={{ viewTransitionName: 'theme-toggle' }} className={wrapperClass}>
       <ToggleButton active={active === 'light'} label="Light mode" onClick={() => setTheme('light')}>
         <Sun className="size-4" />
       </ToggleButton>

@@ -1,5 +1,5 @@
-import { ViewTransition } from 'react';
 import Link from 'next/link';
+import { ViewTransition } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 import { PlayButton } from '@/features/track/components/play-button';

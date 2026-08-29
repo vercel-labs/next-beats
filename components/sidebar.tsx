@@ -1,8 +1,8 @@
 import { Heart, Home, Library, Plus, Search, Music } from 'lucide-react';
+import Link from 'next/link';
 import { Suspense } from 'react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import ErrorBoundary from '@/components/ui/error-boundary';
-import Link from 'next/link';
 import { GitHubIcon } from '@/components/ui/github-icon';
 import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-button-link';
 import { MusicNote } from '@/components/ui/music-note';
@@ -100,12 +100,7 @@ async function SidebarPlaylists() {
   return (
     <div className="flex flex-col gap-0.5">
       {playlists.map(pl => (
-        <NavLink
-          key={pl.id}
-          href={`/playlist/${pl.id}` as Route}
-          aria-label={pl.name}
-          className={sidebarLink}
-        >
+        <NavLink key={pl.id} href={`/playlist/${pl.id}` as Route} aria-label={pl.name} className={sidebarLink}>
           <span className={`inline-block h-3 w-3 shrink-0 rounded-sm bg-gradient-to-br ${pl.coverColor}`} />
           <span className="hidden truncate lg:inline">{pl.name}</span>
         </NavLink>
