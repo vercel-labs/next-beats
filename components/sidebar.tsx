@@ -122,7 +122,10 @@ function SidebarPlaylistsSkeleton() {
   return (
     <div className="flex flex-col gap-0.5">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex min-h-9 items-center justify-center gap-3 rounded-md p-2 lg:justify-start lg:px-3">
+        <div
+          key={i}
+          className="flex min-h-7 items-center justify-center gap-3 rounded-md p-2 lg:min-h-9 lg:justify-start lg:px-3"
+        >
           <Skeleton className="h-3 w-3 shrink-0 rounded-sm" />
         </div>
       ))}
