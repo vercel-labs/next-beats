@@ -188,8 +188,7 @@ export function FavoriteButton({
         data-removing={removing || undefined}
         aria-label={optimisticFavorite ? 'Remove from favorites' : 'Add to favorites'}
         className={cn(
-          'rounded-full transition-colors',
-          size === 'lg' ? 'p-1.5' : 'p-1.5',
+          'rounded-full p-1.5 transition-colors',
           optimisticFavorite
             ? 'text-accent hover:text-accent-hover'
             : 'text-gray hover:text-black dark:hover:text-white',

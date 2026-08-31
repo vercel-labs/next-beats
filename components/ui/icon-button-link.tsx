@@ -1,4 +1,5 @@
 import { PrefetchLink } from '@/components/ui/prefetch-link';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type { Route } from 'next';
 import type { ReactNode } from 'react';
@@ -30,5 +31,5 @@ export function IconButtonLink({
 }
 
 export function IconButtonLinkSkeleton({ className }: { className?: string }) {
-  return <span aria-hidden className={cn('inline-block size-7 rounded-full', className)} />;
+  return <Skeleton className={cn('size-7 rounded-full', className)} />;
 }
