@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-import { Crossfade } from '@/components/ui/crossfade';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { CreatePlaylistForm } from '@/features/playlist/components/create-playlist-form';
 import { PlaylistBrowse } from '@/features/playlist/components/playlist-browse';
@@ -16,11 +15,9 @@ export default function PlaylistsPage() {
       <div className="mb-6 max-w-md">
         <CreatePlaylistForm />
       </div>
-      <Suspense fallback={<PlaylistListSkeleton count={3} />}>
-        <Crossfade>
-          <PlaylistBrowse animateItems />
-        </Crossfade>
-      </Suspense>
+      <AnimatedSuspense fallback={<PlaylistListSkeleton count={3} />}>
+        <PlaylistBrowse animateItems />
+      </AnimatedSuspense>
     </PageWrapper>
   );
 }
