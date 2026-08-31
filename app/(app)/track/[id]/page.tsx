@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-import { Crossfade } from '@/components/ui/crossfade';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { TrackControls, TrackControlsSkeleton } from '@/features/track/components/track-controls';
@@ -17,33 +16,22 @@ export async function generateMetadata({ params }: PageProps<'/track/[id]'>): Pr
 export default function TrackPage({ params }: PageProps<'/track/[id]'>) {
   return (
     <PageWrapper>
-      <Suspense
-        fallback={
+      <AnimatedSuspense>
+        {params.then(({ id }) => (
           <>
-            <TrackHeaderSkeleton />
-            <TrackControlsSkeleton />
+            <TrackHeader id={id} />
+            <TrackControls id={id} />
           </>
-        }
-      >
-        <Crossfade>
-          {params.then(({ id }) => (
-            <>
-              <TrackHeader id={id} />
-              <TrackControls id={id} />
-            </>
-          ))}
-        </Crossfade>
-      </Suspense>
+        ))}
+      </AnimatedSuspense>
       <section>
         <h2 className="mb-4">More songs you might like</h2>
         <ErrorBoundary title="Couldn't load recommendations">
-          <Suspense fallback={<TrackListSkeleton count={3} />}>
-            <Crossfade>
-              {params.then(({ id }) => (
-                <RecommendedTracks trackId={id} />
-              ))}
-            </Crossfade>
-          </Suspense>
+          <AnimatedSuspense>
+            {params.then(({ id }) => (
+              <RecommendedTracks trackId={id} />
+            ))}
+          </AnimatedSuspense>
         </ErrorBoundary>
       </section>
     </PageWrapper>
