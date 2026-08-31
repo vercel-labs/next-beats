@@ -10,13 +10,13 @@ export async function getCurrentUser() {
   const store = await cookies();
   const userId = store.get(SESSION_COOKIE)?.value;
   if (!userId) return '';
-  const exists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  const exists = await prisma.user.findUnique({ select: { id: true }, where: { id: userId } });
   return exists?.id ?? '';
 }
 
 export async function getCurrentUserName() {
   const userId = await verifyAuth();
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+  const user = await prisma.user.findUnique({ select: { name: true }, where: { id: userId } });
   return user?.name ?? 'listener';
 }
 

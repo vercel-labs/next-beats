@@ -3,23 +3,23 @@ import { MusicNote } from '@/components/ui/music-note';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 
 const recentTracks = [
-  { title: 'Async Await', artist: 'Neon Pulse', tone: 'from-blue-500 to-indigo-600' },
-  { title: 'WebSocket Sunset', artist: 'Neon Pulse', tone: 'from-sky-400 to-blue-500' },
-  { title: 'Server Sent Vibes', artist: 'Chrome Echo', tone: 'from-blue-400 to-cyan-500' },
-  { title: 'Hydration', artist: 'Chrome Echo', tone: 'from-indigo-400 to-blue-500' },
-  { title: 'Hot Module Reload', artist: 'Axiom', tone: 'from-sky-500 to-indigo-600' },
-  { title: 'Localhost Morning', artist: 'Paper Lanterns', tone: 'from-blue-300 to-sky-500' },
+  { artist: 'Neon Pulse', title: 'Async Await', tone: 'from-blue-500 to-indigo-600' },
+  { artist: 'Neon Pulse', title: 'WebSocket Sunset', tone: 'from-sky-400 to-blue-500' },
+  { artist: 'Chrome Echo', title: 'Server Sent Vibes', tone: 'from-blue-400 to-cyan-500' },
+  { artist: 'Chrome Echo', title: 'Hydration', tone: 'from-indigo-400 to-blue-500' },
+  { artist: 'Axiom', title: 'Hot Module Reload', tone: 'from-sky-500 to-indigo-600' },
+  { artist: 'Paper Lanterns', title: 'Localhost Morning', tone: 'from-blue-300 to-sky-500' },
 ];
 
 const mostPlayed = [
-  { title: 'Pixel Perfect', artist: 'Luna Park', tone: 'from-blue-400 to-indigo-500' },
-  { title: 'Ship It', artist: 'BLKSMTH', tone: 'from-slate-500 to-blue-700' },
-  { title: 'Tailwind Hearts', artist: 'Luna Park', tone: 'from-indigo-400 to-sky-500' },
-  { title: 'Stack Overflow Flow', artist: 'BLKSMTH', tone: 'from-indigo-600 to-blue-800' },
-  { title: 'Component Chemistry', artist: 'Prism', tone: 'from-sky-400 to-cyan-500' },
-  { title: 'Hot Module Reload', artist: 'Axiom', tone: 'from-sky-500 to-indigo-600' },
-  { title: '3 AM Push', artist: 'SyntaxErr', tone: 'from-blue-500 to-sky-600' },
-  { title: 'Type Safe Love', artist: 'Prism', tone: 'from-blue-300 to-indigo-400' },
+  { artist: 'Luna Park', title: 'Pixel Perfect', tone: 'from-blue-400 to-indigo-500' },
+  { artist: 'BLKSMTH', title: 'Ship It', tone: 'from-slate-500 to-blue-700' },
+  { artist: 'Luna Park', title: 'Tailwind Hearts', tone: 'from-indigo-400 to-sky-500' },
+  { artist: 'BLKSMTH', title: 'Stack Overflow Flow', tone: 'from-indigo-600 to-blue-800' },
+  { artist: 'Prism', title: 'Component Chemistry', tone: 'from-sky-400 to-cyan-500' },
+  { artist: 'Axiom', title: 'Hot Module Reload', tone: 'from-sky-500 to-indigo-600' },
+  { artist: 'SyntaxErr', title: '3 AM Push', tone: 'from-blue-500 to-sky-600' },
+  { artist: 'Prism', title: 'Type Safe Love', tone: 'from-blue-300 to-indigo-400' },
 ];
 
 export function LoginMusicPreview() {

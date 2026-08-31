@@ -15,8 +15,8 @@ async function getGenresCached(slow: boolean) {
 
   await delay(600, slow);
   const rows = await prisma.track.groupBy({
-    by: ['genre'],
     _count: { genre: true },
+    by: ['genre'],
     orderBy: { _count: { genre: 'desc' } },
   });
   return rows.map(r => ({

@@ -17,14 +17,14 @@ export async function POST(request: NextRequest) {
   const { trackId } = parsed.data;
 
   await prisma.track.update({
-    where: { id: trackId },
     data: { playCount: { increment: 1 } },
+    where: { id: trackId },
   });
 
   await prisma.userTrackPlay.upsert({
-    where: { userId_trackId: { userId, trackId } },
-    create: { userId, trackId },
+    create: { trackId, userId },
     update: { lastPlayedAt: new Date() },
+    where: { userId_trackId: { trackId, userId } },
   });
 
   revalidateTag(`recently-played:${userId}`, 'max');

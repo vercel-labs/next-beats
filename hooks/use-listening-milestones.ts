@@ -21,7 +21,7 @@ export function useListeningMilestones(isPlaying: boolean) {
       for (const [threshold, message] of MILESTONES) {
         if (s >= threshold && !milestonesHit.current.has(threshold)) {
           milestonesHit.current.add(threshold);
-          toast(message, { id: 'easter-egg', duration: 15000 });
+          toast(message, { duration: 15000, id: 'easter-egg' });
         }
       }
     }, 1000);

@@ -19,14 +19,14 @@ export default defineConfig({
     storageState: {
       cookies: [
         {
-          name: 'beats-user',
-          value: 'e2e',
           domain: 'localhost',
-          path: '/',
-          httpOnly: false,
-          secure: false,
-          sameSite: 'Lax',
           expires: -1,
+          httpOnly: false,
+          name: 'beats-user',
+          path: '/',
+          sameSite: 'Lax',
+          secure: false,
+          value: 'e2e',
         },
       ],
       origins: [],

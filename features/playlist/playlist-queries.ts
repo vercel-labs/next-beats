@@ -86,7 +86,7 @@ async function getPlaylistForUser(id: string, userId: string, slow: boolean) {
         orderBy: { position: 'asc' },
       },
     },
-    where: { id, OR: [{ userId }, { userId: null }] },
+    where: { OR: [{ userId }, { userId: null }], id },
   });
   if (!row) notFound();
   return {
@@ -120,5 +120,5 @@ async function getPlaylistMenuItemsForUser(trackId: string, userId: string) {
     where: { playlistId: { in: playlists.map(p => p.id) }, trackId },
   });
   const addedSet = new Set(existing.map(e => e.playlistId));
-  return playlists.map(p => ({ label: p.name, value: p.id, active: addedSet.has(p.id) }));
+  return playlists.map(p => ({ active: addedSet.has(p.id), label: p.name, value: p.id }));
 }

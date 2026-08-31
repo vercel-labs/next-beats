@@ -1,0 +1,14 @@
+.next
+.next-cover-studio
+.pnpm-store
+.vercel
+node_modules
+playwright-report
+test-results
+pnpm-lock.yaml
+
+# Prisma client codegen output
+generated
+
+# Vendored agent skills, kept byte-identical to upstream
+.agents

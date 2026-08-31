@@ -45,6 +45,8 @@ const C4 = 261.63,
   E4 = 329.63,
   F4 = 349.23,
   G4 = 392.0,
+  // Unused so far, but kept so the C4 octave matches C3's spelling for the next progression.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, autofix/no-unused-vars
   Ab4 = 415.3,
   A4 = 440.0,
   Bb4 = 466.16,
