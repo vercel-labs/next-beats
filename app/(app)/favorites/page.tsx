@@ -1,5 +1,5 @@
-import { AnimatedSuspense, ViewTransition } from 'react';
-
+import { ViewTransition } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { TopGenresGrid } from '@/features/genre/components/genre-browse';

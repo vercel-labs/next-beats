@@ -1,4 +1,4 @@
-import { AnimatedSuspense } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 
 import { PageWrapper } from '@/components/ui/page-layout';
 import { TopGenresGrid } from '@/features/genre/components/genre-browse';
