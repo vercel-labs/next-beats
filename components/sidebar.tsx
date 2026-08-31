@@ -13,6 +13,7 @@ import { getPlaylists } from '@/features/playlist/playlist-queries';
 import { CurrentUserAvatar, CurrentUserAvatarSkeleton } from '@/features/user/components/current-user-avatar';
 import { LogOutButton } from '@/features/user/components/log-out-button';
 import { signOut } from '@/features/user/user-actions';
+import { AnimatedSuspense } from './ui/animated-suspense';
 import type { Route } from 'next';
 
 const sidebarLink =
@@ -74,16 +75,16 @@ export function Sidebar() {
           </NavLink>
           <div className="border-divider dark:border-divider-dark my-1 hidden border-t lg:block" />
           <ErrorBoundary title="Playlists unavailable" compact>
-            <Suspense fallback={<SidebarPlaylistsSkeleton />}>
+            <AnimatedSuspense fallback={<SidebarPlaylistsSkeleton />}>
               <SidebarPlaylists />
-            </Suspense>
+            </AnimatedSuspense>
           </ErrorBoundary>
         </nav>
         <div className="border-divider dark:border-divider-dark hidden items-center justify-between border-t px-3 py-2 lg:flex">
           <div className="flex items-center gap-2">
-            <Suspense fallback={<CurrentUserAvatarSkeleton />}>
+            <AnimatedSuspense fallback={<CurrentUserAvatarSkeleton />}>
               <CurrentUserAvatar />
-            </Suspense>
+            </AnimatedSuspense>
             <form action={signOut}>
               <LogOutButton />
             </form>
