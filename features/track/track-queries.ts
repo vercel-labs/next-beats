@@ -188,11 +188,7 @@ async function searchTracksCached(query: string, slow: boolean) {
     orderBy: { playCount: 'desc' },
     take: 30,
     where: {
-      OR: [
-        { title: { contains: query } },
-        { artist: { contains: query } },
-        { album: { contains: query } },
-      ],
+      OR: [{ title: { contains: query } }, { artist: { contains: query } }, { album: { contains: query } }],
     },
   });
   return rows.map(row => toTrack(row));
