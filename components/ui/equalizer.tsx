@@ -4,9 +4,7 @@ export function Equalizer({ size = 'sm', color = 'bg-accent' }: { size?: 'sm' | 
   const gapClass = size === 'lg' ? 'gap-1' : size === 'md' ? 'gap-[3px]' : 'gap-0.5';
   return (
     <span className={cn('flex items-center', gapClass)}>
-      <span
-        className={cn('inline-block w-0.75 animate-[eq1_0.8s_ease-in-out_infinite] rounded-sm', color, 'h-2')}
-      />
+      <span className={cn('inline-block w-0.75 animate-[eq1_0.8s_ease-in-out_infinite] rounded-sm', color, 'h-2')} />
       <span
         className={cn('inline-block w-0.75 animate-[eq2_0.6s_ease-in-out_infinite_0.2s] rounded-sm', color, 'h-3')}
       />
