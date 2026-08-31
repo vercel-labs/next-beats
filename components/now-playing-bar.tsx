@@ -97,7 +97,7 @@ export function NowPlayingBar() {
                 <span className="text-muted w-8 text-[10px]">{formatDuration(total)}</span>
               </div>
             </div>
-            <div className="hidden items-center justify-end gap-1.5 lg:flex">
+            <div className="hidden items-end justify-end gap-1.5 lg:flex">
               <button
                 type="button"
                 onClick={() => setVolume(volume === 0 ? 75 : 0)}
