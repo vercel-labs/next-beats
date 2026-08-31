@@ -2,8 +2,9 @@
 
 import * as Ariakit from '@ariakit/react';
 import { ListPlus, Plus } from 'lucide-react';
-import { Suspense, use } from 'react';
+import { use } from 'react';
 import { Boundary } from '@/components/demo/boundary';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AddToPlaylistButtons, NewPlaylistDialog } from '@/features/playlist/components/playlist-interactions';
 import type { PlaylistMenuItem } from '@/types/playlist';
@@ -42,20 +43,9 @@ export function AddToPlaylistMenu({
       >
         <Boundary label="AddToPlaylist">
           <p className="text-muted mb-1 px-3 py-1 text-xs font-semibold">Add to Playlist</p>
-          <Suspense
-            fallback={
-              <div className="flex flex-col gap-0.5">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-2 rounded-md px-3 py-2">
-                    <Skeleton className="h-4 w-4 shrink-0" />
-                    <Skeleton className={`h-4 ${i === 0 ? 'w-24' : i === 1 ? 'w-20' : 'w-28'}`} />
-                  </div>
-                ))}
-              </div>
-            }
-          >
+          <AnimatedSuspense fallback={<PlaylistMenuItemsSkeleton />}>
             <PlaylistMenuItems trackId={trackId} itemsPromise={itemsPromise} />
-          </Suspense>
+          </AnimatedSuspense>
           <div className="border-divider dark:border-divider-dark my-1 border-t" />
           <Ariakit.MenuItem
             onClick={(e: React.MouseEvent) => {
@@ -80,4 +70,17 @@ function PlaylistMenuItems({ trackId, itemsPromise }: { trackId: string; itemsPr
     return <p className="text-muted px-3 py-2 text-xs">Create a playlist first.</p>;
   }
   return <AddToPlaylistButtons trackId={trackId} items={items} />;
+}
+
+function PlaylistMenuItemsSkeleton() {
+  return (
+    <div className="flex flex-col gap-0.5">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-2 rounded-md px-3 py-2">
+          <Skeleton className="h-4 w-4 shrink-0" />
+          <Skeleton className={`h-4 ${i === 0 ? 'w-24' : i === 1 ? 'w-20' : 'w-28'}`} />
+        </div>
+      ))}
+    </div>
+  );
 }

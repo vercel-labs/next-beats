@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <OfflineIndicator />
             {children}
             <div className="demo-toggles fixed top-3 right-3 z-50 hidden items-end gap-2 sm:flex">
-              <Suspense fallback={null}>
+              <Suspense>
                 <DemoToolbar />
               </Suspense>
             </div>
