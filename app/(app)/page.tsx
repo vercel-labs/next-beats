@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-import { Crossfade } from '@/components/ui/crossfade';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { TopGenresGrid } from '@/features/genre/components/genre-browse';
 import { PlaylistBrowse } from '@/features/playlist/components/playlist-browse';
@@ -10,25 +9,21 @@ export default function HomePage() {
   return (
     <PageWrapper title="Welcome back">
       <h2 className="mb-4">Recently Played</h2>
-      <Suspense fallback={<QuickPlayGridSkeleton />}>
-        <Crossfade>
-          <QuickPlayGrid />
-        </Crossfade>
-      </Suspense>
+      <AnimatedSuspense fallback={<QuickPlayGridSkeleton />}>
+        <QuickPlayGrid />
+      </AnimatedSuspense>
       <h2 className="mt-10 mb-4">Most Played</h2>
-      <Suspense fallback={<MostPlayedSkeleton />}>
-        <Crossfade>
-          <MostPlayed />
-          <section className="mt-10">
-            <h2 className="mb-4">Your Playlists</h2>
-            <PlaylistBrowse />
-          </section>
-          <section className="mt-10">
-            <h2 className="mb-4">Browse Genres</h2>
-            <TopGenresGrid />
-          </section>
-        </Crossfade>
-      </Suspense>
+      <AnimatedSuspense fallback={<MostPlayedSkeleton />}>
+        <MostPlayed />
+        <section className="mt-10">
+          <h2 className="mb-4">Your Playlists</h2>
+          <PlaylistBrowse />
+        </section>
+        <section className="mt-10">
+          <h2 className="mb-4">Browse Genres</h2>
+          <TopGenresGrid />
+        </section>
+      </AnimatedSuspense>
     </PageWrapper>
   );
 }
