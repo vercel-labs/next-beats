@@ -25,11 +25,11 @@ type PlayerAction =
   | { type: 'ENDED' };
 
 const initialState: PlayerState = {
-  track: null,
-  queue: [],
-  queueIndex: -1,
   isPlaying: false,
   progress: 0,
+  queue: [],
+  queueIndex: -1,
+  track: null,
   volume: 75,
 };
 
@@ -38,11 +38,11 @@ function playerReducer(state: PlayerState, action: PlayerAction): PlayerState {
     case 'PLAY':
       return {
         ...state,
-        track: action.track,
-        queue: action.queue,
-        queueIndex: action.index,
         isPlaying: true,
         progress: 0,
+        queue: action.queue,
+        queueIndex: action.index,
+        track: action.track,
       };
     case 'PAUSE':
       return { ...state, isPlaying: false };
@@ -108,20 +108,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   function playAtIndex(idx: number, q: Track[]) {
     const t = q[idx];
-    dispatch({ type: 'PLAY', track: t, queue: q, index: idx });
+    dispatch({ index: idx, queue: q, track: t, type: 'PLAY' });
     void fetch('/api/play', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ trackId: t.id }),
+      headers: { 'content-type': 'application/json' },
       keepalive: true,
+      method: 'POST',
     }).catch(() => {});
     scheduleTrack({
-      trackId: t.id,
-      genre: t.genre,
       duration: t.duration,
-      refs: audioRef.current,
-      onProgress: pct => dispatch({ type: 'SET_PROGRESS', progress: pct }),
+      genre: t.genre,
       onEnd: () => advanceQueue(q),
+      onProgress: pct => dispatch({ progress: pct, type: 'SET_PROGRESS' }),
+      refs: audioRef.current,
+      trackId: t.id,
     });
   }
 
@@ -147,7 +147,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         track.duration,
         progress,
         audioRef.current,
-        pct => dispatch({ type: 'SET_PROGRESS', progress: pct }),
+        pct => dispatch({ progress: pct, type: 'SET_PROGRESS' }),
         () => advanceQueue(queue),
       );
     }
@@ -181,20 +181,20 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   return (
     <PlayerContext.Provider
       value={{
-        track,
+        hasQueue: queue.length > 1,
+        isPlaying,
+        next,
+        pause,
+        play,
+        previous,
+        progress,
         queue,
         queueIndex,
-        isPlaying,
-        progress,
-        volume,
-        hasQueue: queue.length > 1,
-        play,
-        pause,
         resume,
-        togglePlayPause,
-        next,
-        previous,
         setVolume,
+        togglePlayPause,
+        track,
+        volume,
       }}
     >
       {children}

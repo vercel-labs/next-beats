@@ -39,11 +39,11 @@ function LiveAlbumArt({ seed, label, kind, beatTrackIds }: Omit<Props, 'small'>)
       .then(({ mountLiveAlbumArt }) => {
         if (cancelled) return;
         unmount = mountLiveAlbumArt({
-          canvas,
-          seed,
-          label,
-          kind,
           beatTrackIds: beatTrackIdsKey?.split('\0'),
+          canvas,
+          kind,
+          label,
+          seed,
         });
       })
       .catch(() => {

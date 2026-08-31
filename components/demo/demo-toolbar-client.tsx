@@ -188,27 +188,27 @@ function DemoGuideDialog({
 }) {
   const toggles = [
     {
+      Icon: client ? Eye : EyeOff,
       name: 'Client',
       on: client,
-      Icon: client ? Eye : EyeOff,
       text: 'Outlines the Client Components. Everything else is server-rendered and ships no JS.',
     },
     {
+      Icon: prefetch ? Zap : ZapOff,
       name: 'Prefetch',
       on: prefetch,
-      Icon: prefetch ? Zap : ZapOff,
       text: 'Resolves the URL data (search params and dynamic params) at prefetch time, so the cached content behind it is ready before the click. Off, only the App Shell is prefetched (still instant, and it already holds your session data), so that URL content streams in after.',
     },
     {
+      Icon: delays ? Timer : TimerOff,
       name: 'Delays',
       on: delays,
-      Icon: delays ? Timer : TimerOff,
       text: 'Adds artificial latency to the real database queries, to prove navigation stays instant on a slow backend.',
     },
     {
+      Icon: offline ? WifiOff : Wifi,
       name: 'Online',
       on: !offline,
-      Icon: offline ? WifiOff : Wifi,
       text: 'Go offline and pages still open to their App Shell, with prefetched data ready. Recovers when you reconnect.',
     },
   ];

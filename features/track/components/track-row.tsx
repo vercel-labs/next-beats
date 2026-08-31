@@ -4,8 +4,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 import { AddToPlaylistMenu } from '@/features/playlist/components/add-to-playlist-menu';
 import { getPlaylistMenuItems } from '@/features/playlist/playlist-queries';
-import { FavoriteButton, NowPlayingTrackLink, TrackIndexCell } from '@/features/track/components/track-interactions';
-import { TrackPlayRow } from '@/features/track/components/track-interactions';
+import {
+  FavoriteButton,
+  NowPlayingTrackLink,
+  TrackIndexCell,
+  TrackPlayRow,
+} from '@/features/track/components/track-interactions';
 import { getRecommendedTracks, getUserFavoriteIds } from '@/features/track/track-queries';
 import { formatDuration, formatCount } from '@/lib/utils';
 import type { Track as TrackT } from '@/types/track';

@@ -16,17 +16,17 @@ export async function toggleFavorite(trackId: string) {
   const id = trackIdSchema.parse(trackId);
 
   const existing = await prisma.userFavorite.findUnique({
-    where: { userId_trackId: { userId, trackId: id } },
+    where: { userId_trackId: { trackId: id, userId } },
   });
 
   if (existing) {
     await prisma.userFavorite.deleteMany({
-      where: { userId, trackId: id },
+      where: { trackId: id, userId },
     });
   } else {
     try {
       await prisma.userFavorite.create({
-        data: { userId, trackId: id },
+        data: { trackId: id, userId },
       });
     } catch (error) {
       if (!(error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002')) {

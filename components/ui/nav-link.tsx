@@ -29,11 +29,7 @@ const OptimisticNavigationContext = createContext<OptimisticNavigation | null>(n
 export function OptimisticNavigationProvider({ children }: { children: React.ReactNode }) {
   const [destination, navigate] = useOptimistic<string | null>(null);
 
-  return (
-    <OptimisticNavigationContext value={{ destination, navigate }}>
-      {children}
-    </OptimisticNavigationContext>
-  );
+  return <OptimisticNavigationContext value={{ destination, navigate }}>{children}</OptimisticNavigationContext>;
 }
 
 // `useSelectedLayoutSegments` is dynamic under `cacheComponents`, so the

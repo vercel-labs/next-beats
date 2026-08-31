@@ -27,7 +27,7 @@ test.describe('Genre page (/genre/[genre])', () => {
     await instant(page, async () => {
       await link.click();
       await page.waitForURL(url => url.pathname === href);
-      await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+      await expect(page.getByRole('heading', { exact: true, name: heading })).toBeVisible();
     });
   });
 });

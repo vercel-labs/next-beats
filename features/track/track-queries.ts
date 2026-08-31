@@ -44,9 +44,9 @@ async function getFavoritesForUser(userId: string, slow: boolean) {
 
   await delay(500, slow);
   const rows = await prisma.userFavorite.findMany({
-    where: { userId },
-    orderBy: { addedAt: 'desc' },
     include: { track: true },
+    orderBy: { addedAt: 'desc' },
+    where: { userId },
   });
   return rows.map(row => toTrack(row.track, { favorites: [row] }));
 }
@@ -61,8 +61,8 @@ async function getUserFavoriteIdsForUser(userId: string) {
   cacheTag(`favorites:${userId}`);
 
   const rows = await prisma.userFavorite.findMany({
-    where: { userId },
     select: { trackId: true },
+    where: { userId },
   });
   return new Set(rows.map(r => r.trackId));
 }
@@ -79,10 +79,10 @@ async function getRecentlyPlayedForUser(userId: string, limit: number, slow: boo
 
   await delay(500, slow);
   const rows = await prisma.userTrackPlay.findMany({
-    where: { userId },
+    include: { track: true },
     orderBy: { lastPlayedAt: 'desc' },
     take: limit,
-    include: { track: true },
+    where: { userId },
   });
   return rows.map(row => toTrack(row.track, { trackPlays: [row] }));
 }
@@ -98,10 +98,10 @@ async function getTrackForUser(id: string, userId: string, slow: boolean) {
 
   await delay(400, slow);
   const row = await prisma.track.findUnique({
-    where: { id },
     include: {
       favorites: { where: { userId } },
     },
+    where: { id },
   });
   if (!row) notFound();
   return toTrack(row, { favorites: row.favorites });
@@ -175,8 +175,8 @@ async function getRecommendedTracksForUser(excludeTrackId: string, userId: strin
     orderBy: { playCount: 'desc' },
     take: limit,
     where: {
-      id: { not: excludeTrackId },
       favorites: { none: { userId } },
+      id: { not: excludeTrackId },
     },
   });
   return rows.map(row => toTrack(row));

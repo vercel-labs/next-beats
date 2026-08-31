@@ -23,9 +23,9 @@ export async function signIn(formData: FormData) {
   let userId: string;
   try {
     const user = await prisma.user.upsert({
-      where: { name: parsed.data.email },
       create: { name: parsed.data.email },
       update: {},
+      where: { name: parsed.data.email },
     });
     userId = user.id;
   } catch {
@@ -34,9 +34,9 @@ export async function signIn(formData: FormData) {
 
   const store = await cookies();
   store.set(SESSION_COOKIE, userId, {
+    maxAge: 60 * 60 * 24 * 30,
     path: '/',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    sameSite: 'lax', // 30 days
   });
   redirect('/');
 }
