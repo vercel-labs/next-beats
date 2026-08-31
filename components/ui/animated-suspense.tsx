@@ -1,11 +1,17 @@
 import { Suspense, ViewTransition } from 'react';
 
-export function AnimatedSuspense({ children }: { children: React.ReactNode }) {
+export function AnimatedSuspense({
+  children,
+  fallback,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) {
   return (
     <Suspense
       fallback={
         <ViewTransition default="none" exit="auto">
-          {children}
+          {fallback}
         </ViewTransition>
       }
     >

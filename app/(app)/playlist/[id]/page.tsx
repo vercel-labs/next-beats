@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps<'/playlist/[id]'>):
 export default function PlaylistDetailPage({ params }: PageProps<'/playlist/[id]'>) {
   return (
     <PageWrapper>
-      <AnimatedSuspense>
+      <AnimatedSuspense fallback={<PlaylistDetailSkeleton />}>
         {params.then(({ id }) => (
           <>
             <PlaylistDetail id={id} />
@@ -25,7 +25,7 @@ export default function PlaylistDetailPage({ params }: PageProps<'/playlist/[id]
               <section className="mt-10">
                 <h2 className="mb-4">Other Playlists</h2>
                 <ErrorBoundary title="Couldn't load other playlists">
-                  <AnimatedSuspense>
+                  <AnimatedSuspense fallback={<PlaylistListSkeleton count={3} />}>
                     <PlaylistBrowse excludeId={id} />
                   </AnimatedSuspense>
                 </ErrorBoundary>

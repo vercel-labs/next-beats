@@ -15,7 +15,7 @@ export default function PlaylistsPage() {
       <div className="mb-6 max-w-md">
         <CreatePlaylistForm />
       </div>
-      <AnimatedSuspense>
+      <AnimatedSuspense fallback={<PlaylistListSkeleton count={3} />}>
         <PlaylistBrowse animateItems />
       </AnimatedSuspense>
     </PageWrapper>

@@ -10,7 +10,7 @@ export default function GenreLayout({ children }: LayoutProps<'/genre'>) {
       <section className="mt-10">
         <h2 className="mb-4">Explore Other Genres</h2>
         <ErrorBoundary title="Couldn't load other genres">
-          <AnimatedSuspense>
+          <AnimatedSuspense fallback={<TopGenresGridSkeleton />}>
             <TopGenresGrid />
           </AnimatedSuspense>
         </ErrorBoundary>

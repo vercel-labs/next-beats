@@ -16,7 +16,14 @@ export async function generateMetadata({ params }: PageProps<'/track/[id]'>): Pr
 export default function TrackPage({ params }: PageProps<'/track/[id]'>) {
   return (
     <PageWrapper>
-      <AnimatedSuspense>
+      <AnimatedSuspense
+        fallback={
+          <>
+            <TrackHeaderSkeleton />
+            <TrackControlsSkeleton />
+          </>
+        }
+      >
         {params.then(({ id }) => (
           <>
             <TrackHeader id={id} />
@@ -27,7 +34,7 @@ export default function TrackPage({ params }: PageProps<'/track/[id]'>) {
       <section>
         <h2 className="mb-4">More songs you might like</h2>
         <ErrorBoundary title="Couldn't load recommendations">
-          <AnimatedSuspense>
+          <AnimatedSuspense fallback={<TrackListSkeleton count={3} />}>
             {params.then(({ id }) => (
               <RecommendedTracks trackId={id} />
             ))}

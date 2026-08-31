@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-button-link';
 import { PageWrapper } from '@/components/ui/page-layout';
@@ -15,7 +16,7 @@ export default function LibraryPage() {
   return (
     <PageWrapper title="Library">
       <h2 className="mb-4">All Tracks</h2>
-      <AnimatedSuspense>
+      <AnimatedSuspense fallback={<LibraryGridSkeleton />}>
         <div className="mb-10">
           <LibraryGrid />
         </div>

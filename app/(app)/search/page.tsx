@@ -15,7 +15,7 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
     <PageWrapper title="Search">
       <Search>
         <ErrorBoundary title="Search is taking a breather">
-          <AnimatedSuspense>
+          <AnimatedSuspense fallback={<GenreBrowseSkeleton />}>
             {searchParams.then(sp => {
               const q = typeof sp.q === 'string' ? sp.q : '';
               if (!q) {

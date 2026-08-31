@@ -13,7 +13,14 @@ export async function generateMetadata({ params }: PageProps<'/genre/[genre]'>):
 export default function GenreDetailPage({ params }: PageProps<'/genre/[genre]'>) {
   return (
     <div>
-      <AnimatedSuspense>
+      <AnimatedSuspense
+        fallback={
+          <>
+            <Skeleton className="mb-6 h-9 w-40" />
+            <TrackListSkeleton count={5} showIndex showMore />
+          </>
+        }
+      >
         {params.then(({ genre }) => {
           const label = decodeURIComponent(genre);
           return (
