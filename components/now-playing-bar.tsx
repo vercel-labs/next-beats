@@ -59,7 +59,7 @@ export function NowPlayingBar() {
           style={{ viewTransitionName: 'player-bar-desktop' }}
           className="border-divider dark:border-divider-dark hidden shrink-0 border-t bg-white px-4 py-2 sm:block dark:bg-[#181818]"
         >
-          <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_2fr] items-center gap-4 lg:grid-cols-[minmax(0,1fr)_2fr_minmax(0,1fr)]">
+          <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_2fr] items-end gap-4 lg:grid-cols-[minmax(0,1fr)_2fr_minmax(0,1fr)]">
             <div className="min-w-0">
               <div className="hidden items-center gap-3 lg:flex">
                 <AlbumArt
@@ -97,7 +97,7 @@ export function NowPlayingBar() {
                 <span className="text-muted w-8 text-[10px]">{formatDuration(total)}</span>
               </div>
             </div>
-            <div className="hidden items-end justify-end gap-1.5 lg:flex">
+            <div className="hidden items-center justify-end gap-1.5 lg:flex">
               <button
                 type="button"
                 onClick={() => setVolume(volume === 0 ? 75 : 0)}
