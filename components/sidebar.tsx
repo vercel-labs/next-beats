@@ -16,7 +16,7 @@ import { signOut } from '@/features/user/user-actions';
 import type { Route } from 'next';
 
 const sidebarLink =
-  'flex items-center justify-center gap-3 rounded-md p-2 text-sm tracking-tight transition-colors lg:justify-start lg:px-3 text-muted not-aria-[current=page]:hover:text-black dark:not-aria-[current=page]:hover:text-white aria-[current=page]:bg-white/10 aria-[current=page]:font-bold aria-[current=page]:text-black aria-[current=page]:dark:text-white aria-[current=page]:[&_svg]:stroke-[2.5]';
+  'flex items-center justify-center gap-3 rounded-md p-2 text-sm tracking-tight lg:justify-start lg:px-3 text-muted not-aria-[current=page]:hover:text-black dark:not-aria-[current=page]:hover:text-white aria-[current=page]:bg-white/10 aria-[current=page]:font-bold aria-[current=page]:text-black aria-[current=page]:dark:text-white aria-[current=page]:[&_svg]:stroke-[2.5]';
 
 export function Sidebar() {
   return (
