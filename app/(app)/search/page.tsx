@@ -1,5 +1,4 @@
-import { Suspense } from 'react';
-import { Crossfade } from '@/components/ui/crossfade';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { GenreBrowse, GenreBrowseSkeleton } from '@/features/genre/components/genre-browse';
@@ -16,22 +15,20 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
     <PageWrapper title="Search">
       <Search>
         <ErrorBoundary title="Search is taking a breather">
-          <Suspense fallback={<GenreBrowseSkeleton />}>
-            <Crossfade>
-              {searchParams.then(sp => {
-                const q = typeof sp.q === 'string' ? sp.q : '';
-                if (!q) {
-                  return (
-                    <>
-                      <h2 className="mb-4">Browse All</h2>
-                      <GenreBrowse />
-                    </>
-                  );
-                }
-                return <SearchResults query={q} />;
-              })}
-            </Crossfade>
-          </Suspense>
+          <AnimatedSuspense fallback={<GenreBrowseSkeleton />}>
+            {searchParams.then(sp => {
+              const q = typeof sp.q === 'string' ? sp.q : '';
+              if (!q) {
+                return (
+                  <>
+                    <h2 className="mb-4">Browse All</h2>
+                    <GenreBrowse />
+                  </>
+                );
+              }
+              return <SearchResults query={q} />;
+            })}
+          </AnimatedSuspense>
         </ErrorBoundary>
       </Search>
     </PageWrapper>

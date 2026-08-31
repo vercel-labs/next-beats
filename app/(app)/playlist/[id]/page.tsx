@@ -1,5 +1,5 @@
 import { Suspense, ViewTransition } from 'react';
-import { Crossfade } from '@/components/ui/crossfade';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { PlaylistBrowse } from '@/features/playlist/components/playlist-browse';
@@ -17,27 +17,23 @@ export async function generateMetadata({ params }: PageProps<'/playlist/[id]'>):
 export default function PlaylistDetailPage({ params }: PageProps<'/playlist/[id]'>) {
   return (
     <PageWrapper>
-      <Suspense fallback={<PlaylistDetailSkeleton />}>
-        <Crossfade>
-          {params.then(({ id }) => (
-            <>
-              <PlaylistDetail id={id} />
-              <ViewTransition>
-                <section className="mt-10">
-                  <h2 className="mb-4">Other Playlists</h2>
-                  <ErrorBoundary title="Couldn't load other playlists">
-                    <Suspense fallback={<PlaylistListSkeleton count={3} />}>
-                      <Crossfade>
-                        <PlaylistBrowse excludeId={id} />
-                      </Crossfade>
-                    </Suspense>
-                  </ErrorBoundary>
-                </section>
-              </ViewTransition>
-            </>
-          ))}
-        </Crossfade>
-      </Suspense>
+      <AnimatedSuspense fallback={<PlaylistDetailSkeleton />}>
+        {params.then(({ id }) => (
+          <>
+            <PlaylistDetail id={id} />
+            <ViewTransition>
+              <section className="mt-10">
+                <h2 className="mb-4">Other Playlists</h2>
+                <ErrorBoundary title="Couldn't load other playlists">
+                  <AnimatedSuspense fallback={<PlaylistListSkeleton count={3} />}>
+                    <PlaylistBrowse excludeId={id} />
+                  </AnimatedSuspense>
+                </ErrorBoundary>
+              </section>
+            </ViewTransition>
+          </>
+        ))}
+      </AnimatedSuspense>
     </PageWrapper>
   );
 }
