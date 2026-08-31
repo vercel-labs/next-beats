@@ -289,28 +289,34 @@
 @keyframes eq1 {
   0%,
   100% {
-    height: 3px;
+    height: 4px;
+    transform: translateY(0);
   }
   50% {
-    height: 12px;
+    height: 4px;
+    transform: translateY(-6px);
   }
 }
 @keyframes eq2 {
   0%,
   100% {
-    height: 8px;
+    height: 4px;
+    transform: translateY(0);
   }
   50% {
     height: 4px;
+    transform: translateY(3px);
   }
 }
 @keyframes eq3 {
   0%,
   100% {
-    height: 5px;
+    height: 4px;
+    transform: translateY(0);
   }
   50% {
-    height: 11px;
+    height: 4px;
+    transform: translateY(-4px);
   }
 }
 
