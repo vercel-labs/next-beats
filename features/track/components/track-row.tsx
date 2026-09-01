@@ -1,4 +1,4 @@
-import { ViewTransition } from 'react';
+import { Suspense, ViewTransition } from 'react';
 import { Collapsible } from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlbumArt } from '@/features/artwork/components/album-art';
@@ -40,7 +40,9 @@ export async function TrackRow({ track, index, showAlbum = true, queue }: Props 
         <span className="text-muted hidden text-xs sm:block">{formatCount(track.playCount)} plays</span>
         <span className="text-muted font-mono text-xs">{formatDuration(track.duration)}</span>
         <FavoriteButton trackId={track.id} isFavorite={isFavorite} />
-        <AddToPlaylistMenu trackId={track.id} itemsPromise={getPlaylistMenuItems(track.id)} />
+        <Suspense fallback={<Skeleton className="h-4 w-4 rounded-full" />}>
+          <AddToPlaylistMenu trackId={track.id} itemsPromise={getPlaylistMenuItems(track.id)} />
+        </Suspense>
       </div>
     </TrackPlayRow>
   );
