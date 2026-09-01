@@ -23,7 +23,6 @@ export default function FavoritesPage() {
             <ErrorBoundary title="Couldn't load recommendations">
               <AnimatedSuspense fallback={<DiscoverSkeleton />}>
                 <Discover />
-
                 <section className="mt-10">
                   <h2 className="mb-4">Explore Genres</h2>
                   <TopGenresGrid />
