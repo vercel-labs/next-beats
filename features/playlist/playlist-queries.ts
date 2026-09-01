@@ -12,7 +12,7 @@ export async function getPlaylists() {
 }
 
 async function getPlaylistsForUser(userId: string, slow: boolean) {
-  await delay(1000, slow);
+  await delay(1500, slow);
   const rows = await prisma.playlist.findMany({
     include: {
       _count: { select: { tracks: true } },
