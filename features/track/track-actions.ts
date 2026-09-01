@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidateTag, updateTag } from 'next/cache';
+import { refresh, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { verifyAuth } from '@/features/user/user-queries';
 import { Prisma } from '@/generated/prisma/client';
@@ -34,8 +34,7 @@ export async function toggleFavorite(trackId: string) {
     }
   }
 
-  updateTag(`track-${id}:${userId}`);
-  updateTag(`favorites:${userId}`);
+  refresh();
   revalidateTag(`discover:${userId}`, 'max');
   revalidateTag(`recommendations:${userId}`, 'max');
   return { ok: true as const };

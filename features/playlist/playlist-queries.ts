@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
@@ -13,7 +12,7 @@ export async function getPlaylists() {
 }
 
 async function getPlaylistsForUser(userId: string, slow: boolean) {
-  await delay(500, slow);
+  await delay(1000, slow);
   const rows = await prisma.playlist.findMany({
     include: {
       _count: { select: { tracks: true } },
@@ -41,9 +40,6 @@ export async function searchPlaylists(query: string) {
 }
 
 async function searchPlaylistsForUser(userId: string, query: string, slow: boolean) {
-  'use cache';
-  cacheTag(`playlists:${userId}`);
-
   await delay(400, slow);
   const rows = await prisma.playlist.findMany({
     include: {
@@ -75,9 +71,6 @@ export async function getPlaylist(id: string) {
 }
 
 async function getPlaylistForUser(id: string, userId: string, slow: boolean) {
-  'use cache';
-  cacheTag(`playlist-${id}`);
-
   await delay(500, slow);
   const row = await prisma.playlist.findFirst({
     include: {
@@ -105,9 +98,6 @@ export async function getPlaylistMenuItems(trackId: string) {
 }
 
 async function getPlaylistMenuItemsForUser(trackId: string, userId: string) {
-  'use cache';
-  cacheTag(`playlists:${userId}`);
-
   const playlists = await prisma.playlist.findMany({
     include: { _count: { select: { tracks: true } } },
     orderBy: { createdAt: 'desc' },
