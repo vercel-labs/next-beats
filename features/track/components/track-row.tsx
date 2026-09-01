@@ -97,8 +97,8 @@ export function TrackRowSkeleton({ showIndex = false, index }: { showIndex?: boo
       )}
       <Skeleton className="h-10 w-10 shrink-0 rounded-md" />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <Skeleton className="h-3.5 w-28" />
-        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3.5 w-28 max-w-full" />
+        <Skeleton className="h-3 w-20 max-w-full" />
       </div>
       <Skeleton className="hidden h-3 w-14 sm:block" />
       <Skeleton className="h-3 w-8" />
