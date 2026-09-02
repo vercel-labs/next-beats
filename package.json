@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "postinstall": "prisma generate",
     "prisma.push": "prisma db push",
     "prisma.seed": "prisma db seed",
     "prisma.studio": "prisma studio",
@@ -68,7 +69,9 @@
   "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
-      "better-sqlite3"
+      "@vgpu/adapter-node",
+      "better-sqlite3",
+      "webgpu"
     ],
     "overrides": {
       "brace-expansion": "1.1.11"
