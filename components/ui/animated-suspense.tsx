@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 export function AnimatedSuspense({ fallback, children }: { fallback: ReactNode; children: ReactNode }) {
   return (
-    <ViewTransition update="auto" default="none">
+    <ViewTransition enter="auto" exit="auto" default="none">
       <Suspense fallback={fallback}>
         <ViewTransition default="none">{children}</ViewTransition>
       </Suspense>
