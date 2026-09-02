@@ -14,7 +14,7 @@
     "lint:fix": "eslint . --fix",
     "postinstall": "prisma generate",
     "prisma.push": "prisma db push",
-    "prisma.seed": "prisma db seed",
+    "prisma.seed": "prisma generate && prisma db seed",
     "prisma.studio": "prisma studio",
     "prisma.reset": "prisma db push --force-reset && pnpm prisma.seed",
     "test:e2e": "playwright test"
