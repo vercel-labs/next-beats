@@ -4,7 +4,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
+    "postinstall": "prisma generate",
     "analyze": "next build && next experimental-analyze",
     "build": "prisma generate && next build",
     "covers:icons": "tsx scripts/generate-covers.mts",
