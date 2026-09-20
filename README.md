@@ -71,3 +71,18 @@ pnpm test:e2e
 ## License
 
 [MIT](LICENSE)
+
+### Text moderation
+
+User-submitted content is checked on the server before saving. A local profanity
+filter runs first, followed by `typesafe-ai/jev` through AI Gateway to check for
+spam, scams, phishing, harassment, threats, and hate speech. Set
+`AI_GATEWAY_API_KEY` (or the existing `VERCEL_AI_GATEWAY_TOKEN`) in the server
+environment; Vercel OIDC authentication is also supported by the Gateway SDK.
+
+Jev uses the experimental AI SDK evaluation API. The demo blocks policy-violation
+probabilities of 0.9 or higher; this is an initial conservative threshold, not a
+measured accuracy guarantee. Check it against representative examples before
+changing the policy. AI failures or the three-second timeout allow the submission
+through, while the local profanity check remains active. Submitted content and
+provider responses are not logged by the moderator.

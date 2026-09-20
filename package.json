@@ -20,12 +20,14 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "4.0.86",
     "@ariakit/react": "^0.4.28",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "ai": "7.0.106",
     "better-sqlite3": "^12.11.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",

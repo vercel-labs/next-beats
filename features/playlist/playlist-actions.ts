@@ -7,10 +7,11 @@ import { SEED_PLAYLIST_IDS } from '@/features/playlist/playlist-constants';
 import { verifyAuth } from '@/features/user/user-queries';
 import { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/db';
+import { moderateText } from '@/lib/moderation';
 import { delay } from '@/lib/utils';
 
 const createPlaylistSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
+  name: z.string().trim().min(1, 'Name is required').max(100),
 });
 const idSchema = z.string().min(1);
 
@@ -30,6 +31,9 @@ export async function createPlaylist(formData: FormData) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message, ok: false as const };
   }
+
+  const flagged = await moderateText(parsed.data.name);
+  if (flagged) return { error: flagged, ok: false as const };
 
   const playlist = await prisma.playlist.create({
     data: {
