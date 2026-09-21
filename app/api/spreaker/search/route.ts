@@ -18,29 +18,59 @@ export async function GET(request: NextRequest) {
   const token = process.env.SPREAKER_ACCESS_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const response = await fetch(`${SPREAKER_API_URL}?${params}`, {
-    headers,
-    next: { revalidate: 300 },
-  });
-
-  if (!response.ok) {
-    return NextResponse.json({ error: 'Spreaker could not complete the search.' }, { status: response.status });
+  let response: Response;
+  try {
+    response = await fetch(`${SPREAKER_API_URL}?${params}`, {
+      headers,
+      next: { revalidate: 300 },
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Spreaker is temporarily unavailable. Please try again.' },
+      { status: 502 },
+    );
   }
 
-  const payload = await response.json();
-  const episodes = Array.isArray(payload.response?.items) ? payload.response.items : [];
+  if (!response.ok) {
+    const status = response.status === 401 || response.status === 403 ? 502 : response.status;
+    return NextResponse.json(
+      { error: 'Spreaker could not complete the search.' },
+      { status },
+    );
+  }
 
-  return NextResponse.json({
-    episodes: episodes.map((episode: Record<string, unknown>) => ({
-      author: typeof episode.show === 'object' && episode.show ? (episode.show as Record<string, unknown>).title : 'Spreaker',
+  let payload: { response?: { items?: unknown[] } };
+  try {
+    payload = await response.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'Spreaker returned an invalid response.' },
+      { status: 502 },
+    );
+  }
+
+  const episodes = Array.isArray(payload.response?.items) ? payload.response.items : [];
+  const normalizedEpisodes = episodes.flatMap(item => {
+    if (!item || typeof item !== 'object') return [];
+    const episode = item as Record<string, unknown>;
+    const show = episode.show && typeof episode.show === 'object'
+      ? episode.show as Record<string, unknown>
+      : null;
+    const id = episode.episode_id ?? episode.id;
+    if (id === undefined || id === null) return [];
+
+    return [{
+      author: typeof show?.title === 'string' ? show.title : 'Spreaker',
       description: typeof episode.description === 'string' ? episode.description : '',
       duration: typeof episode.duration === 'number' ? episode.duration : 0,
-      id: String(episode.episode_id ?? episode.id ?? ''),
+      id: String(id),
       imageUrl: typeof episode.image_url === 'string' ? episode.image_url : null,
       publishedAt: typeof episode.published_at === 'string' ? episode.published_at : null,
       title: typeof episode.title === 'string' ? episode.title : 'Untitled episode',
       url: typeof episode.audio_url === 'string' ? episode.audio_url : null,
       webpageUrl: typeof episode.site_url === 'string' ? episode.site_url : null,
-    })),
+    }];
   });
+
+  return NextResponse.json({ episodes: normalizedEpisodes });
 }

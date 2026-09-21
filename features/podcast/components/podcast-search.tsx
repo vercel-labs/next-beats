@@ -36,9 +36,9 @@ export function PodcastSearch() {
     setError('');
     try {
       const response = await fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}`);
-      const payload = await response.json();
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error ?? 'Search failed.');
-      setEpisodes(payload.episodes ?? []);
+      setEpisodes(Array.isArray(payload.episodes) ? payload.episodes : []);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Search failed.');
       setEpisodes([]);
