@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 const SPREAKER_API_URL = 'https://api.spreaker.com/v2/search';
 

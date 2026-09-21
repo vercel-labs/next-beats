@@ -1,6 +1,7 @@
 'use client';
 
 import { LoaderCircle, Play, Search } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 
 type Episode = {
@@ -61,7 +62,7 @@ export function PodcastSearch() {
       <div className="grid gap-4 md:grid-cols-2">
         {episodes.map(episode => (
           <article key={episode.id} className="bg-card dark:bg-card-dark flex gap-4 rounded-xl p-4">
-            {episode.imageUrl ? <img src={episode.imageUrl} alt="" className="h-24 w-24 shrink-0 rounded-lg object-cover" /> : <div className="bg-accent/15 h-24 w-24 shrink-0 rounded-lg" />}
+            {episode.imageUrl ? <Image src={episode.imageUrl} alt="" width={96} height={96} className="h-24 w-24 shrink-0 rounded-lg object-cover" unoptimized /> : <div className="bg-accent/15 h-24 w-24 shrink-0 rounded-lg" />}
             <div className="min-w-0 flex-1">
               <p className="text-muted mb-1 text-xs font-medium">{episode.author}</p>
               <h2 className="line-clamp-2 font-semibold">{episode.title}</h2>
