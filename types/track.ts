@@ -13,6 +13,7 @@ export type Track = {
   lastPlayedAt: Date | null;
   createdAt: Date;
   audioUrl?: string;
+  imageUrl?: string | null;
   webpageUrl?: string | null;
 };
 
@@ -27,6 +28,7 @@ export function toTrack(row: PrismaTrack, userData?: UserData): Track {
     artist: row.artist,
     audioUrl: row.audioUrl ?? undefined,
     coverColor: row.coverColor,
+    imageUrl: null,
     createdAt: row.createdAt,
     duration: row.duration,
     genre: row.genre,
