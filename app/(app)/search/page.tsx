@@ -1,10 +1,9 @@
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PageWrapper } from '@/components/ui/page-layout';
-import { GenreBrowse, GenreBrowseSkeleton } from '@/features/genre/components/genre-browse';
+import { Skeleton } from '@/components/ui/skeleton';
 import { PodcastSearch } from '@/features/podcast/components/podcast-search';
 import { Search } from '@/features/search/components/search';
-import { SearchResults } from '@/features/search/components/search-results';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -16,23 +15,19 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
     <PageWrapper title="Search">
       <Search>
         <ErrorBoundary title="Search is taking a breather">
-          <AnimatedSuspense fallback={<GenreBrowseSkeleton />}>
+          <AnimatedSuspense fallback={<Skeleton className="h-32 w-full" />}>
             {searchParams.then(sp => {
               const q = typeof sp.q === 'string' ? sp.q : '';
               if (!q) {
                 return (
                   <>
-                    <h2 className="mb-4">Browse All</h2>
-                    <GenreBrowse />
+                    <h2 className="mb-4">Discover podcasts</h2>
+                    <PodcastSearch query="" />
                   </>
                 );
               }
               return (
                 <div className="space-y-10">
-                  <section>
-                    <h2 className="mb-4">Music</h2>
-                    <SearchResults query={q} />
-                  </section>
                   <section>
                     <div className="mb-4 flex items-baseline justify-between gap-4">
                       <h2>Podcasts</h2>

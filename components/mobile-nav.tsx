@@ -1,4 +1,4 @@
-import { Headphones, Heart, Home, Library, Search, ShoppingBag } from 'lucide-react';
+import { Headphones, Home, Search, ShoppingBag } from 'lucide-react';
 import { NavLink } from './ui/nav-link';
 
 const mobileTab =
@@ -20,10 +20,6 @@ export function MobileTabBar() {
           <Search className="h-5 w-5" />
           <span>Search</span>
         </NavLink>
-        <NavLink href="/library" aria-label="Library" className={mobileTab}>
-          <Library className="h-5 w-5" />
-          <span>Library</span>
-        </NavLink>
         <NavLink href="/podcasts" aria-label="Podcasts" className={mobileTab}>
           <Headphones className="h-5 w-5" />
           <span>Podcasts</span>
@@ -31,10 +27,6 @@ export function MobileTabBar() {
         <NavLink href="/cart" aria-label="Shopping bag" className={mobileTab}>
           <ShoppingBag className="h-5 w-5" />
           <span>Bag</span>
-        </NavLink>
-        <NavLink href="/favorites" aria-label="Liked" className={mobileTab}>
-          <Heart className="h-5 w-5" />
-          <span>Liked</span>
         </NavLink>
       </nav>
     </div>
