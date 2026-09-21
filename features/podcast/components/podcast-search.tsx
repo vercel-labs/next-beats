@@ -25,7 +25,7 @@ function formatDuration(seconds: number) {
 }
 
 export function PodcastSearch() {
-  const { playExternal, track, isPlaying } = usePlayer();
+  const { playExternal, togglePlayPause, track, isPlaying } = usePlayer();
   const [query, setQuery] = useState('');
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +33,11 @@ export function PodcastSearch() {
 
   function playEpisode(episode: Episode) {
     if (!episode.url) return;
+    const episodeId = `spreaker-${episode.id}`;
+    if (track?.id === episodeId) {
+      togglePlayPause();
+      return;
+    }
     const podcastTrack: Track = {
       album: episode.author,
       artist: episode.author,
@@ -41,7 +46,7 @@ export function PodcastSearch() {
       createdAt: new Date(episode.publishedAt ?? '1970-01-01T00:00:00.000Z'),
       duration: episode.duration,
       genre: 'Podcast',
-      id: `spreaker-${episode.id}`,
+      id: episodeId,
       isFavorite: false,
       lastPlayedAt: null,
       playCount: 0,
