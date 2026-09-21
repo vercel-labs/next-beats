@@ -90,9 +90,10 @@ export function NowPlayingBar() {
                 className="hidden items-center gap-3 lg:flex"
               >
                 <AlbumArt
-                  coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
-                  coverSeed={track?.id}
-                  label={track?.title}
+coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
+  coverSeed={track?.id}
+  imageUrl={track?.imageUrl}
+  label={track?.title}
                   size="sm"
                   className="!h-14 !w-14 !rounded-sm"
                 />
@@ -103,9 +104,10 @@ export function NowPlayingBar() {
               </div>
               <div className="flex items-center gap-3 lg:hidden">
                 <AlbumArt
-                  coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
-                  coverSeed={track?.id}
-                  label={track?.title}
+coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
+  coverSeed={track?.id}
+  imageUrl={track?.imageUrl}
+  label={track?.title}
                   size="sm"
                   className="!h-10 !w-10 !rounded-sm"
                 />
@@ -260,7 +262,7 @@ function ExpandedPlayer({
         <span className="w-10" aria-hidden="true" />
       </div>
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center">
-        <AlbumArt coverColor={track.coverColor} coverSeed={track.id} label={track.title} size="lg" className="mx-auto !h-[min(72vw,22rem)] !w-[min(72vw,22rem)] !rounded-xl shadow-2xl" />
+        <AlbumArt coverColor={track.coverColor} coverSeed={track.id} imageUrl={track.imageUrl} label={track.title} size="lg" className="mx-auto !h-[min(72vw,22rem)] !w-[min(72vw,22rem)] !rounded-xl shadow-2xl" />
         <div className="mt-8">
           <TrackInfo title={track.title} subtitle={`${track.artist} · ${track.album}`} />
         </div>
