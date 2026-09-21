@@ -5,6 +5,7 @@ const SPREAKER_API_URL = 'https://api.spreaker.com/v2/search';
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q')?.trim();
+  const type = request.nextUrl.searchParams.get('type') === 'shows' ? 'shows' : 'episodes';
   if (!query) {
     return NextResponse.json({ error: 'A search query is required.' }, { status: 400 });
   }
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   const params = new URLSearchParams({
     limit: '20',
     q: query,
-    type: 'episodes',
+    type,
   });
   const headers: HeadersInit = { Accept: 'application/json' };
   const token = process.env.SPREAKER_ACCESS_TOKEN;
@@ -71,6 +72,25 @@ export async function GET(request: NextRequest) {
       webpageUrl: typeof episode.site_url === 'string' ? episode.site_url : null,
     }];
   });
+
+  if (type === 'shows') {
+    const shows = episodes.flatMap(item => {
+      if (!item || typeof item !== 'object') return [];
+      const show = item as Record<string, unknown>;
+      const id = show.show_id ?? show.id;
+      if (id === undefined || id === null) return [];
+      return [{
+        author: typeof show.author === 'string' ? show.author : 'Spreaker',
+        description: typeof show.description === 'string' ? show.description : '',
+        episodeCount: typeof show.episodes_count === 'number' ? show.episodes_count : null,
+        id: String(id),
+        imageUrl: typeof show.image_url === 'string' ? show.image_url : null,
+        title: typeof show.title === 'string' ? show.title : 'Untitled show',
+        webpageUrl: typeof show.site_url === 'string' ? show.site_url : null,
+      }];
+    });
+    return NextResponse.json({ shows });
+  }
 
   return NextResponse.json({ episodes: normalizedEpisodes });
 }
