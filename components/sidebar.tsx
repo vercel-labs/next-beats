@@ -1,4 +1,4 @@
-import { Headphones, Heart, Home, Library, Plus, Search, Music } from 'lucide-react';
+import { Headphones, Heart, Home, Library, Plus, Search, ShoppingBag, Music } from 'lucide-react';
 import { Suspense } from 'react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import ErrorBoundary from '@/components/ui/error-boundary';
@@ -58,6 +58,10 @@ export function Sidebar() {
           <NavLink href="/podcasts" aria-label="Podcasts" className={sidebarLink}>
             <Headphones className="h-5 w-5" />
             <span className="hidden truncate lg:inline">Podcasts</span>
+          </NavLink>
+          <NavLink href="/merch" aria-label="Merch" className={sidebarLink}>
+            <ShoppingBag className="h-5 w-5" />
+            <span className="hidden truncate lg:inline">Merch</span>
           </NavLink>
         </nav>
       </div>
