@@ -12,6 +12,8 @@ export type Track = {
   isFavorite: boolean;
   lastPlayedAt: Date | null;
   createdAt: Date;
+  audioUrl?: string;
+  webpageUrl?: string | null;
 };
 
 type UserData = {
