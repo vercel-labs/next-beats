@@ -28,9 +28,9 @@ export function MobileTabBar() {
           <Headphones className="h-5 w-5" />
           <span>Podcasts</span>
         </NavLink>
-        <NavLink href="/merch" aria-label="Merch" className={mobileTab}>
+        <NavLink href="/cart" aria-label="Shopping bag" className={mobileTab}>
           <ShoppingBag className="h-5 w-5" />
-          <span>Merch</span>
+          <span>Bag</span>
         </NavLink>
         <NavLink href="/favorites" aria-label="Liked" className={mobileTab}>
           <Heart className="h-5 w-5" />
