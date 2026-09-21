@@ -32,7 +32,10 @@ export function normalizeDatabaseUrl(url: string): string {
     throw new Error('Database URL must use the postgres:// or postgresql:// protocol.');
   }
 
-  if (u.searchParams.get('sslmode') !== 'disable') {
+  if (u.hostname.endsWith('.pooler.supabase.com')) {
+    u.searchParams.set('sslmode', 'require');
+    u.searchParams.set('uselibpqcompat', 'true');
+  } else if (u.searchParams.get('sslmode') !== 'disable') {
     u.searchParams.set('sslmode', 'verify-full');
   }
   return u.toString();
