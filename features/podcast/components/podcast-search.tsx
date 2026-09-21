@@ -51,8 +51,9 @@ export function PodcastSearch({ query }: { query?: string }) {
     const podcastTrack: Track = {
       album: episode.author,
       artist: episode.author,
-      audioUrl: playbackUrl,
-      coverColor: 'from-slate-500 to-slate-800',
+    audioUrl: playbackUrl,
+    coverColor: 'from-slate-500 to-slate-800',
+    imageUrl: episode.imageUrl,
       createdAt: new Date(episode.publishedAt ?? '1970-01-01T00:00:00.000Z'),
       duration: episode.duration,
       genre: 'Podcast',

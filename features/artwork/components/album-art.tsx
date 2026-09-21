@@ -1,9 +1,11 @@
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { AlbumArtCover } from './album-art-cover';
 
 type Props = {
   coverColor: string;
   coverSeed?: string;
+  imageUrl?: string | null;
   label?: string;
   kind?: 'track' | 'album' | 'playlist';
   beatTrackIds?: string[];
@@ -20,6 +22,7 @@ const sizeMap = {
 export function AlbumArt({
   coverColor,
   coverSeed,
+  imageUrl,
   label,
   kind = 'track',
   beatTrackIds,
@@ -35,7 +38,8 @@ export function AlbumArt({
         className,
       )}
     >
-      {coverSeed && (
+      {imageUrl ? <Image src={imageUrl} alt={label ?? 'Podcast thumbnail'} fill sizes="(max-width: 640px) 48px, 96px" unoptimized className="relative z-30 object-cover" /> : null}
+      {coverSeed && !imageUrl && (
         <AlbumArtCover
           seed={coverSeed}
           label={label ?? coverSeed}

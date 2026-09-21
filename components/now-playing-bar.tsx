@@ -45,6 +45,7 @@ export function NowPlayingBar() {
               <AlbumArt
                 coverColor={track.coverColor}
                 coverSeed={track.id}
+                imageUrl={track.imageUrl}
                 label={track.title}
                 size="sm"
                 className="!h-12 !w-12 !rounded-sm"
