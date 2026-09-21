@@ -3,6 +3,8 @@
 import { LoaderCircle, Play, Search } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { usePlayer } from '@/providers/player-provider';
+import type { Track } from '@/types/track';
 
 type Episode = {
   author: string;
@@ -23,10 +25,31 @@ function formatDuration(seconds: number) {
 }
 
 export function PodcastSearch() {
+  const { playExternal, track, isPlaying } = usePlayer();
   const [query, setQuery] = useState('');
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  function playEpisode(episode: Episode) {
+    if (!episode.url) return;
+    const podcastTrack: Track = {
+      album: episode.author,
+      artist: episode.author,
+      audioUrl: episode.url,
+      coverColor: 'from-slate-500 to-slate-800',
+      createdAt: new Date(episode.publishedAt ?? '1970-01-01T00:00:00.000Z'),
+      duration: episode.duration,
+      genre: 'Podcast',
+      id: `spreaker-${episode.id}`,
+      isFavorite: false,
+      lastPlayedAt: null,
+      playCount: 0,
+      title: episode.title,
+      webpageUrl: episode.webpageUrl,
+    };
+    playExternal(podcastTrack, episode.url);
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,7 +90,7 @@ export function PodcastSearch() {
               <p className="text-muted mb-1 text-xs font-medium">{episode.author}</p>
               <h2 className="line-clamp-2 font-semibold">{episode.title}</h2>
               <p className="text-muted mt-1 text-xs">{formatDuration(episode.duration)}</p>
-              {episode.url ? <audio className="mt-3 h-8 w-full" controls preload="none" src={episode.url}><track kind="captions" /></audio> : <a href={episode.webpageUrl ?? '#'} target="_blank" rel="noreferrer" className="text-accent mt-3 inline-flex items-center gap-1 text-sm font-medium"><Play className="h-3.5 w-3.5" /> Listen on Spreaker</a>}
+              {episode.url ? <button type="button" onClick={() => playEpisode(episode)} className="bg-accent text-accent-foreground mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"><Play className="h-3.5 w-3.5" fill="currentColor" /> {track?.id === `spreaker-${episode.id}` && isPlaying ? 'Playing' : 'Play episode'}</button> : <a href={episode.webpageUrl ?? '#'} target="_blank" rel="noreferrer" className="text-accent mt-3 inline-flex items-center gap-1 text-sm font-medium"><Play className="h-3.5 w-3.5" /> Listen on Spreaker</a>}
             </div>
           </article>
         ))}

@@ -66,6 +66,7 @@ type PlayerContextValue = PlayerState & {
   next: () => void;
   previous: () => void;
   setVolume: (v: number) => void;
+  playExternal: (track: Track, audioUrl: string) => void;
 };
 
 const PlayerContext = createContext<PlayerContextValue | null>(null);
@@ -75,6 +76,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const { track, queue, queueIndex, isPlaying, progress, volume } = state;
   const queueIndexRef = useRef(-1);
   const audioRef = useRef<AudioRefs>(createAudioRefs());
+  const externalAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     queueIndexRef.current = queueIndex;
@@ -84,6 +86,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     const refs = audioRef.current;
     return () => {
       stopAll(refs);
+      externalAudioRef.current?.pause();
+      externalAudioRef.current = null;
       killAudio();
     };
   }, []);
@@ -106,7 +110,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  function stopExternalAudio() {
+    externalAudioRef.current?.pause();
+    externalAudioRef.current = null;
+  }
+
   function playAtIndex(idx: number, q: Track[]) {
+    stopExternalAudio();
     const t = q[idx];
     dispatch({ index: idx, queue: q, track: t, type: 'PLAY' });
     void fetch('/api/play', {
@@ -131,13 +141,39 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     playAtIndex(idx >= 0 ? idx : 0, fullQueue);
   }
 
+  function playExternal(t: Track, audioUrl: string) {
+    stopAll(audioRef.current);
+    const audio = new Audio(audioUrl);
+    audio.preload = 'metadata';
+    audio.volume = volume / 100;
+    audio.onplay = () => dispatch({ type: 'RESUME' });
+    audio.onpause = () => dispatch({ type: 'PAUSE' });
+    audio.ontimeupdate = () => {
+      if (audio.duration) {
+        dispatch({ progress: (audio.currentTime / audio.duration) * 100, type: 'SET_PROGRESS' });
+      }
+    };
+    audio.onended = () => dispatch({ progress: 0, type: 'ENDED' });
+    externalAudioRef.current = audio;
+    dispatch({ index: 0, queue: [t], track: t, type: 'PLAY' });
+    void audio.play().catch(() => dispatch({ type: 'PAUSE' }));
+  }
+
   function pause() {
     dispatch({ type: 'PAUSE' });
+    if (externalAudioRef.current) {
+      externalAudioRef.current.pause();
+      return;
+    }
     stopAll(audioRef.current);
     suspendAudio();
   }
 
   function resume() {
+    if (externalAudioRef.current) {
+      void externalAudioRef.current.play().catch(() => dispatch({ type: 'PAUSE' }));
+      return;
+    }
     dispatch({ type: 'RESUME' });
     resumeAudio();
     if (track) {
@@ -174,6 +210,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   function setVolume(v: number) {
     dispatch({ type: 'SET_VOLUME', volume: v });
+    if (externalAudioRef.current) externalAudioRef.current.volume = v / 100;
   }
 
   useListeningMilestones(isPlaying);
@@ -186,6 +223,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         next,
         pause,
         play,
+        playExternal,
         previous,
         progress,
         queue,
