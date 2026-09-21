@@ -156,6 +156,23 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     };
     audio.onended = () => dispatch({ type: 'ENDED' });
     externalAudioRef.current = audio;
+    void fetch('/api/play', {
+      body: JSON.stringify({
+        track: {
+          album: t.album,
+          artist: t.artist,
+          audioUrl,
+          coverColor: t.coverColor,
+          duration: t.duration,
+          genre: t.genre,
+          title: t.title,
+          webpageUrl: t.webpageUrl,
+        },
+        trackId: t.id,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+    });
     dispatch({ index: 0, queue: [t], track: t, type: 'PLAY' });
     void audio.play().catch(() => dispatch({ type: 'PAUSE' }));
   }

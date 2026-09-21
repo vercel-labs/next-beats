@@ -5,6 +5,16 @@ import { getCurrentUser } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 
 const bodySchema = z.object({
+  track: z.object({
+    album: z.string().min(1),
+    artist: z.string().min(1),
+    audioUrl: z.string().min(1).optional(),
+    coverColor: z.string().min(1),
+    duration: z.number().int().nonnegative(),
+    genre: z.string().min(1),
+    title: z.string().min(1),
+    webpageUrl: z.string().url().optional(),
+  }).optional(),
   trackId: z.string().min(1),
 });
 
@@ -14,7 +24,15 @@ export async function POST(request: NextRequest) {
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return new NextResponse(null, { status: 400 });
-  const { trackId } = parsed.data;
+  const { trackId, track } = parsed.data;
+
+  if (track) {
+    await prisma.track.upsert({
+      create: { id: trackId, ...track },
+      update: track,
+      where: { id: trackId },
+    });
+  }
 
   await prisma.track.update({
     data: { playCount: { increment: 1 } },
