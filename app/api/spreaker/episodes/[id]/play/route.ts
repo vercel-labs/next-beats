@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 const SPREAKER_API_URL = 'https://api.spreaker.com/v2/episodes';
 
@@ -19,8 +19,8 @@ export async function GET(
   try {
     response = await fetch(`${SPREAKER_API_URL}/${id}/play`, {
       headers,
-      redirect: 'follow',
       next: { revalidate: 0 },
+      redirect: 'follow',
     });
   } catch {
     return new Response('Spreaker playback is temporarily unavailable.', { status: 502 });

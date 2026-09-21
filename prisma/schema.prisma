@@ -27,6 +27,8 @@ model Track {
   coverColor String
   playCount  Int      @default(0)
   createdAt  DateTime @default(now())
+  audioUrl   String?
+  webpageUrl String?
 
   playlistTracks PlaylistTrack[]
   favorites      UserFavorite[]

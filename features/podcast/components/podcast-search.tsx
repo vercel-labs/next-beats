@@ -6,6 +6,16 @@ import { useEffect, useState } from 'react';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
 
+type Show = {
+  author: string;
+  description: string;
+  episodeCount: number | null;
+  id: string;
+  imageUrl: string | null;
+  title: string;
+  webpageUrl: string | null;
+};
+
 type Episode = {
   author: string;
   description: string;
@@ -27,11 +37,12 @@ function formatDuration(seconds: number) {
 export function PodcastSearch({ query }: { query?: string }) {
   const { playExternal, togglePlayPause, track, isPlaying } = usePlayer();
   const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [shows, setShows] = useState<Show[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   function playEpisode(episode: Episode) {
-    if (!episode.url) return;
+    const playbackUrl = episode.url ?? `/api/spreaker/episodes/${episode.id}/play`;
     const episodeId = `spreaker-${episode.id}`;
     if (track?.id === episodeId) {
       togglePlayPause();
@@ -40,7 +51,7 @@ export function PodcastSearch({ query }: { query?: string }) {
     const podcastTrack: Track = {
       album: episode.author,
       artist: episode.author,
-      audioUrl: episode.url,
+      audioUrl: playbackUrl,
       coverColor: 'from-slate-500 to-slate-800',
       createdAt: new Date(episode.publishedAt ?? '1970-01-01T00:00:00.000Z'),
       duration: episode.duration,
@@ -52,18 +63,25 @@ export function PodcastSearch({ query }: { query?: string }) {
       title: episode.title,
       webpageUrl: episode.webpageUrl,
     };
-    playExternal(podcastTrack, episode.url);
+    playExternal(podcastTrack, playbackUrl);
   }
 
   useEffect(() => {
     const value = query?.trim();
     if (!value) return;
     const controller = new AbortController();
-    fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}`, { signal: controller.signal })
-      .then(async response => {
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error ?? 'Podcast search failed.');
-        setEpisodes(Array.isArray(payload.episodes) ? payload.episodes : []);
+    Promise.all([
+      fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}&type=episodes`, { signal: controller.signal }),
+      fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}&type=shows`, { signal: controller.signal }),
+    ])
+      .then(async ([episodesResponse, showsResponse]) => {
+        const [episodePayload, showPayload] = await Promise.all([
+          episodesResponse.json().catch(() => ({})),
+          showsResponse.json().catch(() => ({})),
+        ]);
+        if (!episodesResponse.ok) throw new Error(episodePayload.error ?? 'Podcast search failed.');
+        setEpisodes(Array.isArray(episodePayload.episodes) ? episodePayload.episodes : []);
+        setShows(showsResponse.ok && Array.isArray(showPayload.shows) ? showPayload.shows : []);
       })
       .catch(caught => {
         if (caught instanceof DOMException && caught.name === 'AbortError') return;
@@ -77,6 +95,15 @@ export function PodcastSearch({ query }: { query?: string }) {
   return (
     <div>
       {error && <p role="alert" className="text-destructive mb-6">{error}</p>}
+      {shows.length > 0 && <section className="mb-8">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Shows</h3>
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {shows.map(show => <a key={show.id} href={show.webpageUrl ?? '#'} target="_blank" rel="noreferrer" className="bg-card dark:bg-card-dark flex w-52 shrink-0 gap-3 rounded-xl p-3 transition-transform hover:-translate-y-0.5">
+            {show.imageUrl ? <Image src={show.imageUrl} alt="" width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg object-cover" unoptimized /> : <div className="bg-accent/15 h-14 w-14 shrink-0 rounded-lg" />}
+            <span className="min-w-0"><strong className="line-clamp-2 text-sm">{show.title}</strong><span className="text-muted mt-1 block text-xs">{show.episodeCount ? `${show.episodeCount} episodes` : 'Public show'}</span></span>
+          </a>)}
+        </div>
+      </section>}
       {query?.trim() && episodes.length === 0 && !isLoading && !error && <p className="text-muted">No Spreaker episodes found for this search.</p>}
       <div className="grid gap-4 md:grid-cols-2">
         {episodes.map(episode => (
@@ -86,7 +113,7 @@ export function PodcastSearch({ query }: { query?: string }) {
               <p className="text-muted mb-1 text-xs font-medium">{episode.author}</p>
               <h2 className="line-clamp-2 font-semibold">{episode.title}</h2>
               <p className="text-muted mt-1 text-xs">{formatDuration(episode.duration)}</p>
-              {episode.url ? <button type="button" onClick={() => playEpisode(episode)} className="bg-accent text-accent-foreground mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"><Play className="h-3.5 w-3.5" fill="currentColor" /> {track?.id === `spreaker-${episode.id}` && isPlaying ? 'Playing' : 'Play episode'}</button> : <a href={episode.webpageUrl ?? '#'} target="_blank" rel="noreferrer" className="text-accent mt-3 inline-flex items-center gap-1 text-sm font-medium"><Play className="h-3.5 w-3.5" /> Listen on Spreaker</a>}
+              <button type="button" onClick={() => playEpisode(episode)} className="bg-accent text-accent-foreground mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"><Play className="h-3.5 w-3.5" fill="currentColor" /> {track?.id === `spreaker-${episode.id}` && isPlaying ? 'Playing' : 'Play episode'}</button>
             </div>
           </article>
         ))}

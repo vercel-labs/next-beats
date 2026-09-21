@@ -25,6 +25,7 @@ export function toTrack(row: PrismaTrack, userData?: UserData): Track {
   return {
     album: row.album,
     artist: row.artist,
+    audioUrl: row.audioUrl ?? undefined,
     coverColor: row.coverColor,
     createdAt: row.createdAt,
     duration: row.duration,
@@ -34,5 +35,6 @@ export function toTrack(row: PrismaTrack, userData?: UserData): Track {
     lastPlayedAt: userData?.trackPlays?.[0]?.lastPlayedAt ?? null,
     playCount: row.playCount,
     title: row.title,
+    webpageUrl: row.webpageUrl,
   };
 }
