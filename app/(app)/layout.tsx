@@ -1,6 +1,5 @@
 import { MobileTabBar } from '@/components/mobile-nav';
 import { NowPlayingBar } from '@/components/now-playing-bar';
-import { SeedNavLinks } from '@/components/scripts/seed-nav-links';
 import { Sidebar } from '@/components/sidebar';
 import { OptimisticNavigationProvider } from '@/components/ui/nav-link';
 import { PlayerProvider } from '@/providers/player-provider';
@@ -17,7 +16,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
         <NowPlayingBar />
         <MobileTabBar />
-        <SeedNavLinks />
       </OptimisticNavigationProvider>
     </PlayerProvider>
   );

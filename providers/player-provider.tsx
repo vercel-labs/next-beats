@@ -143,6 +143,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   function playExternal(t: Track, audioUrl: string) {
     stopAll(audioRef.current);
+    stopExternalAudio();
     const audio = new Audio(audioUrl);
     audio.preload = 'metadata';
     audio.volume = volume / 100;
