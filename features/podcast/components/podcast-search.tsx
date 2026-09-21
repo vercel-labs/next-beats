@@ -31,7 +31,7 @@ export function PodcastSearch({ query }: { query?: string }) {
   const [error, setError] = useState('');
 
   function playEpisode(episode: Episode) {
-    if (!episode.url) return;
+    const playbackUrl = episode.url ?? `/api/spreaker/episodes/${episode.id}/play`;
     const episodeId = `spreaker-${episode.id}`;
     if (track?.id === episodeId) {
       togglePlayPause();
@@ -40,7 +40,7 @@ export function PodcastSearch({ query }: { query?: string }) {
     const podcastTrack: Track = {
       album: episode.author,
       artist: episode.author,
-      audioUrl: episode.url,
+      audioUrl: playbackUrl,
       coverColor: 'from-slate-500 to-slate-800',
       createdAt: new Date(episode.publishedAt ?? '1970-01-01T00:00:00.000Z'),
       duration: episode.duration,
@@ -52,7 +52,7 @@ export function PodcastSearch({ query }: { query?: string }) {
       title: episode.title,
       webpageUrl: episode.webpageUrl,
     };
-    playExternal(podcastTrack, episode.url);
+    playExternal(podcastTrack, playbackUrl);
   }
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export function PodcastSearch({ query }: { query?: string }) {
               <p className="text-muted mb-1 text-xs font-medium">{episode.author}</p>
               <h2 className="line-clamp-2 font-semibold">{episode.title}</h2>
               <p className="text-muted mt-1 text-xs">{formatDuration(episode.duration)}</p>
-              {episode.url ? <button type="button" onClick={() => playEpisode(episode)} className="bg-accent text-accent-foreground mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"><Play className="h-3.5 w-3.5" fill="currentColor" /> {track?.id === `spreaker-${episode.id}` && isPlaying ? 'Playing' : 'Play episode'}</button> : <a href={episode.webpageUrl ?? '#'} target="_blank" rel="noreferrer" className="text-accent mt-3 inline-flex items-center gap-1 text-sm font-medium"><Play className="h-3.5 w-3.5" /> Listen on Spreaker</a>}
+              <button type="button" onClick={() => playEpisode(episode)} className="bg-accent text-accent-foreground mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"><Play className="h-3.5 w-3.5" fill="currentColor" /> {track?.id === `spreaker-${episode.id}` && isPlaying ? 'Playing' : 'Play episode'}</button>
             </div>
           </article>
         ))}
