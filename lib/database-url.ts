@@ -8,8 +8,30 @@
 // Postgres without TLS (e.g. the service container in .github/workflows/e2e.yml)
 // can connect. Remote URLs like Neon never set `disable`, so they still get
 // upgraded to `verify-full`.
+export function getDatabaseUrl(): string | undefined {
+  const url =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_PRISMA_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim();
+
+  return url || undefined;
+}
+
 export function normalizeDatabaseUrl(url: string): string {
-  const u = new URL(url);
+  let u: URL;
+
+  try {
+    u = new URL(url);
+  } catch {
+    throw new Error(
+      'Invalid database URL. Set DATABASE_URL or POSTGRES_PRISMA_URL to a valid PostgreSQL connection string.',
+    );
+  }
+
+  if (u.protocol !== 'postgresql:' && u.protocol !== 'postgres:') {
+    throw new Error('Database URL must use the postgres:// or postgresql:// protocol.');
+  }
+
   if (u.searchParams.get('sslmode') !== 'disable') {
     u.searchParams.set('sslmode', 'verify-full');
   }
