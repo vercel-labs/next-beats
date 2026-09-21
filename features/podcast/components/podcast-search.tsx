@@ -100,7 +100,7 @@ export function PodcastSearch({ query }: { query?: string }) {
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Shows</h3>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {shows.map(show => <a key={show.id} href={`/podcasts/show/${show.id}`} className="bg-card dark:bg-card-dark flex w-52 shrink-0 gap-3 rounded-xl p-3 transition-transform hover:-translate-y-0.5">
-            {show.imageUrl ? <Image src={show.imageUrl} alt={`${show.title} cover`} width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg object-cover" unoptimized /> : <div className="bg-accent/15 flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-accent"><Play className="h-5 w-5" /></div>}
+            {show.imageUrl ? <Image src={show.imageUrl} alt={`${show.title} cover`} width={56} height={56} className="h-14 w-14 shrink-0 rounded-lg object-cover shadow-sm" unoptimized /> : <div className="bg-accent/15 flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-accent"><Play className="h-5 w-5" /></div>}
             <span className="min-w-0"><strong className="line-clamp-2 text-sm">{show.title}</strong><span className="text-muted mt-1 block text-xs">{show.episodeCount ? `${show.episodeCount} episodes` : 'Public show'}</span></span>
           </a>)}
         </div>
@@ -109,7 +109,7 @@ export function PodcastSearch({ query }: { query?: string }) {
       <div className="grid gap-4 md:grid-cols-2">
         {episodes.map(episode => (
           <article key={episode.id} className="bg-card dark:bg-card-dark flex gap-4 rounded-xl p-4">
-            {episode.imageUrl ? <Image src={episode.imageUrl} alt={`${episode.title} cover`} width={96} height={96} className="h-24 w-24 shrink-0 rounded-lg object-cover" unoptimized /> : <div className="bg-accent/15 flex h-24 w-24 shrink-0 items-center justify-center rounded-lg text-accent"><Play className="h-6 w-6" /></div>}
+            {episode.imageUrl ? <Image src={episode.imageUrl} alt={`${episode.title} cover`} width={96} height={96} className="h-24 w-24 shrink-0 rounded-xl object-cover shadow-sm" unoptimized /> : <div className="bg-accent/15 flex h-24 w-24 shrink-0 items-center justify-center rounded-lg text-accent"><Play className="h-6 w-6" /></div>}
             <div className="min-w-0 flex-1">
               <p className="text-muted mb-1 text-xs font-medium">{episode.author}</p>
               <a href={`/podcasts/episode/${episode.id}`} className="line-clamp-2 font-semibold hover:underline">{episode.title}</a>

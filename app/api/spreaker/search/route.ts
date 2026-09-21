@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
       description: typeof episode.description === 'string' ? episode.description : '',
       duration: typeof episode.duration === 'number' ? episode.duration : 0,
       id: String(id),
-      imageUrl: typeof episode.image_url === 'string' ? episode.image_url : null,
+      imageUrl: [episode.image_url, episode.image_original_url, episode.image_medium_url, show?.image_url].find(value => typeof value === 'string' && value.length > 0) as string | undefined ?? null,
       publishedAt: typeof episode.published_at === 'string' ? episode.published_at : null,
       title: typeof episode.title === 'string' ? episode.title : 'Untitled episode',
       url: `/api/spreaker/episodes/${String(id)}/play`,
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         description: typeof show.description === 'string' ? show.description : '',
         episodeCount: typeof show.episodes_count === 'number' ? show.episodes_count : null,
         id: String(id),
-        imageUrl: typeof show.image_url === 'string' ? show.image_url : null,
+        imageUrl: [show.image_url, show.image_original_url, show.image_medium_url].find(value => typeof value === 'string' && value.length > 0) as string | undefined ?? null,
         title: typeof show.title === 'string' ? show.title : 'Untitled show',
         webpageUrl: typeof show.site_url === 'string' ? show.site_url : null,
       }];
