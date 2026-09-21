@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       imageUrl: typeof episode.image_url === 'string' ? episode.image_url : null,
       publishedAt: typeof episode.published_at === 'string' ? episode.published_at : null,
       title: typeof episode.title === 'string' ? episode.title : 'Untitled episode',
-      url: typeof episode.audio_url === 'string' ? episode.audio_url : null,
+      url: `/api/spreaker/episodes/${String(id)}/play`,
       webpageUrl: typeof episode.site_url === 'string' ? episode.site_url : null,
     }];
   });
