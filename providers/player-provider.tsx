@@ -154,7 +154,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         dispatch({ progress: (audio.currentTime / audio.duration) * 100, type: 'SET_PROGRESS' });
       }
     };
-    audio.onended = () => dispatch({ progress: 0, type: 'ENDED' });
+    audio.onended = () => dispatch({ type: 'ENDED' });
     externalAudioRef.current = audio;
     dispatch({ index: 0, queue: [t], track: t, type: 'PLAY' });
     void audio.play().catch(() => dispatch({ type: 'PAUSE' }));
