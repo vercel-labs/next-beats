@@ -1,8 +1,8 @@
 'use client';
 
-import { LoaderCircle, Play, Search } from 'lucide-react';
+import { Play } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
 
@@ -24,9 +24,8 @@ function formatDuration(seconds: number) {
   return `${minutes} min`;
 }
 
-export function PodcastSearch() {
+export function PodcastSearch({ query }: { query?: string }) {
   const { playExternal, togglePlayPause, track, isPlaying } = usePlayer();
-  const [query, setQuery] = useState('');
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -56,37 +55,29 @@ export function PodcastSearch() {
     playExternal(podcastTrack, episode.url);
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const value = query.trim();
+  useEffect(() => {
+    const value = query?.trim();
     if (!value) return;
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}`);
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error ?? 'Search failed.');
-      setEpisodes(Array.isArray(payload.episodes) ? payload.episodes : []);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Search failed.');
-      setEpisodes([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    const controller = new AbortController();
+    fetch(`/api/spreaker/search?q=${encodeURIComponent(value)}`, { signal: controller.signal })
+      .then(async response => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error ?? 'Podcast search failed.');
+        setEpisodes(Array.isArray(payload.episodes) ? payload.episodes : []);
+      })
+      .catch(caught => {
+        if (caught instanceof DOMException && caught.name === 'AbortError') return;
+        setError(caught instanceof Error ? caught.message : 'Podcast search failed.');
+        setEpisodes([]);
+      })
+      .finally(() => setIsLoading(false));
+    return () => controller.abort();
+  }, [query]);
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="relative mb-8 flex max-w-2xl items-center">
-        <Search className="text-gray pointer-events-none absolute left-4 h-5 w-5" aria-hidden="true" />
-        <label htmlFor="podcast-query" className="sr-only">Search podcasts</label>
-        <input id="podcast-query" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search podcasts and episodes" className="!rounded-full !py-3 !pr-28 !pl-12 !text-base" />
-        <button type="submit" disabled={isLoading || !query.trim()} className="bg-accent text-accent-foreground absolute right-1.5 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50">
-          {isLoading ? <LoaderCircle className="h-4 w-4 animate-spin" aria-label="Searching" /> : 'Search'}
-        </button>
-      </form>
       {error && <p role="alert" className="text-destructive mb-6">{error}</p>}
-      {episodes.length === 0 && !isLoading && !error && <p className="text-muted">Search for a topic to find episodes from Spreaker.</p>}
+      {query?.trim() && episodes.length === 0 && !isLoading && !error && <p className="text-muted">No Spreaker episodes found for this search.</p>}
       <div className="grid gap-4 md:grid-cols-2">
         {episodes.map(episode => (
           <article key={episode.id} className="bg-card dark:bg-card-dark flex gap-4 rounded-xl p-4">
