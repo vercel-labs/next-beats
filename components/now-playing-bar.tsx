@@ -1,6 +1,7 @@
 'use client';
 
-import { Pause, Play, SkipBack, SkipForward, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { ChevronDown, Pause, Play, SkipBack, SkipForward, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { useState } from 'react';
 import { Boundary } from '@/components/demo/boundary';
 import { AlbumArt } from '@/features/artwork/components/album-art';
 import { formatDuration } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { usePlayer } from '@/providers/player-provider';
 
 export function NowPlayingBar() {
   const { track, isPlaying, progress, volume, hasQueue, togglePlayPause, next, previous, setVolume } = usePlayer();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const VolumeIcon = volume === 0 ? VolumeX : volume < 50 ? Volume1 : Volume2;
   const elapsed = track ? Math.floor((progress / 100) * track.duration) : 0;
@@ -15,9 +17,27 @@ export function NowPlayingBar() {
 
   return (
     <>
+      {track && isExpanded ? (
+        <ExpandedPlayer
+          track={track}
+          isPlaying={isPlaying}
+          progress={progress}
+          volume={volume}
+          hasQueue={hasQueue}
+          onClose={() => setIsExpanded(false)}
+          onToggle={togglePlayPause}
+          onNext={next}
+          onPrevious={previous}
+          onVolumeChange={setVolume}
+        />
+      ) : null}
       {track ? (
         <Boundary label="NowPlayingBar">
           <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setIsExpanded(true)}
+            onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') setIsExpanded(true); }}
             style={{ viewTransitionName: 'player-bar' }}
             className="border-divider dark:border-divider-dark shrink-0 border-t bg-white px-4 py-2 sm:hidden dark:bg-[#181818]"
           >
@@ -61,7 +81,13 @@ export function NowPlayingBar() {
         >
           <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_2fr] items-center gap-4 lg:grid-cols-[minmax(0,1fr)_2fr_minmax(0,1fr)]">
             <div className="min-w-0">
-              <div className="hidden items-center gap-3 lg:flex">
+              <div
+                role={track ? 'button' : undefined}
+                tabIndex={track ? 0 : undefined}
+                onClick={track ? () => setIsExpanded(true) : undefined}
+                onKeyDown={track ? event => { if (event.key === 'Enter' || event.key === ' ') setIsExpanded(true); } : undefined}
+                className="hidden items-center gap-3 lg:flex"
+              >
                 <AlbumArt
                   coverColor={track?.coverColor ?? 'from-gray-400 to-gray-600'}
                   coverSeed={track?.id}
@@ -163,7 +189,7 @@ function SkipButton({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={event => { event.stopPropagation(); onClick(); }}
       disabled={disabled}
       className="text-muted p-1 transition-colors hover:text-black disabled:opacity-40 dark:hover:text-white"
       aria-label={direction === 'back' ? 'Previous' : 'Next'}
@@ -185,7 +211,7 @@ function PlayPauseButton({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={event => { event.stopPropagation(); onClick(); }}
       disabled={disabled}
       className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-white transition-transform hover:scale-105 disabled:opacity-40 dark:bg-white dark:text-black"
       aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -196,6 +222,63 @@ function PlayPauseButton({
         <Play className="h-4 w-4 translate-x-[1px]" fill="currentColor" />
       )}
     </button>
+  );
+}
+
+function ExpandedPlayer({
+  track,
+  isPlaying,
+  progress,
+  volume,
+  hasQueue,
+  onClose,
+  onToggle,
+  onNext,
+  onPrevious,
+  onVolumeChange,
+}: {
+  track: NonNullable<ReturnType<typeof usePlayer>['track']>;
+  isPlaying: boolean;
+  progress: number;
+  volume: number;
+  hasQueue: boolean;
+  onClose: () => void;
+  onToggle: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  onVolumeChange: (value: number) => void;
+}) {
+  const elapsed = Math.floor((progress / 100) * track.duration);
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#f7f7f7] px-6 pb-10 pt-[calc(env(safe-area-inset-top)+1rem)] text-black dark:bg-[#121212] dark:text-white">
+      <div className="flex items-center justify-between">
+        <button type="button" onClick={onClose} className="rounded-full p-2 text-muted hover:bg-black/5 dark:hover:bg-white/10" aria-label="Collapse player">
+          <ChevronDown className="h-6 w-6" />
+        </button>
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Now playing</span>
+        <span className="w-10" aria-hidden="true" />
+      </div>
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center">
+        <AlbumArt coverColor={track.coverColor} coverSeed={track.id} label={track.title} size="lg" className="mx-auto !h-[min(72vw,22rem)] !w-[min(72vw,22rem)] !rounded-xl shadow-2xl" />
+        <div className="mt-8">
+          <TrackInfo title={track.title} subtitle={`${track.artist} · ${track.album}`} />
+        </div>
+        <div className="mt-8">
+          <SliderBar value={progress} onChange={() => {}} label="Seek" disabled />
+          <div className="mt-2 flex justify-between text-xs text-muted"><span>{formatDuration(elapsed)}</span><span>{formatDuration(track.duration)}</span></div>
+        </div>
+        <div className="mt-8 flex items-center justify-center gap-8">
+          <SkipButton direction="back" onClick={onPrevious} disabled={!hasQueue} />
+          <PlayPauseButton isPlaying={isPlaying} onClick={onToggle} />
+          <SkipButton direction="forward" onClick={onNext} disabled={!hasQueue} />
+        </div>
+        <div className="mt-10 flex items-center gap-3">
+          <Volume1 className="h-4 w-4 text-muted" />
+          <SliderBar value={volume} onChange={onVolumeChange} label="Volume" />
+          <Volume2 className="h-4 w-4 text-muted" />
+        </div>
+      </div>
+    </div>
   );
 }
 
