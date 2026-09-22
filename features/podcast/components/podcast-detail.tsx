@@ -8,7 +8,8 @@ import type { Track } from '@/types/track';
 
 type Entity = Record<string, unknown>;
 
-function text(entity: Entity, key: string, fallback = '') { return typeof entity[key] === 'string' ? entity[key] as string : fallback; }
+function text(entity: Entity, key: string, fallback = '') { return typeof entity[key] === 'string' && entity[key].trim() ? entity[key] as string : fallback; }
+function episodeTitle(entity: Entity) { return text(entity, 'title') || text(entity, 'name') || text(entity, 'episode_title') || `Episode ${String(entity.episode_id ?? entity.id ?? '')}`; }
 function number(entity: Entity, key: string) { return typeof entity[key] === 'number' ? entity[key] as number : 0; }
 function normalize(value: Entity) { return (value.response && typeof value.response === 'object' ? value.response as Entity : value); }
 
@@ -26,7 +27,7 @@ export function PodcastShowDetail({ id }: { id: string }) {
 function EpisodeRow({ episode }: { episode: Entity }) {
   const { playExternal } = usePlayer();
   const id = String(episode.episode_id ?? episode.id ?? '');
-  const title = text(episode, 'title', 'Untitled episode');
+  const title = episodeTitle(episode);
   const audioUrl = `/api/spreaker/episodes/${id}/play`;
   function play() { const track: Track = { album: text(episode, 'show_name', 'Spreaker'), artist: text(episode, 'author', 'Spreaker'), audioUrl, coverColor: 'from-slate-500 to-slate-800', createdAt: new Date(text(episode, 'published_at', '1970-01-01')), duration: number(episode, 'duration'), genre: 'Podcast', id: `spreaker-${id}`, imageUrl: text(episode, 'image_url', ''), isFavorite: false, lastPlayedAt: null, playCount: 0, title, webpageUrl: text(episode, 'site_url') }; playExternal(track, audioUrl); }
   return <article className="bg-card dark:bg-card-dark flex items-center gap-3 rounded-xl p-3"><button type="button" onClick={play} aria-label={`Play ${title}`} className="bg-accent text-accent-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full"><Play className="h-4 w-4" fill="currentColor" /></button><div className="min-w-0 flex-1"><h3 className="truncate font-medium">{title}</h3><p className="text-muted text-xs">{number(episode, 'duration') ? `${Math.floor(number(episode, 'duration') / 60)} min` : 'Podcast episode'}</p></div></article>;
@@ -36,5 +37,5 @@ export function PodcastEpisodeDetail({ id }: { id: string }) {
   const [episode, setEpisode] = useState<Entity | null>(null);
   useEffect(() => { fetch(`/api/spreaker/episodes/${id}`).then(r => r.json()).then(data => setEpisode(normalize(data))); }, [id]);
   if (!episode) return <p className="text-muted">Loading episode…</p>;
-  return <div className="bg-card dark:bg-card-dark rounded-2xl p-6"><p className="text-muted text-xs font-semibold uppercase tracking-widest">Podcast episode</p><h1 className="mt-2 text-2xl font-bold">{text(episode, 'title', 'Untitled episode')}</h1><p className="text-muted mt-4 whitespace-pre-line">{text(episode, 'description')}</p></div>;
+  return <div className="bg-card dark:bg-card-dark rounded-2xl p-6"><p className="text-muted text-xs font-semibold uppercase tracking-widest">Podcast episode</p><h1 className="mt-2 text-2xl font-bold">{episodeTitle(episode)}</h1><p className="text-muted mt-4 whitespace-pre-line">{text(episode, 'description')}</p></div>;
 }
