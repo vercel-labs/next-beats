@@ -9,16 +9,17 @@ import { LibraryGrid, LibraryGridSkeleton } from '@/features/track/components/li
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Library',
+  title: 'Music library',
 };
 
 export default function LibraryPage() {
   return (
-    <PageWrapper title="Library">
+    <PageWrapper title="Music library">
       <section className="relative mb-8 overflow-hidden rounded-3xl bg-[#171717] p-6 text-white sm:p-8">
         <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-accent/25 blur-3xl" aria-hidden="true" />
-        <div className="relative max-w-2xl"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Your listening space</p><h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Keep the conversations close.</h1><p className="mt-3 text-sm leading-6 text-white/65">Your saved tracks, playlists, and discovery tools in one calm, accessible home.</p></div>
+        <div className="relative max-w-2xl"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Your listening space</p><h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Keep the conversations close.</h1><p className="mt-3 text-sm leading-6 text-white/65">A secondary space for tracks, playlists, and genres while Neurodiversity Nation remains the heart of the platform.</p></div>
       </section>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/20 bg-accent/5 px-4 py-3"><p className="text-sm"><span className="font-semibold">Looking for the main experience?</span> Explore the latest Neurodiversity Nation conversations.</p><a href="/podcasts" className="text-accent text-sm font-bold hover:underline">Browse podcasts →</a></div>
       <h2 className="mb-4">All Tracks</h2>
       <AnimatedSuspense fallback={<LibraryGridSkeleton />}>
         <div className="mb-10">

@@ -57,7 +57,7 @@ export function Sidebar() {
           </NavLink>
           <NavLink href="/library" aria-label="Library" className={sidebarLink}>
             <Library className="h-5 w-5" />
-            <span className="hidden truncate lg:inline">Library</span>
+            <span className="hidden truncate lg:inline">Music library</span>
           </NavLink>
           <NavLink href="/cart" aria-label="Shopping bag" className={sidebarLink}>
   <ShoppingBag className="h-5 w-5" />

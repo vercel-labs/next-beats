@@ -22,7 +22,7 @@ export function MobileTabBar() {
         </NavLink>
         <NavLink href="/library" aria-label="Library" className={mobileTab}>
           <Library className="h-5 w-5" />
-          <span>Library</span>
+          <span>Music</span>
         </NavLink>
         <NavLink href="/cart" aria-label="Shopping bag" className={mobileTab}>
           <ShoppingBag className="h-5 w-5" />

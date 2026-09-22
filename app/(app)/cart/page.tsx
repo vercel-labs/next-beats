@@ -9,7 +9,7 @@ export default function CartPage() {
         <div className="mb-8">
           <p className="text-accent text-sm font-semibold uppercase tracking-[0.18em]">Shopping bag</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Your bag</h1>
-          <p className="text-muted mt-2">Review your NextBeats merch before checkout.</p>
+          <p className="text-muted mt-2">Review your Neurodiversity Nation merch before checkout.</p>
         </div>
         <div className="bg-card dark:bg-card-dark rounded-2xl p-8 text-center">
           <CartContents />
