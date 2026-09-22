@@ -20,8 +20,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  applicationName: 'Neurodiversity Nation: Amplifying Voices',
+  authors: [{ name: 'Neurodiversity Nation' }],
+  creator: 'Neurodiversity Nation',
   description:
-    'Neurodiversity Nation: Amplifying Voices — discover and listen to every episode in one focused podcast experience.',
+    'Neurodiversity Nation: Amplifying Voices — discover and listen to podcast episodes about lived experience, education, advocacy, and inclusive care.',
+  keywords: ['neurodiversity podcast', 'autism podcast', 'neurodivergent voices', 'inclusive education', 'disability advocacy'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://neurodiversitynation.com'),
   title: {
     default: 'Neurodiversity Nation: Amplifying Voices',
     template: '%s · Neurodiversity Nation: Amplifying Voices',

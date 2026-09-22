@@ -4,6 +4,7 @@ import { Play, Share2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { SocialShare } from '@/features/podcast/components/social-share';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
 
@@ -13,6 +14,7 @@ function text(entity: Entity, key: string, fallback = '') { return typeof entity
 function episodeTitle(entity: Entity) { return text(entity, 'title') || text(entity, 'name') || text(entity, 'episode_title') || `Episode ${String(entity.episode_id ?? entity.id ?? '')}`; }
 function number(entity: Entity, key: string) { return typeof entity[key] === 'number' ? entity[key] as number : 0; }
 function normalize(value: Entity) { return (value.response && typeof value.response === 'object' ? value.response as Entity : value); }
+function normalizeShow(value: Entity) { const normalized = normalize(value); return normalized.show && typeof normalized.show === 'object' ? normalized.show as Entity : normalized; }
 
 export function PodcastShowDetail({ id }: { id: string }) {
   const [show, setShow] = useState<Entity | null>(null);
@@ -20,7 +22,7 @@ export function PodcastShowDetail({ id }: { id: string }) {
   const [error, setError] = useState('');
   const [episodeQuery, setEpisodeQuery] = useState('');
   const filteredEpisodes = useMemo(() => episodes.filter(episode => episodeTitle(episode).toLowerCase().includes(episodeQuery.toLowerCase().trim())), [episodes, episodeQuery]);
-  useEffect(() => { Promise.all([fetch(`/api/spreaker/shows/${id}`).then(r => r.json()), fetch(`/api/spreaker/shows/${id}/episodes?limit=100`).then(r => r.json())]).then(([showData, episodeData]) => { if (showData.error || episodeData.error) { setError(showData.error ?? episodeData.error); return; } setShow(normalize(showData)); const items = normalize(episodeData).items; setEpisodes(Array.isArray(items) ? items as Entity[] : []); }).catch(() => setError('This podcast is unavailable right now.')); }, [id]);
+  useEffect(() => { Promise.all([fetch(`/api/spreaker/shows/${id}`).then(r => r.json()), fetch(`/api/spreaker/shows/${id}/episodes?limit=100`).then(r => r.json())]).then(([showData, episodeData]) => { if (showData.error || episodeData.error) { setError(showData.error ?? episodeData.error); return; } setShow(normalizeShow(showData)); const items = normalize(episodeData).items; setEpisodes(Array.isArray(items) ? items as Entity[] : []); }).catch(() => setError('This podcast is unavailable right now.')); }, [id]);
   if (error) return <p className="text-muted" role="alert">{error}</p>;
   if (!show) return <p className="text-muted">Loading show…</p>;
   const imageUrl = text(show, 'image_url') || text(show, 'cover_url');
@@ -36,6 +38,7 @@ export function PodcastShowDetail({ id }: { id: string }) {
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
           <p className="text-muted mt-3 line-clamp-4 max-w-2xl text-sm leading-6">{text(show, 'description', 'Listen to the latest conversations from Neurodiversity Nation.')}</p>
           <div className="text-muted mt-4 flex items-center gap-3 text-xs font-medium"><span>{episodes.length} episodes</span><span aria-hidden="true">•</span><span>Spreaker podcast</span></div>
+          <div className="mt-5"><SocialShare title={title} text={`Listen to ${title} from Neurodiversity Nation.`} /></div>
         </div>
       </div>
     </header>
