@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     type,
   });
   const headers: HeadersInit = { Accept: 'application/json' };
-  const token = process.env.SPREAKER_ACCESS_TOKEN;
+  const token = process.env.SPREAKER_API_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;
 
   let response: Response;
