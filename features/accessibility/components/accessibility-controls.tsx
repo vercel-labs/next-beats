@@ -13,13 +13,16 @@ export function AccessibilityControls() {
     return saved && sizes.includes(saved) ? saved : 'default';
   });
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.localStorage.getItem('nn-reduced-motion') === 'true');
+  const [highContrast, setHighContrast] = useState(() => typeof window !== 'undefined' && window.localStorage.getItem('nn-high-contrast') === 'true');
 
   useEffect(() => {
     document.documentElement.dataset.textSize = size;
     document.documentElement.dataset.reducedMotion = String(reducedMotion);
+    document.documentElement.dataset.highContrast = String(highContrast);
     window.localStorage.setItem('nn-text-size', size);
     window.localStorage.setItem('nn-reduced-motion', String(reducedMotion));
-  }, [reducedMotion, size]);
+    window.localStorage.setItem('nn-high-contrast', String(highContrast));
+  }, [highContrast, reducedMotion, size]);
 
   return (
     <section className="bg-card dark:bg-card-dark rounded-2xl p-5" aria-labelledby="accessibility-heading">
@@ -32,6 +35,7 @@ export function AccessibilityControls() {
         <div className="flex flex-wrap gap-2" role="group" aria-label="Text size">
           {sizes.map(option => <button key={option} type="button" onClick={() => setSize(option)} aria-pressed={size === option} className={`rounded-full border px-3 py-2 text-xs font-semibold capitalize transition-colors ${size === option ? 'border-accent bg-accent text-black' : 'border-divider dark:border-divider-dark text-muted'}`}>{option === 'xlarge' ? 'Extra large' : option}</button>)}
           <button type="button" onClick={() => setReducedMotion(value => !value)} aria-pressed={reducedMotion} className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${reducedMotion ? 'border-accent bg-accent text-black' : 'border-divider dark:border-divider-dark text-muted'}`}>Reduce motion</button>
+          <button type="button" onClick={() => setHighContrast(value => !value)} aria-pressed={highContrast} className={`rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${highContrast ? 'border-accent bg-accent text-black' : 'border-divider dark:border-divider-dark text-muted'}`}>High contrast</button>
         </div>
       </div>
     </section>

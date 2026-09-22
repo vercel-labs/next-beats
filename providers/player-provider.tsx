@@ -206,6 +206,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
           coverColor: t.coverColor,
           duration: t.duration,
           genre: t.genre,
+          imageUrl: t.imageUrl,
           title: t.title,
           webpageUrl: t.webpageUrl,
         },
