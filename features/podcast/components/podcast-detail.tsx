@@ -4,6 +4,7 @@ import { Play, Share2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { SocialShare } from '@/features/podcast/components/social-share';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
 
@@ -37,6 +38,7 @@ export function PodcastShowDetail({ id }: { id: string }) {
           <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
           <p className="text-muted mt-3 line-clamp-4 max-w-2xl text-sm leading-6">{text(show, 'description', 'Listen to the latest conversations from Neurodiversity Nation.')}</p>
           <div className="text-muted mt-4 flex items-center gap-3 text-xs font-medium"><span>{episodes.length} episodes</span><span aria-hidden="true">•</span><span>Spreaker podcast</span></div>
+          <div className="mt-5"><SocialShare title={title} text={`Listen to ${title} from Neurodiversity Nation.`} /></div>
         </div>
       </div>
     </header>
