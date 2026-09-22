@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       id: String(id),
       imageUrl: [episode.image_url, episode.image_original_url, episode.image_medium_url, show?.image_url].find(value => typeof value === 'string' && value.length > 0) as string | undefined ?? null,
       publishedAt: typeof episode.published_at === 'string' ? episode.published_at : null,
-      title: typeof episode.title === 'string' ? episode.title : 'Untitled episode',
+      title: [episode.title, episode.name, episode.episode_title].find(value => typeof value === 'string' && value.trim().length > 0) as string | undefined ?? `Episode ${String(id)}`,
       url: `/api/spreaker/episodes/${String(id)}/play`,
       webpageUrl: typeof episode.site_url === 'string' ? episode.site_url : null,
     }];
