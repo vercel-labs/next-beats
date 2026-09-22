@@ -21,7 +21,26 @@ export function PodcastShowDetail({ id }: { id: string }) {
   if (error) return <p className="text-muted" role="alert">{error}</p>;
   if (!show) return <p className="text-muted">Loading show…</p>;
   const imageUrl = text(show, 'image_url') || text(show, 'cover_url');
-  return <div className="space-y-8"><header className="bg-card dark:bg-card-dark flex flex-col gap-5 rounded-2xl p-4 sm:flex-row sm:p-6"><div className="bg-accent/15 relative h-40 w-40 shrink-0 overflow-hidden rounded-xl sm:h-28 sm:w-28">{imageUrl && <Image src={imageUrl} alt="" fill className="object-cover" unoptimized />}</div><div><p className="text-muted text-xs font-semibold uppercase tracking-widest">Podcast show</p><h1 className="mt-2 text-2xl font-bold">{text(show, 'title', 'Untitled show')}</h1><p className="text-muted mt-2 line-clamp-3 text-sm">{text(show, 'description')}</p></div></header><section><h2 className="mb-4 text-lg font-semibold">Episodes</h2><div className="space-y-3">{episodes.map(episode => <EpisodeRow key={String(episode.episode_id ?? episode.id)} episode={episode} />)}</div></section></div>;
+  const title = text(show, 'title', 'Podcast show');
+  return <div className="space-y-8">
+    <header className="bg-card dark:bg-card-dark overflow-hidden rounded-2xl">
+      <div className="from-accent/15 via-background to-background grid gap-6 bg-gradient-to-br p-4 sm:grid-cols-[9rem_1fr] sm:p-6">
+        <div className="bg-accent/15 relative aspect-square w-full overflow-hidden rounded-xl sm:w-36">
+          {imageUrl ? <Image src={imageUrl} alt={`${title} cover`} fill sizes="(max-width: 640px) 100vw, 144px" className="object-cover" unoptimized /> : <div className="flex h-full items-center justify-center text-4xl font-bold text-accent">NN</div>}
+        </div>
+        <div className="flex min-w-0 flex-col justify-center">
+          <p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Discover podcasts</p>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+          <p className="text-muted mt-3 line-clamp-4 max-w-2xl text-sm leading-6">{text(show, 'description', 'Listen to the latest conversations from Neurodiversity Nation.')}</p>
+          <div className="text-muted mt-4 flex items-center gap-3 text-xs font-medium"><span>{episodes.length} episodes</span><span aria-hidden="true">•</span><span>Spreaker podcast</span></div>
+        </div>
+      </div>
+    </header>
+    <section>
+      <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-muted text-xs font-semibold uppercase tracking-[0.16em]">Latest from the show</p><h2 className="mt-1 text-2xl font-bold">Recent episodes</h2></div><span className="text-muted hidden text-sm sm:block">Tap an episode to listen</span></div>
+      <div className="space-y-3">{episodes.map(episode => <EpisodeRow key={String(episode.episode_id ?? episode.id)} episode={episode} />)}</div>
+    </section>
+  </div>;
 }
 
 function EpisodeRow({ episode }: { episode: Entity }) {
