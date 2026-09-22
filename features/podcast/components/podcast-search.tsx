@@ -106,7 +106,7 @@ export function PodcastSearch({ query }: { query?: string }) {
           </a>)}
         </div>
       </section>}
-      {query?.trim() && episodes.length === 0 && !isLoading && !error && <p className="text-muted">No Spreaker episodes found for this search.</p>}
+      {query?.trim() && episodes.length === 0 && shows.length === 0 && !isLoading && !error && <div className="bg-card dark:bg-card-dark rounded-xl p-5"><p className="font-semibold">No episodes found yet</p><p className="text-muted mt-1 text-sm">Your Spreaker catalog may still be syncing. Open Podcasts to browse the featured show.</p><a href="/podcasts" className="text-accent mt-3 inline-block text-sm font-semibold">Open podcast catalog</a></div>}
       <div className="grid gap-4 md:grid-cols-2">
         {episodes.map(episode => (
           <article key={episode.id} className="bg-card dark:bg-card-dark flex gap-4 rounded-xl p-4">

@@ -1,11 +1,11 @@
 import { Headphones, Heart, Home, Library, Plus, Search, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
 import { Suspense } from 'react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { FastLink } from '@/components/ui/fast-link';
 import { GitHubIcon } from '@/components/ui/github-icon';
 import { IconButtonLink, IconButtonLinkSkeleton } from '@/components/ui/icon-button-link';
-import { MusicNote } from '@/components/ui/music-note';
 import { NavLink } from '@/components/ui/nav-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { playlistCoverPreloads } from '@/features/artwork/cover-assets';
@@ -29,8 +29,8 @@ export function Sidebar() {
             className="text-accent inline-flex items-center gap-2 px-1 text-xl font-bold tracking-tight"
             aria-label="Neurodiversity Nation home"
           >
-            <MusicNote size={24} className="text-accent" />
-            <span>Neurodiversity Nation</span>
+            <Image src="/brand-logo.png" alt="Neurodiversity Nation logo" width={36} height={36} className="h-9 w-9 rounded-full object-cover" />
+            <span className="leading-tight">Neurodiversity Nation</span>
           </FastLink>
           <a
             href="https://github.com/vercel-labs/next-beats"

@@ -5,17 +5,21 @@
   --color-muted: #71717a;
   --color-divider-dark: #282828;
   --color-divider: #e4e4e7;
-  --color-card-dark: #181818;
-  --color-card: #f4f4f5;
-  --color-surface-dark: #121212;
-  --color-surface: #fafafa;
+  --color-card-dark: #0b0b0b;
+  --color-card: #ffffff;
+  --color-surface-dark: #000000;
+  --color-surface: #f7f8fc;
 
-  --color-primary: #4f6ef7;
-  --color-primary-dark: #3d5bd9;
-  --color-primary-darker: #2c42a0;
-  --color-accent: #4f6ef7;
-  --color-accent-hover: #3d5bd9;
-  --color-accent-fade: #4f6ef722;
+  --color-primary: #2f3b91;
+  --color-primary-dark: #253078;
+  --color-primary-darker: #1c245d;
+  --color-accent: #f28c28;
+  --color-accent-hover: #d96f0b;
+  --color-accent-fade: #f28c2822;
+  --color-brand-blue: #2f3b91;
+  --color-brand-orange: #f28c28;
+  --color-brand-teal: #1b9aaa;
+  --color-brand-purple: #9b2c83;
 
   --color-success: #0fa958;
   --color-danger: #e54848;
@@ -68,7 +72,7 @@
 
   input,
   textarea {
-    @apply border-divider placeholder-gray focus:border-accent focus:ring-accent/30 dark:border-divider-dark w-full rounded-full border bg-white px-4 py-2 text-sm text-black transition-colors focus:ring-2 focus:outline-none dark:bg-[#242424] dark:text-white;
+    @apply border-divider placeholder-gray focus:border-accent focus:ring-accent/30 dark:border-divider-dark w-full rounded-full border bg-white px-4 py-2 text-sm text-black transition-colors focus:ring-2 focus:outline-none dark:bg-[#0b0b0b] dark:text-white;
   }
 
   label {
