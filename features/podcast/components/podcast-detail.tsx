@@ -20,7 +20,7 @@ export function PodcastShowDetail({ id }: { id: string }) {
   const [error, setError] = useState('');
   const [episodeQuery, setEpisodeQuery] = useState('');
   const filteredEpisodes = useMemo(() => episodes.filter(episode => episodeTitle(episode).toLowerCase().includes(episodeQuery.toLowerCase().trim())), [episodes, episodeQuery]);
-  useEffect(() => { Promise.all([fetch(`/api/spreaker/shows/${id}`).then(r => r.json()), fetch(`/api/spreaker/shows/${id}/episodes`).then(r => r.json())]).then(([showData, episodeData]) => { if (showData.error || episodeData.error) { setError(showData.error ?? episodeData.error); return; } setShow(normalize(showData)); const items = normalize(episodeData).items; setEpisodes(Array.isArray(items) ? items as Entity[] : []); }).catch(() => setError('This podcast is unavailable right now.')); }, [id]);
+  useEffect(() => { Promise.all([fetch(`/api/spreaker/shows/${id}`).then(r => r.json()), fetch(`/api/spreaker/shows/${id}/episodes?limit=100`).then(r => r.json())]).then(([showData, episodeData]) => { if (showData.error || episodeData.error) { setError(showData.error ?? episodeData.error); return; } setShow(normalize(showData)); const items = normalize(episodeData).items; setEpisodes(Array.isArray(items) ? items as Entity[] : []); }).catch(() => setError('This podcast is unavailable right now.')); }, [id]);
   if (error) return <p className="text-muted" role="alert">{error}</p>;
   if (!show) return <p className="text-muted">Loading show…</p>;
   const imageUrl = text(show, 'image_url') || text(show, 'cover_url');

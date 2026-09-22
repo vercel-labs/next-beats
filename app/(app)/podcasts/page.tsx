@@ -1,8 +1,8 @@
 import { ExternalLink } from 'lucide-react';
-import type { Metadata } from 'next';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { AccessibilityControls } from '@/features/accessibility/components/accessibility-controls';
 import { PodcastShowDetail } from '@/features/podcast/components/podcast-detail';
+import type { Metadata } from 'next';
 
 const FEATURED_SHOW_ID = '5972496';
 
@@ -43,13 +43,23 @@ export default function PodcastsPage() {
             ['Intersectional health', 'Panels connect neurodiversity with overlapping health experiences, including epilepsy and everyday mental health.'],
           ].map(([title, description]) => <article key={title} className="bg-card dark:bg-card-dark rounded-2xl p-5"><h3 className="font-semibold">{title}</h3><p className="text-muted mt-2 text-sm leading-6">{description}</p></article>)}
         </div>
-        <div className="bg-card dark:bg-card-dark rounded-2xl p-5 sm:p-6">
+        <div id="highlighted-conversations" className="bg-card dark:bg-card-dark rounded-2xl p-5 sm:p-6">
           <p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Highlighted conversations</p>
           <ul className="text-muted mt-3 grid gap-3 text-sm leading-6 sm:grid-cols-3">
             <li><strong className="text-foreground">Parental empowerment:</strong> a conversation with Temple Grandin and Dr. Geeta Shroff about proactive family engagement.</li>
             <li><strong className="text-foreground">Overcoming academic stigma:</strong> Nicholas Ndungu, Mr. Autism Kenya, on advocacy, farming, and being misread by the school system.</li>
             <li><strong className="text-foreground">Special-needs education:</strong> specialist teachers on vocabulary, patience, and building a child&apos;s self-esteem.</li>
           </ul>
+        </div>
+      </section>
+      <section className="mt-10" aria-labelledby="take-action">
+        <div className="mb-4"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Beyond listening</p><h2 id="take-action" className="mt-1 text-2xl font-bold">Turn insight into action.</h2><p className="text-muted mt-2 max-w-2xl text-sm leading-6">Keep the conversation moving with practical starting points for families, educators, and advocates.</p></div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            ['For families', 'Prepare questions, document support needs, and build a care team around the person at the center.', 'Start with a conversation', '#about-podcast'],
+            ['For educators', 'Explore individualized support, inclusive language, and classroom practices that build confidence.', 'Explore inclusive learning', '#highlighted-conversations'],
+            ['For advocates', 'Share lived experience, challenge stigma, and help make education and healthcare more empathetic.', 'Join the movement', 'https://www.spreaker.com/podcast/neurodiversity-nation-amplifying-voices--5972496'],
+          ].map(([title, description, action, href]) => <article key={title} className="bg-card dark:bg-card-dark rounded-2xl p-5"><div className="mb-4 h-1 w-10 rounded-full bg-accent" /><h3 className="font-semibold">{title}</h3><p className="text-muted mt-2 text-sm leading-6">{description}</p><a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noreferrer' : undefined} className="text-accent mt-4 inline-flex text-sm font-bold hover:underline">{action} <span aria-hidden="true">→</span></a></article>)}
         </div>
       </section>
       <div className="mt-6"><AccessibilityControls /></div>
