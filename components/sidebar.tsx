@@ -27,10 +27,10 @@ export function Sidebar() {
           <FastLink
             href="/"
             className="text-accent inline-flex items-center gap-2 px-1 text-xl font-bold tracking-tight"
-            aria-label="NextBeats home"
+            aria-label="Neurodiversity Nation home"
           >
             <MusicNote size={24} className="text-accent" />
-            <span>NextBeats</span>
+            <span>Neurodiversity Nation</span>
           </FastLink>
           <a
             href="https://github.com/vercel-labs/next-beats"

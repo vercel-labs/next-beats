@@ -9,7 +9,7 @@ export default async function HomePage() {
   const products = isShopifyConfigured() ? await getMerchProducts() : [];
 
   return (
-    <PageWrapper title="NextBeats">
+    <PageWrapper title="Neurodiversity Nation: Amplifying Voices">
       <section className="bg-card dark:bg-card-dark mb-8 rounded-2xl p-6 sm:p-8">
         <p className="text-accent mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em]"><Headphones className="h-4 w-4" /> Podcast & commerce</p>
         <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">Listen to what&apos;s next.</h1>
