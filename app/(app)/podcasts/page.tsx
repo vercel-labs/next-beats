@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { AccessibilityControls } from '@/features/accessibility/components/accessibility-controls';
 import { PodcastShowDetail } from '@/features/podcast/components/podcast-detail';
+import { PodcastStructuredData } from '@/features/podcast/components/podcast-structured-data';
 import type { Metadata } from 'next';
 
 const FEATURED_SHOW_ID = '5972496';
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function PodcastsPage() {
   return (
     <PageWrapper>
+      <PodcastStructuredData title="Neurodiversity Nation: Amplifying Voices" description="Podcast conversations about neurodivergent lived experience, education, advocacy, and inclusive care." url="/podcasts/show/5972496" />
       <PodcastShowDetail id={FEATURED_SHOW_ID} />
       <section className="mt-10" aria-labelledby="explore-podcast">
         <div className="mb-4"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Explore the show</p><h2 id="explore-podcast" className="mt-1 text-2xl font-bold">Find your way in</h2></div>
