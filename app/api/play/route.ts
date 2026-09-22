@@ -12,6 +12,7 @@ const bodySchema = z.object({
     coverColor: z.string().min(1),
     duration: z.number().int().nonnegative(),
     genre: z.string().min(1),
+    imageUrl: z.string().url().nullable().optional(),
     title: z.string().min(1),
     webpageUrl: z.string().url().optional(),
   }).optional(),

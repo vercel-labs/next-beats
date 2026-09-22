@@ -217,6 +217,12 @@
 }
 
 /* Reduced Motion */
+html[data-text-size='large'] { font-size: 112.5%; }
+html[data-text-size='xlarge'] { font-size: 125%; }
+html[data-reduced-motion='true'] *, html[data-reduced-motion='true'] *::before, html[data-reduced-motion='true'] *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+html[data-high-contrast='true'] { filter: contrast(1.12); }
+html[data-high-contrast='true'] :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(*),
   ::view-transition-new(*),

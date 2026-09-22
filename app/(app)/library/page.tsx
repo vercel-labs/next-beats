@@ -15,6 +15,10 @@ export const metadata: Metadata = {
 export default function LibraryPage() {
   return (
     <PageWrapper title="Library">
+      <section className="relative mb-8 overflow-hidden rounded-3xl bg-[#171717] p-6 text-white sm:p-8">
+        <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-accent/25 blur-3xl" aria-hidden="true" />
+        <div className="relative max-w-2xl"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Your listening space</p><h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Keep the conversations close.</h1><p className="mt-3 text-sm leading-6 text-white/65">Your saved tracks, playlists, and discovery tools in one calm, accessible home.</p></div>
+      </section>
       <h2 className="mb-4">All Tracks</h2>
       <AnimatedSuspense fallback={<LibraryGridSkeleton />}>
         <div className="mb-10">
