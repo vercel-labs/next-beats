@@ -1,8 +1,8 @@
 import { ExternalLink } from 'lucide-react';
-import type { Metadata } from 'next';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { AccessibilityControls } from '@/features/accessibility/components/accessibility-controls';
 import { PodcastShowDetail } from '@/features/podcast/components/podcast-detail';
+import type { Metadata } from 'next';
 
 const FEATURED_SHOW_ID = '5972496';
 
@@ -50,6 +50,16 @@ export default function PodcastsPage() {
             <li><strong className="text-foreground">Overcoming academic stigma:</strong> Nicholas Ndungu, Mr. Autism Kenya, on advocacy, farming, and being misread by the school system.</li>
             <li><strong className="text-foreground">Special-needs education:</strong> specialist teachers on vocabulary, patience, and building a child&apos;s self-esteem.</li>
           </ul>
+        </div>
+      </section>
+      <section className="mt-10" aria-labelledby="take-action">
+        <div className="mb-4"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Beyond listening</p><h2 id="take-action" className="mt-1 text-2xl font-bold">Turn insight into action.</h2><p className="text-muted mt-2 max-w-2xl text-sm leading-6">Keep the conversation moving with practical starting points for families, educators, and advocates.</p></div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[
+            ['For families', 'Prepare questions, document support needs, and build a care team around the person at the center.', 'Start with a conversation'],
+            ['For educators', 'Explore individualized support, inclusive language, and classroom practices that build confidence.', 'Explore inclusive learning'],
+            ['For advocates', 'Share lived experience, challenge stigma, and help make education and healthcare more empathetic.', 'Join the movement'],
+          ].map(([title, description, action]) => <article key={title} className="bg-card dark:bg-card-dark rounded-2xl p-5"><div className="mb-4 h-1 w-10 rounded-full bg-accent" /><h3 className="font-semibold">{title}</h3><p className="text-muted mt-2 text-sm leading-6">{description}</p><button type="button" className="text-accent mt-4 text-sm font-bold hover:underline">{action} <span aria-hidden="true">→</span></button></article>)}
         </div>
       </section>
       <div className="mt-6"><AccessibilityControls /></div>
