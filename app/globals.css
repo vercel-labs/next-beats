@@ -10,12 +10,12 @@
   --color-surface-dark: #121212;
   --color-surface: #fafafa;
 
-  --color-primary: #4f6ef7;
-  --color-primary-dark: #3d5bd9;
-  --color-primary-darker: #2c42a0;
-  --color-accent: #4f6ef7;
-  --color-accent-hover: #3d5bd9;
-  --color-accent-fade: #4f6ef722;
+  --color-primary: #1ed760;
+  --color-primary-dark: #1db954;
+  --color-primary-darker: #15883e;
+  --color-accent: #1ed760;
+  --color-accent-hover: #1db954;
+  --color-accent-fade: #1ed76022;
 
   --color-success: #0fa958;
   --color-danger: #e54848;
