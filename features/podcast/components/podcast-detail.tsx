@@ -1,7 +1,8 @@
 'use client';
 
-import { Play } from 'lucide-react';
+import { Play, Share2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
@@ -49,12 +50,14 @@ function EpisodeRow({ episode }: { episode: Entity }) {
   const title = episodeTitle(episode);
   const audioUrl = `/api/spreaker/episodes/${id}/play`;
   function play() { const track: Track = { album: text(episode, 'show_name', 'Spreaker'), artist: text(episode, 'author', 'Spreaker'), audioUrl, coverColor: 'from-slate-500 to-slate-800', createdAt: new Date(text(episode, 'published_at', '1970-01-01')), duration: number(episode, 'duration'), genre: 'Podcast', id: `spreaker-${id}`, imageUrl: text(episode, 'image_url', ''), isFavorite: false, lastPlayedAt: null, playCount: 0, title, webpageUrl: text(episode, 'site_url') }; playExternal(track, audioUrl); }
-  return <article className="bg-card dark:bg-card-dark flex items-center gap-3 rounded-xl p-3"><button type="button" onClick={play} aria-label={`Play ${title}`} className="bg-accent text-accent-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full"><Play className="h-4 w-4" fill="currentColor" /></button><div className="min-w-0 flex-1"><h3 className="truncate font-medium">{title}</h3><p className="text-muted text-xs">{number(episode, 'duration') ? `${Math.floor(number(episode, 'duration') / 60)} min` : 'Podcast episode'}</p></div></article>;
+  return <article className="bg-card dark:bg-card-dark flex items-center gap-3 rounded-xl p-3 transition-colors hover:bg-accent/5"><button type="button" onClick={play} aria-label={`Play ${title}`} className="bg-accent text-accent-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-full"><Play className="h-4 w-4" fill="currentColor" /></button><div className="min-w-0 flex-1"><Link href={`/podcasts/episode/${id}`} className="block truncate font-medium hover:underline">{title}</Link><p className="text-muted text-xs">{number(episode, 'duration') ? `${Math.floor(number(episode, 'duration') / 60)} min` : 'Podcast episode'}</p></div><button type="button" onClick={() => void navigator.clipboard?.writeText(`${window.location.origin}/podcasts/episode/${id}`)} aria-label={`Share ${title}`} className="text-muted hover:text-foreground rounded-full p-2"><Share2 className="h-4 w-4" /></button></article>;
 }
 
 export function PodcastEpisodeDetail({ id }: { id: string }) {
   const [episode, setEpisode] = useState<Entity | null>(null);
   useEffect(() => { fetch(`/api/spreaker/episodes/${id}`).then(r => r.json()).then(data => setEpisode(normalize(data))); }, [id]);
   if (!episode) return <p className="text-muted">Loading episode…</p>;
-  return <div className="bg-card dark:bg-card-dark rounded-2xl p-6"><p className="text-muted text-xs font-semibold uppercase tracking-widest">Podcast episode</p><h1 className="mt-2 text-2xl font-bold">{episodeTitle(episode)}</h1><p className="text-muted mt-4 whitespace-pre-line">{text(episode, 'description')}</p></div>;
+  const title = episodeTitle(episode);
+  const description = text(episode, 'description', 'Episode details and a readable summary will appear here when provided by the show.');
+  return <div className="space-y-5"><header className="bg-card dark:bg-card-dark rounded-2xl p-6"><p className="text-accent flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em]"><Sparkles className="h-4 w-4" /> Podcast episode</p><h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-4xl">{title}</h1><p className="text-muted mt-4 max-w-3xl whitespace-pre-line text-sm leading-7">{description}</p></header><section className="grid gap-4 sm:grid-cols-2" aria-label="Episode accessibility features"><article className="bg-card dark:bg-card-dark rounded-2xl p-5"><p className="text-accent text-xs font-bold uppercase tracking-[0.16em]">Episode summary</p><h2 className="mt-2 font-semibold">What this conversation explores</h2><p className="text-muted mt-2 text-sm leading-6">Listen for lived experience, practical insight, and advocacy perspectives from the Neurodiversity Nation community.</p></article><article className="bg-card dark:bg-card-dark rounded-2xl p-5"><p className="text-accent text-xs font-bold uppercase tracking-[0.16em]">Transcript</p><h2 className="mt-2 font-semibold">Read along with the episode</h2><p className="text-muted mt-2 text-sm leading-6">A readable transcript panel can be added here as transcript data becomes available from the show.</p><span className="mt-3 inline-block rounded-full bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent">Coming with transcript data</span></article></section></div>;
 }
