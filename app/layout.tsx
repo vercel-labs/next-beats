@@ -21,10 +21,10 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   description:
-    'A Next.js 16.3 music player demonstrating Instant Navigations with Cache Components, App Shells, and Partial Prefetching.',
+    'Neurodiversity Nation: Amplifying Voices — discover and listen to every episode in one focused podcast experience.',
   title: {
-    default: 'NextBeats',
-    template: '%s · NextBeats',
+    default: 'Neurodiversity Nation: Amplifying Voices',
+    template: '%s · Neurodiversity Nation: Amplifying Voices',
   },
 };
 

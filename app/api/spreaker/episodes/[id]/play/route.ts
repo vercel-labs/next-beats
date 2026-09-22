@@ -12,7 +12,7 @@ export async function GET(
   }
 
   const headers: HeadersInit = { Accept: 'audio/mpeg, audio/*;q=0.9, */*;q=0.1' };
-  const token = process.env.SPREAKER_ACCESS_TOKEN;
+  const token = process.env.SPREAKER_API_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;
 
   let response: Response;

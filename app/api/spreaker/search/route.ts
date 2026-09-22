@@ -1,7 +1,24 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const SPREAKER_API_URL = 'https://api.spreaker.com/v2/search';
+const SPREAKER_API_URL = 'https://api.spreaker.com/v2';
+const FEATURED_SHOW_ID = '5972496';
+
+function belongsToFeaturedShow(item: unknown) {
+  if (!item || typeof item !== 'object') return false;
+  const value = item as Record<string, unknown>;
+  const nestedShow = value.show && typeof value.show === 'object' ? value.show as Record<string, unknown> : null;
+  return [value.show_id, value.showId, nestedShow?.show_id, nestedShow?.id].some(id => String(id ?? '') === FEATURED_SHOW_ID);
+}
+
+type SpreakerResponse = { response?: { items?: unknown[]; user?: { user_id?: string | number; id?: string | number } } };
+
+async function spreakerFetch(path: string, token: string) {
+  return fetch(`${SPREAKER_API_URL}${path}`, {
+    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+    next: { revalidate: 300 },
+  });
+}
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get('q')?.trim();
@@ -10,21 +27,20 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'A search query is required.' }, { status: 400 });
   }
 
-  const params = new URLSearchParams({
-    limit: '20',
-    q: query,
-    type,
-  });
-  const headers: HeadersInit = { Accept: 'application/json' };
-  const token = process.env.SPREAKER_ACCESS_TOKEN;
-  if (token) headers.Authorization = `Bearer ${token}`;
+  const token = process.env.SPREAKER_API_TOKEN;
+  if (!token) return NextResponse.json({ error: 'Spreaker API is not configured.' }, { status: 503 });
 
   let response: Response;
   try {
-    response = await fetch(`${SPREAKER_API_URL}?${params}`, {
-      headers,
-      next: { revalidate: 300 },
-    });
+    const meResponse = await spreakerFetch('/me', token);
+    if (!meResponse.ok) return NextResponse.json({ error: 'Spreaker profile authentication failed.' }, { status: 502 });
+    const mePayload = await meResponse.json() as SpreakerResponse;
+    const profile = mePayload.response?.user;
+    const profileId = profile?.user_id ?? profile?.id;
+    if (profileId === undefined || profileId === null) return NextResponse.json({ error: 'Spreaker profile could not be identified.' }, { status: 502 });
+
+    const params = new URLSearchParams({ limit: '20', q: query, type });
+    response = await spreakerFetch(`/search/users/${encodeURIComponent(String(profileId))}?${params}`, token);
   } catch {
     return NextResponse.json(
       { error: 'Spreaker is temporarily unavailable. Please try again.' },
@@ -40,9 +56,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  let payload: { response?: { items?: unknown[] } };
+  let payload: SpreakerResponse;
   try {
-    payload = await response.json();
+    payload = await response.json() as SpreakerResponse;
   } catch {
     return NextResponse.json(
       { error: 'Spreaker returned an invalid response.' },
@@ -50,7 +66,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const episodes = Array.isArray(payload.response?.items) ? payload.response.items : [];
+  const episodes = (Array.isArray(payload.response?.items) ? payload.response.items : []).filter(belongsToFeaturedShow);
   const normalizedEpisodes = episodes.flatMap(item => {
     if (!item || typeof item !== 'object') return [];
     const episode = item as Record<string, unknown>;

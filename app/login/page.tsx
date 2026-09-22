@@ -16,7 +16,7 @@ export default function LoginPage() {
       <section className="border-divider bg-surface/95 dark:border-divider-dark dark:bg-surface-dark/95 relative z-20 w-full max-w-sm rounded-2xl border p-6 shadow-2xl backdrop-blur-xl sm:p-8">
         <div className="flex items-center justify-center gap-2 text-2xl font-bold tracking-tight">
           <MusicNote size={28} className="text-accent" />
-          <span>NextBeats</span>
+          <span>Neurodiversity Nation</span>
         </div>
         <div className="mt-8">
           <SignInForm />

@@ -93,6 +93,47 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!track || typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      album: track.album || 'NextBeats',
+      artist: track.artist || 'NextBeats',
+      artwork: track.imageUrl ? [{ sizes: '512x512', src: track.imageUrl, type: 'image/jpeg' }] : [],
+      title: track.title,
+    });
+    navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+    if (typeof navigator.mediaSession.setPositionState === 'function' && track.duration > 0) {
+      navigator.mediaSession.setPositionState({
+        duration: track.duration,
+        playbackRate: 1,
+        position: Math.min((progress / 100) * track.duration, track.duration),
+      });
+    }
+  }, [isPlaying, progress, track]);
+
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+
+    const setAction = (action: MediaSessionAction, handler: () => void) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch {
+        // Some browsers expose only a subset of Media Session actions.
+      }
+    };
+    setAction('play', resume);
+    setAction('pause', pause);
+    setAction('nexttrack', next);
+    setAction('previoustrack', previous);
+    return () => {
+      for (const action of ['play', 'pause', 'nexttrack', 'previoustrack'] as MediaSessionAction[]) {
+        try { navigator.mediaSession.setActionHandler(action, null); } catch {}
+      }
+    };
+  }, [next, pause, previous, resume]);
+
+  useEffect(() => {
     const refs = audioRef.current;
     refs.volume = volume;
     for (const bar of refs.bars) {
