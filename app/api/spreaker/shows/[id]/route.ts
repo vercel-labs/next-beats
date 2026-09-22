@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  if (id !== '5972496') return NextResponse.json({ error: 'Show unavailable.' }, { status: 404 });
   const headers: HeadersInit = { Accept: 'application/json' };
   const token = process.env.SPREAKER_API_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;

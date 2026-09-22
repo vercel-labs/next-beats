@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const SPREAKER_API_URL = 'https://api.spreaker.com/v2';
+const FEATURED_SHOW_ID = '5972496';
+
+function belongsToFeaturedShow(item: unknown) {
+  if (!item || typeof item !== 'object') return false;
+  const value = item as Record<string, unknown>;
+  const nestedShow = value.show && typeof value.show === 'object' ? value.show as Record<string, unknown> : null;
+  return [value.show_id, value.showId, nestedShow?.show_id, nestedShow?.id].some(id => String(id ?? '') === FEATURED_SHOW_ID);
+}
 
 type SpreakerResponse = { response?: { items?: unknown[]; user?: { user_id?: string | number; id?: string | number } } };
 
@@ -58,7 +66,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const episodes = Array.isArray(payload.response?.items) ? payload.response.items : [];
+  const episodes = (Array.isArray(payload.response?.items) ? payload.response.items : []).filter(belongsToFeaturedShow);
   const normalizedEpisodes = episodes.flatMap(item => {
     if (!item || typeof item !== 'object') return [];
     const episode = item as Record<string, unknown>;
