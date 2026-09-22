@@ -1,6 +1,8 @@
-import { PageWrapper } from '@/components/ui/page-layout';
-import { PodcastShowDetail } from '@/features/podcast/components/podcast-detail';
+import { ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
+import { PageWrapper } from '@/components/ui/page-layout';
+import { AccessibilityControls } from '@/features/accessibility/components/accessibility-controls';
+import { PodcastShowDetail } from '@/features/podcast/components/podcast-detail';
 
 const FEATURED_SHOW_ID = '5972496';
 
@@ -13,7 +15,21 @@ export default function PodcastsPage() {
   return (
     <PageWrapper>
       <PodcastShowDetail id={FEATURED_SHOW_ID} />
-      <section className="mt-10 space-y-6" aria-labelledby="about-podcast">
+      <section className="mt-10" aria-labelledby="explore-podcast">
+        <div className="mb-4"><p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">Explore the show</p><h2 id="explore-podcast" className="mt-1 text-2xl font-bold">Find your way in</h2></div>
+        <div className="flex flex-wrap gap-2" aria-label="Podcast topics">
+          {['Lived experience', 'Caregiving', 'Education', 'Advocacy', 'Intersectional health', 'Interviews'].map(topic => <span key={topic} className="rounded-full bg-accent/10 px-3 py-2 text-sm font-semibold text-accent">{topic}</span>)}
+        </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {[
+            ['Spotify', 'https://open.spotify.com'],
+            ['JioSaavn', 'https://www.jiosaavn.com'],
+            ['Amazon Music', 'https://music.amazon.com'],
+            ['Spreaker', 'https://www.spreaker.com/podcast/neurodiversity-nation-amplifying-voices--5972496'],
+          ].map(([label, href]) => <a key={label} href={href} target="_blank" rel="noreferrer" className="border-divider dark:border-divider-dark text-muted hover:border-accent hover:text-accent inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold">{label}<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" /></a>)}
+        </div>
+      </section>
+      <section className="mt-6" aria-labelledby="about-podcast">
         <div>
           <p className="text-accent text-xs font-bold uppercase tracking-[0.18em]">The mission</p>
           <h2 id="about-podcast" className="mt-1 text-2xl font-bold tracking-tight">Stories that make room for every voice.</h2>
@@ -36,6 +52,7 @@ export default function PodcastsPage() {
           </ul>
         </div>
       </section>
+      <div className="mt-6"><AccessibilityControls /></div>
     </PageWrapper>
   );
 }
