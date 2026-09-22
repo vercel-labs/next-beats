@@ -55,7 +55,11 @@ export function Sidebar() {
             <Headphones className="h-5 w-5" />
             <span className="hidden truncate lg:inline">Podcasts</span>
           </NavLink>
-<NavLink href="/cart" aria-label="Shopping bag" className={sidebarLink}>
+          <NavLink href="/library" aria-label="Library" className={sidebarLink}>
+            <Library className="h-5 w-5" />
+            <span className="hidden truncate lg:inline">Library</span>
+          </NavLink>
+          <NavLink href="/cart" aria-label="Shopping bag" className={sidebarLink}>
   <ShoppingBag className="h-5 w-5" />
   <span className="hidden truncate lg:inline">Bag</span>
   </NavLink>
