@@ -3,7 +3,7 @@
 import { Play, Share2, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePlayer } from '@/providers/player-provider';
 import type { Track } from '@/types/track';
 
@@ -18,6 +18,8 @@ export function PodcastShowDetail({ id }: { id: string }) {
   const [show, setShow] = useState<Entity | null>(null);
   const [episodes, setEpisodes] = useState<Entity[]>([]);
   const [error, setError] = useState('');
+  const [episodeQuery, setEpisodeQuery] = useState('');
+  const filteredEpisodes = useMemo(() => episodes.filter(episode => episodeTitle(episode).toLowerCase().includes(episodeQuery.toLowerCase().trim())), [episodes, episodeQuery]);
   useEffect(() => { Promise.all([fetch(`/api/spreaker/shows/${id}`).then(r => r.json()), fetch(`/api/spreaker/shows/${id}/episodes`).then(r => r.json())]).then(([showData, episodeData]) => { if (showData.error || episodeData.error) { setError(showData.error ?? episodeData.error); return; } setShow(normalize(showData)); const items = normalize(episodeData).items; setEpisodes(Array.isArray(items) ? items as Entity[] : []); }).catch(() => setError('This podcast is unavailable right now.')); }, [id]);
   if (error) return <p className="text-muted" role="alert">{error}</p>;
   if (!show) return <p className="text-muted">Loading show…</p>;
@@ -38,8 +40,9 @@ export function PodcastShowDetail({ id }: { id: string }) {
       </div>
     </header>
     <section>
-      <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-muted text-xs font-semibold uppercase tracking-[0.16em]">Latest from the show</p><h2 className="mt-1 text-2xl font-bold">Recent episodes</h2></div><span className="text-muted hidden text-sm sm:block">Tap an episode to listen</span></div>
-      <div className="space-y-3">{episodes.map(episode => <EpisodeRow key={String(episode.episode_id ?? episode.id)} episode={episode} />)}</div>
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-muted text-xs font-semibold uppercase tracking-[0.16em]">Latest from the show</p><h2 className="mt-1 text-2xl font-bold">Recent episodes</h2></div><label className="relative block sm:w-64"><span className="sr-only">Filter episodes</span><input value={episodeQuery} onChange={event => setEpisodeQuery(event.target.value)} placeholder="Find an episode" className="border-divider dark:border-divider-dark bg-background w-full rounded-full border px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted focus:border-accent" /></label></div>
+      <div className="space-y-3">{filteredEpisodes.map(episode => <EpisodeRow key={String(episode.episode_id ?? episode.id)} episode={episode} />)}</div>
+      {episodeQuery && filteredEpisodes.length === 0 ? <p className="text-muted rounded-xl border border-dashed p-5 text-sm">No episodes match “{episodeQuery}”.</p> : null}
     </section>
   </div>;
 }
