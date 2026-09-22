@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { PageWrapper } from '@/components/ui/page-layout';
 import { MerchGrid } from '@/features/merch/components/merch-grid';
 import { PodcastSearch } from '@/features/podcast/components/podcast-search';
+import { RecentPodcastCategories } from '@/features/podcast/components/recent-podcast-categories';
 import { getMerchProducts, isShopifyConfigured } from '@/lib/shopify/storefront';
 
 export default async function HomePage() {
@@ -19,6 +20,7 @@ export default async function HomePage() {
           <Link href="/merch" className="border-divider dark:border-divider-dark inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold"><ShoppingBag className="h-4 w-4" /> Shop merch</Link>
         </div>
       </section>
+      <RecentPodcastCategories />
       <section className="mb-10">
         <div className="mb-4 flex items-center justify-between gap-3"><h2>Find a podcast</h2><Link href="/search" className="text-accent text-sm font-semibold">Search all</Link></div>
         <PodcastSearch query="" />
