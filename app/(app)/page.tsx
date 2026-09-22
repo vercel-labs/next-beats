@@ -23,7 +23,7 @@ export default async function HomePage() {
       <RecentPodcastCategories />
       <section className="mb-10">
         <div className="mb-4 flex items-center justify-between gap-3"><h2>Find a podcast</h2><Link href="/search" className="text-accent text-sm font-semibold">Search all</Link></div>
-        <PodcastSearch query="" />
+        <PodcastSearch query="Neurodiversity Nation" />
       </section>
       <section>
         <div className="mb-4 flex items-center justify-between gap-3"><h2>Featured merch</h2><Link href="/merch" className="text-accent text-sm font-semibold">View catalog</Link></div>

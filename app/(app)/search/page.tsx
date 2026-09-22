@@ -22,7 +22,7 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
                 return (
                   <>
                     <h2 className="mb-4">Discover podcasts</h2>
-                    <PodcastSearch query="" />
+                    <PodcastSearch query="Neurodiversity Nation" />
                   </>
                 );
               }
