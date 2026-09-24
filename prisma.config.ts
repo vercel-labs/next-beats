@@ -5,10 +5,10 @@ loadEnv({ path: '.env.local' });
 loadEnv({ path: '.env' });
 
 const url = process.env.DATABASE_URL;
-if (!url) throw new Error('DATABASE_URL is not set');
+// Client generation does not need a database connection, including on fresh installs.
 
 export default defineConfig({
-  datasource: { url },
+  ...(url ? { datasource: { url } } : {}),
   migrations: {
     seed: 'tsx prisma/seed.ts',
   },

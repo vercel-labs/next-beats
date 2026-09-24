@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
 const createPlaylistSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
+  name: z.string().trim().min(1, 'Name is required').max(100),
 });
 const idSchema = z.string().min(1);
 

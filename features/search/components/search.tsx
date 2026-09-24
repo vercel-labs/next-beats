@@ -1,6 +1,7 @@
 'use client';
 
 import { Search as SearchIcon } from 'lucide-react';
+import Form from 'next/form';
 import { useRouter } from 'next/navigation';
 import { useId, useRef, useTransition } from 'react';
 import { SeedFromSearchParam } from '@/components/scripts/seed-from-search-param';
@@ -17,7 +18,7 @@ export function Search({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="relative mb-8 flex items-center">
+      <Form action="/search" replace scroll={false} className="relative mb-8 flex items-center">
         <SearchIcon className="text-gray pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
         <input
           ref={inputRef}
@@ -39,7 +40,7 @@ export function Search({ children }: { children: React.ReactNode }) {
           className="!rounded-full !py-3 !pr-4 !pl-12 !text-base"
         />
         <SeedFromSearchParam targetId={inputId} param="q" />
-      </div>
+      </Form>
       <div
         className="transition-opacity duration-200 ease-out data-pending:opacity-60"
         data-pending={isPending ? '' : undefined}
