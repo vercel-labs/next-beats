@@ -1,6 +1,6 @@
 import { PageWrapper } from '@/components/ui/page-layout';
 
-export default async function PlaylistDetailPage(_props: PageProps<'/playlist/[id]'>) {
+export default function PlaylistDetailPage(_props: PageProps<'/playlist/[id]'>) {
   return (
     <PageWrapper>
       {/* Playlist detail */}
