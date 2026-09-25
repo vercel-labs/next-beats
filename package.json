@@ -57,7 +57,7 @@
     "@vgpu/wgsl": "0.3.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.4.0-canary.42",
+    "eslint-config-next": "16.4.0-canary.45",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-autofix": "^2.2.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
