@@ -10,6 +10,7 @@ export function PlaylistCard({ playlist }: { playlist: PlaylistWithTracks }) {
   const trackIds = playlist.tracks.map(track => track.id);
   return (
     <Link
+      prefetch={true}
       href={`/playlist/${playlist.id}`}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >

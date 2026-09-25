@@ -17,6 +17,7 @@ export function IconButtonLink({
 }) {
   return (
     <Link
+      prefetch={true}
       href={href as Route}
       className={cn(
         'text-gray rounded-full p-1 transition-colors hover:bg-black/10 hover:text-black dark:hover:bg-white/10 dark:hover:text-white',

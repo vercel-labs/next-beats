@@ -1,0 +1,12 @@
+{
+  "Cache user playlists": {
+    "scope": "typescript,typescriptreact",
+    "prefix": "cacheplaylists",
+    "body": [
+      "'use cache';",
+      "cacheTag(`user:\\${userId}:playlists`);",
+      "cacheLife('hours');"
+    ],
+    "description": "Cache playlists by user for hours"
+  }
+}

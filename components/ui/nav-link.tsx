@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import type { Route } from 'next';
 
 type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 'href'> & {
   href: Route<T> | URL;
+  hoverPrefetch?: boolean;
 };
 
 // `useSelectedLayoutSegments` is dynamic under `cacheComponents`, so the
@@ -28,11 +29,29 @@ function ActiveLink<T extends string>(props: Props<T>) {
   return <NavLinkShell {...props} isActive={isActive} />;
 }
 
-function NavLinkShell<T extends string>({ href, isActive, ...rest }: Props<T> & { isActive: boolean }) {
+function NavLinkShell<T extends string>({
+  href,
+  isActive,
+  hoverPrefetch = false,
+  prefetch = true,
+  onMouseEnter,
+  onFocus,
+  ...rest
+}: Props<T> & { isActive: boolean }) {
+  const [intent, setIntent] = useState(false);
   return (
     <Link
       {...rest}
       href={href as Route}
+      prefetch={hoverPrefetch && !intent ? null : prefetch}
+      onMouseEnter={event => {
+        if (hoverPrefetch) setIntent(true);
+        onMouseEnter?.(event);
+      }}
+      onFocus={event => {
+        if (hoverPrefetch) setIntent(true);
+        onFocus?.(event);
+      }}
       data-nav-link
       aria-current={isActive ? 'page' : undefined}
       suppressHydrationWarning

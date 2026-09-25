@@ -101,7 +101,13 @@ async function SidebarPlaylists() {
   return (
     <div className="flex flex-col gap-0.5">
       {playlists.map(pl => (
-        <NavLink key={pl.id} href={`/playlist/${pl.id}` as Route} aria-label={pl.name} className={sidebarLink}>
+        <NavLink
+          hoverPrefetch
+          key={pl.id}
+          href={`/playlist/${pl.id}` as Route}
+          aria-label={pl.name}
+          className={sidebarLink}
+        >
           <span className={`inline-block h-3 w-3 shrink-0 rounded-sm bg-gradient-to-br ${pl.coverColor}`} />
           <span className="hidden truncate lg:inline">{pl.name}</span>
         </NavLink>

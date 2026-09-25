@@ -8,6 +8,7 @@ import type { Track } from '@/types/track';
 export function AlbumCard({ track }: { track: Track }) {
   return (
     <Link
+      prefetch={true}
       href={`/track/${track.id}`}
       className="group bg-card/50 hover:bg-card dark:bg-card-dark/50 dark:hover:bg-card-dark flex flex-col gap-3 rounded-lg p-3 transition-colors"
     >
