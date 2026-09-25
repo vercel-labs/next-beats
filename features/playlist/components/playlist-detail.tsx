@@ -51,7 +51,10 @@ export function PlaylistDetailSkeleton() {
   return (
     <>
       <div className="mb-8 flex flex-col items-center gap-4 sm:flex-row sm:items-end sm:gap-6">
-        <Skeleton className="skeleton-subtle h-40 w-40 shrink-0 rounded-md shadow-2xl sm:h-48 sm:w-48" />
+        <span
+          aria-hidden
+          className="dark:bg-divider-dark block h-40 w-40 shrink-0 rounded-md bg-zinc-300 shadow-2xl sm:h-48 sm:w-48"
+        />
         <div className="flex flex-col items-center gap-1 sm:items-start">
           <Skeleton className="h-3 w-16" />
           <Skeleton className="h-9 w-44 sm:h-11 sm:w-52" />
