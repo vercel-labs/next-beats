@@ -58,11 +58,11 @@ export function Sidebar() {
       </div>
 
       <div className="bg-card dark:bg-card-dark flex min-h-0 flex-1 flex-col rounded-lg">
-        <div className="flex items-center gap-2 px-3 py-3 lg:px-4">
+        <div className="flex flex-col items-center gap-1 px-2 py-3 lg:flex-row lg:gap-2 lg:px-4">
           <Library className="text-gray h-5 w-5 shrink-0" />
           <span className="text-gray hidden text-sm font-bold lg:inline">Your Library</span>
-          <Suspense fallback={<IconButtonLinkSkeleton className="ml-auto hidden lg:block" />}>
-            <IconButtonLink href="/playlist" label="Create playlist" className="ml-auto hidden lg:block">
+          <Suspense fallback={<IconButtonLinkSkeleton className="lg:ml-auto" />}>
+            <IconButtonLink href="/playlist" label="Create playlist" className="lg:ml-auto">
               <Plus className="h-5 w-5" />
             </IconButtonLink>
           </Suspense>
