@@ -30,4 +30,22 @@ test.describe('Playlist detail page (/playlist/[id])', () => {
       await expect(page.getByRole('heading', { exact: true, name: heading })).toBeVisible();
     });
   });
+
+  test('sidebar hover prefetches playlist details before navigation', async ({ page }) => {
+    await page.goto('/');
+    const link = page.locator('aside a[href^="/playlist/"]').first();
+    await link.waitFor({ state: 'visible', timeout: 15000 });
+    const href = await link.getAttribute('href');
+    if (!href) throw new Error('Expected the playlist link to have an href');
+    const heading = await link.getAttribute('aria-label');
+    if (!heading) throw new Error('Expected the playlist link to have a label');
+
+    await link.hover();
+
+    await instant(page, async () => {
+      await link.click();
+      await page.waitForURL(url => url.pathname === href);
+      await expect(page.getByRole('heading', { exact: true, name: heading })).toBeVisible();
+    });
+  });
 });
