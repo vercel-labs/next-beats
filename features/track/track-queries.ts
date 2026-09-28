@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, unstable_navigation as navigation } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
@@ -161,7 +161,6 @@ async function getTracksByGenreCached(genre: string, slow: boolean) {
 }
 
 export async function getRecommendedTracks(excludeTrackId: string, limit: number = 5) {
-  await navigation();
   const userId = await verifyAuth();
   return getRecommendedTracksForUser(excludeTrackId, userId, limit, await isSlowEnabled());
 }
