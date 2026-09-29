@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, unstable_navigation as navigation } from 'next/cache';
+import { cacheLife, cacheTag, navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';

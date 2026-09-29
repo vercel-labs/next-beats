@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { createHash } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../generated/prisma/client';
 import { normalizeDatabaseUrl } from '../lib/database-url';
@@ -590,8 +591,19 @@ async function main() {
   }
   console.log(`  ${PLAYLISTS.length} playlists created`);
 
-  await prisma.user.create({ data: { id: 'e2e', name: 'E2E Tester' } });
-  console.log('  e2e test user created');
+  await prisma.user.create({
+    data: {
+      id: 'guest',
+      name: 'Guest',
+      sessions: {
+        create: {
+          expiresAt: new Date('2100-01-01T00:00:00.000Z'),
+          tokenHash: createHash('sha256').update('e2e-session-token').digest('hex'),
+        },
+      },
+    },
+  });
+  console.log('  guest user created');
 
   console.log('Seed complete.');
 }

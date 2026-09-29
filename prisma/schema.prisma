@@ -15,6 +15,20 @@ model User {
   favorites  UserFavorite[]
   trackPlays UserTrackPlay[]
   playlists  Playlist[]
+  sessions   Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Track {

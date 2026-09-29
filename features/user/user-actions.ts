@@ -4,8 +4,14 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
-
-const SESSION_COOKIE = 'beats-user';
+import {
+  createSessionToken,
+  GUEST_USER_ID,
+  getSessionExpiration,
+  hashSessionToken,
+  SESSION_COOKIE,
+  SESSION_MAX_AGE_SECONDS,
+} from './session';
 
 const signInSchema = z.object({
   email: z.preprocess(
@@ -20,29 +26,43 @@ export async function signIn(formData: FormData) {
     return { error: parsed.error.issues[0].message, ok: false as const };
   }
 
-  let userId: string;
+  const token = createSessionToken();
+  const session = {
+    expiresAt: getSessionExpiration(),
+    tokenHash: hashSessionToken(token),
+  };
   try {
-    const user = await prisma.user.upsert({
-      create: { name: parsed.data.email },
-      update: {},
-      where: { name: parsed.data.email },
+    // The submitted email is only a demo affordance. It never selects an account.
+    await prisma.user.upsert({
+      create: {
+        id: GUEST_USER_ID,
+        name: 'Guest',
+        sessions: { create: session },
+      },
+      update: { sessions: { create: session } },
+      where: { id: GUEST_USER_ID },
     });
-    userId = user.id;
   } catch {
     return { error: 'Could not sign you in. Please try again.', ok: false as const };
   }
 
   const store = await cookies();
-  store.set(SESSION_COOKIE, userId, {
-    maxAge: 60 * 60 * 24 * 30,
+  store.set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    maxAge: SESSION_MAX_AGE_SECONDS,
     path: '/',
-    sameSite: 'lax', // 30 days
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
   });
   redirect('/');
 }
 
 export async function signOut() {
   const store = await cookies();
+  const token = store.get(SESSION_COOKIE)?.value;
+  if (token) {
+    await prisma.session.deleteMany({ where: { tokenHash: hashSessionToken(token) } }).catch(() => undefined);
+  }
   store.delete(SESSION_COOKIE);
   redirect('/login');
 }

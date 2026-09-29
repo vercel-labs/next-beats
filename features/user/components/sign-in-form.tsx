@@ -33,7 +33,7 @@ export function SignInForm() {
         aria-describedby={state?.error ? 'sign-in-hint sign-in-error' : 'sign-in-hint'}
       />
       <p id="sign-in-hint" className="text-muted -mt-1 text-xs">
-        Any fake email works.
+        Any email works. Everyone signs into the shared guest account.
       </p>
       {state?.error ? (
         <p id="sign-in-error" role="alert" className="text-sm text-red-500">
@@ -41,7 +41,7 @@ export function SignInForm() {
         </p>
       ) : null}
       <Button type="submit" className="w-full">
-        Sign in
+        Continue as guest
       </Button>
     </form>
   );

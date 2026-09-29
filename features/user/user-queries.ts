@@ -4,18 +4,22 @@ import { cacheLife } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
-
-const SESSION_COOKIE = 'beats-user';
+import { hashSessionToken, SESSION_COOKIE } from './session';
 
 export async function getCurrentUser() {
   'use cache: private';
-  cacheLife({ stale: Infinity });
+  cacheLife('seconds');
 
   const store = await cookies();
-  const userId = store.get(SESSION_COOKIE)?.value;
-  if (!userId) return '';
-  const exists = await prisma.user.findUnique({ select: { id: true }, where: { id: userId } });
-  return exists?.id ?? '';
+  const token = store.get(SESSION_COOKIE)?.value;
+  if (!token) return '';
+
+  const session = await prisma.session.findUnique({
+    select: { expiresAt: true, user: { select: { id: true } } },
+    where: { tokenHash: hashSessionToken(token) },
+  });
+  if (!session || session.expiresAt <= new Date()) return '';
+  return session.user.id;
 }
 
 export async function getCurrentUserName() {
